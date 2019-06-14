@@ -25,10 +25,10 @@ export class Buttons {
         this.skipButton.show()
         this.backButton.show()
         this.statusButton.show()
-        this.statusButton.command = 'LetMePlayTheMusic.browserlaunch'
-        this.playButton.command = 'LetMePlayTheMusic.playpause'
-        this.backButton.command = 'LetMePlayTheMusic.back'
-        this.skipButton.command = 'LetMePlayTheMusic.skip'
+        this.statusButton.command = 'lmptm.browserlaunch'
+        this.playButton.command = 'lmptm.playpause'
+        this.backButton.command = 'lmptm.back'
+        this.skipButton.command = 'lmptm.skip'
     }
 
     setLauchedState(boolean: true | false) {
