@@ -6,36 +6,37 @@ import * as whichChrome from 'which-chrome'
 import { Buttons } from './buttons'
 import { Browser } from './browser'
 
-let browser: Browser
-
 export function activate(context: vscode.ExtensionContext) {
-  new Buttons()
-  const d1 = vscode.commands.registerCommand('lmptm.browserlaunch', browserLaunch)
+  const buttons = new Buttons
+  const d1 = vscode.commands.registerCommand('lmptm.browserlaunch', () => browserLaunch(buttons))
   const d2 = vscode.commands.registerCommand('lmptm.playpause', playpause)
   const d3 = vscode.commands.registerCommand('lmptm.skip', skip)
   const d4 = vscode.commands.registerCommand('lmptm.back', back)
   context.subscriptions.concat([d1, d2, d3, d4])
 }
 
-function browserLaunch() {
+function browserLaunch(buttons: Buttons) {
   const chromePath = whichChrome.Chrome || whichChrome.Chromium
   if (!chromePath) {
     vscode.window.showErrorMessage(`No Chrome or Chromium installation found! 😕`)
   } else {
-    if (!browser) browser = new Browser()
+    Browser.launch(buttons)
   }
 }
 
 function playpause() {
-  browser.playPause()
+  if (Browser.activeBrowser)
+    Browser.activeBrowser.playPause()
 }
 
 function skip() {
-  browser.skip()
+  if (Browser.activeBrowser)
+    Browser.activeBrowser.skip()
 }
 
 function back() {
-  browser.back()
+  if (Browser.activeBrowser)
+    Browser.activeBrowser.back()
 }
 
-export function deactivate() {}
+export function deactivate() { }
