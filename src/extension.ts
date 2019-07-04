@@ -9,10 +9,11 @@ import { Browser } from './browser'
 export function activate(context: vscode.ExtensionContext) {
   const buttons = new Buttons
   const d1 = vscode.commands.registerCommand('lmptm.browserlaunch', () => browserLaunch(buttons))
-  const d2 = vscode.commands.registerCommand('lmptm.playpause', playpause)
-  const d3 = vscode.commands.registerCommand('lmptm.skip', skip)
-  const d4 = vscode.commands.registerCommand('lmptm.back', back)
-  context.subscriptions.concat([d1, d2, d3, d4])
+  const d2 = vscode.commands.registerCommand('lmptm.play', play)
+  const d3 = vscode.commands.registerCommand('lmptm.pause', pause)
+  const d4 = vscode.commands.registerCommand('lmptm.skip', skip)
+  const d5 = vscode.commands.registerCommand('lmptm.back', back)
+  context.subscriptions.concat([d1, d2, d3, d4, d5])
 }
 
 function browserLaunch(buttons: Buttons) {
@@ -24,9 +25,14 @@ function browserLaunch(buttons: Buttons) {
   }
 }
 
-function playpause() {
+function play() {
   if (Browser.activeBrowser)
-    Browser.activeBrowser.playPause()
+    Browser.activeBrowser.play()
+}
+
+function pause() {
+  if (Browser.activeBrowser)
+    Browser.activeBrowser.pause()
 }
 
 function skip() {

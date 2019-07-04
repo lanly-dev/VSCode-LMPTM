@@ -28,12 +28,23 @@ export class Buttons {
     this.statusButton.show()
 
     this.statusButton.command = 'lmptm.browserlaunch'
-    this.playButton.command = 'lmptm.playpause'
+    this.playButton.command = 'lmptm.play'
     this.backButton.command = 'lmptm.back'
     this.skipButton.command = 'lmptm.skip'
   }
 
   setStatusButtonText(text: string) {
     this.statusButton.text = text
+  }
+
+  setPlayButton(text: string) {
+    if (text === 'play') {
+      this.playButton.text = '▶'
+      this.playButton.command = 'lmptm.play'
+    }
+    else {
+      this.playButton.text = '||'
+      this.playButton.command = 'lmptm.pause'
+    }
   }
 }
