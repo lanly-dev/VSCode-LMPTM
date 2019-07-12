@@ -17,9 +17,9 @@ export class Buttons {
     this.getPlayState = 'playing'
     this.broswerLaunched = false
 
-    this.playButton.text = '▶'
-    this.skipButton.text = '⏭'
-    this.backButton.text = '⏮'
+    this.playButton.text = '▶️'
+    this.skipButton.text = '⏭️'
+    this.backButton.text = '⏮️'
     this.statusButton.text = 'Launch'
 
     this.playButton.show()
@@ -39,11 +39,11 @@ export class Buttons {
 
   setPlayButton(text: string) {
     if (text === 'play') {
-      this.playButton.text = '▶'
+      this.playButton.text = '▶️'
       this.playButton.command = 'lmptm.play'
     }
     else {
-      this.playButton.text = '||'
+      this.playButton.text = '⏸️'
       this.playButton.command = 'lmptm.pause'
     }
   }
