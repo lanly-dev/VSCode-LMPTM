@@ -14,6 +14,8 @@ export class Browser {
   public static cssPath: string
   public static jsPath: string
   public static uiHtmlPath: string
+  public static faCssPath: string
+  public static faJsPath: string
   private currentBrowser: puppeteer.Browser
   private pages: puppeteer.Page[]
   private selectedPage: puppeteer.Page | undefined
@@ -33,6 +35,8 @@ export class Browser {
         buttons.setStatusButtonText('running')
         Browser.cssPath = path.join(context.extensionPath, 'out', 'resrc', 'style.css')
         Browser.jsPath = path.join(context.extensionPath, 'out', 'resrc', 'script.js')
+        Browser.faCssPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css')
+        Browser.faJsPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'js', 'all.min.js')
         Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'out', 'resrc', 'ui.html'), 'utf8')
         Browser.activeBrowser = new Browser(browser, await browser.pages(), buttons)
       })
@@ -55,7 +59,7 @@ export class Browser {
         Browser.activeBrowser = undefined
       })
       pages.forEach(page => this.setupPageWatcher(page))
-      pages.forEach(page => page.on('load', () => this.setupPageWatcher(page)))
+      // pages.forEach(page => page.on('load', () => this.setupPageWatcher(page)))
     })
   }
 
@@ -92,8 +96,11 @@ export class Browser {
       }
     }, Browser.uiHtmlPath)
 
+    page.addScriptTag({url: 'https://code.jquery.com/jquery-3.4.1.min.js'})
     page.addStyleTag({ path: Browser.cssPath })
     page.addScriptTag({ path: Browser.jsPath })
+    page.addStyleTag({ path: Browser.faCssPath })
+    page.addScriptTag({ path: Browser.faJsPath })
     this.newTabFixed(page)
 
     page.on('close', async () => {
@@ -101,9 +108,19 @@ export class Browser {
       if (Browser.activeBrowser) this.update('page_closed', page.target())
     })
 
-    page.exposeFunction('pageSelected', _e => {
-      this.update('pageSelected', page.target())
-    })
+    // @ts-ignore
+    if (!page._pageBindings.has('pageSelected')) {
+      page.exposeFunction('pageSelected', e => {
+        this.update('pageSelected', page.target())
+        if (page !== this.selectedPage) {
+          this.selectedPage = page
+          this.setupMusicPage()
+        }
+        if (e.brand !== this.selectedMusicPageBrand) {
+          this.selectedMusicPageBrand = e.brand
+        }
+      })
+    }
   }
 
   private newTabFixed(page: puppeteer.Page) {
@@ -122,41 +139,29 @@ export class Browser {
     }, Browser.uiHtmlPath)
   }
 
+  private setupMusicPage() {
+    const page = this.selectedPage
+    if (!page) return
+    // @ts-ignore
+    if (!page._pageBindings.has('onUserClick')) {
+      page.exposeFunction('onUserClick', _e => {
+        this.update('click', page.target())
+      })
+    }
 
-  // private setupPage(page: puppeteer.Page) {
-  //   // @ts-ignore
-  //   if (!page._pageBindings.has('onPlayClick')) {
-  //     page.exposeFunction('onPlayClick', _e => {
-  //       this.update('click', page.target())
-  //     })
-  //   }
+    page.evaluate((type) => {
+      // @ts-ignore
+      document.addEventListener(type, e => {
+        // @ts-ignore
+        window.onUserClick({ type })
+      })
+    }, 'click')
 
-  //   page.evaluate((type) => {
-  //     // @ts-ignore
-  //     document.addEventListener(type, e => {
-  //       // @ts-ignore
-  //       window.onPlayClick({ type })
-  //     })
-  //   }, 'click')
-
-  //   const cssPath = path.join(this.context.extensionPath, 'out', 'resrc', 'style.css')
-  //   const uiHtmlPath = fs.readFileSync(path.join(this.context.extensionPath, 'out', 'resrc', 'ui.html'), 'utf8')
-  //   page.addStyleTag({ path: cssPath })
-  //   // page.addStyleTag({content: '#columns {background: red !important;}'})
-
-  //   // @ts-ignore
-  //   page.evaluateOnNewDocument(uiHtmlPath => {
-  //     const div = document.createElement('div')
-  //     div.innerHTML = uiHtmlPath
-  //     console.log('asdfasdfasdfadsfa')
-  //     document.getElementsByTagName('body')[0].appendChild(div)
-  //   }, uiHtmlPath)
-
-  //   page.on('close', async () => {
-  //     await new Promise(resolve => setTimeout(() => resolve(), 1000))
-  //     if (Browser.activeBrowser) this.update('page_closed', page.target())
-  //   })
-  // }
+    page.on('close', async () => {
+      await new Promise(resolve => setTimeout(() => resolve(), 1000))
+      if (Browser.activeBrowser) this.update('music_page_closed', page.target())
+    })
+  }
 
   private async updatePages() {
     this.pages = await this.currentBrowser.pages()
@@ -183,12 +188,7 @@ export class Browser {
 
   private async closeEventUpdate() {
     this.buttons.setPlayButton('pause')
-    this.selectedPage = await this.updatePages()
-    const pStatus = await this.getPlayingStatus(this.selectedPage)
-    if (pStatus.brand !== 'other') {
-      this.selectedMusicPageBrand = pStatus.brand
-      this.buttons.setPlayButton(pStatus.status)
-    }
+    this.selectedPage = undefined
   }
 
   private async getPlayingStatus(page: puppeteer.Page) {
@@ -214,8 +214,10 @@ export class Browser {
   private async update(event: string, target: puppeteer.Target) {
     const page = await target.page()
     if (event === 'page_closed') {
-      if (this.selectedPage === page) this.closeEventUpdate()
-      else this.updatePages()
+      this.updatePages()
+    }
+    if (event === 'music_page_closed') {
+      this.closeEventUpdate()
     }
     else if (event === 'page_created') {
       if (page) page.on('load', () => this.setupPageWatcher(page))

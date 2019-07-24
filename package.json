@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.6.2",
+    "@types/node": "^12.6.8",
     "@types/shelljs": "^0.8.5",
     "shelljs": "^0.8.3",
     "ts-node": "^8.3.0",
@@ -41,9 +41,10 @@
     "vscode": "^1.1.35"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.9.0",
     "@types/puppeteer-core": "^1.9.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "puppeteer-core": "^1.18.1",
+    "karma-chrome-launcher": "^3.0.0",
+    "puppeteer-core": "^1.19.0",
     "which-chrome": "^0.1.1"
   }
 }

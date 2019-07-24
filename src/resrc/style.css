@@ -1,16 +1,34 @@
-#columns {
+/* #columns {
   background: red !important;
+} */
+
+.btn-float {
+  position: fixed;
+  width: 70px;
+  height: 30px;
+  bottom: 10px;
+  right: 10px;
+  background-color: #25aff0;
+  color: black;
+  border-radius: 5px;
+  text-align: center;
+  /* box-shadow: 2px 2px 3px #999; */
+  cursor: pointer;
+  box-shadow:
+    1px 0px #3a587f, 0px 1px #4171ae,
+    2px 1px #3a587f, 1px 2px #4171ae,
+    3px 2px #3a587f, 2px 3px #4171ae,
+    4px 3px #3a587f, 3px 4px #4171ae;
 }
 
-.float {
-    position: fixed;
-    width: 60px;
-    height: 30px;
-    bottom: 10px;
-    right: 10px;
-    background-color: red;
-    color: #fff;
-    border-radius: 5px;
-    text-align: center;
-    box-shadow: 2px 2px 3px #999;
-  }
+.youtube {
+  background-color: white;
+  color:red;
+  width: 100px;
+}
+
+.error {
+  background-color: red;
+  color:white;
+  width: 120px;
+}
