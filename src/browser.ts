@@ -1,5 +1,8 @@
-import * as puppeteer from 'puppeteer-core'
 import { URL } from 'url'
+import * as puppeteer from 'puppeteer-core'
+import * as vscode from 'vscode'
+import * as path from 'path'
+import * as fs from 'fs';
 
 // @ts-ignore
 import * as whichChrome from 'which-chrome'
@@ -11,39 +14,44 @@ export class Browser {
   private currentBrowser: puppeteer.Browser
   private pages: puppeteer.Page[]
   private currentPage: puppeteer.Page
-  private currentPlayingType: String | undefined
+  private currentMusicPageBrand: String | undefined
   private buttons: Buttons
+  private context: vscode.ExtensionContext
 
-  public static launch(buttons: Buttons) {
+  public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     const chromePath = whichChrome.Chrome || whichChrome.Chromium
 
     if (!Browser.activeBrowser) {
       puppeteer.launch({
         executablePath: chromePath,
         headless: false,
-        args: ['--incognito']
+        defaultViewport: null,
+        args: ['--incognito', '--window-size=500,500']
       }).then(async browser => {
         buttons.setStatusButtonText('running')
-        Browser.activeBrowser = new Browser(browser, await browser.pages(), buttons)
+        Browser.activeBrowser = new Browser(browser, await browser.pages(), buttons, context)
       })
     }
   }
 
-  constructor(browser: puppeteer.Browser, pages: puppeteer.Page[], buttons: Buttons) {
-    this.currentBrowser = browser
+  constructor(browser: puppeteer.Browser, pages: puppeteer.Page[], buttons: Buttons, context: vscode.ExtensionContext) {
     this.buttons = buttons
-    this.pages = pages
+    this.context = context
+    this.currentBrowser = browser
     this.currentPage = pages[0]
+    this.pages = pages
     this.currentPage.goto('https://youtube.com/')
-    this.currentBrowser.on('targetcreated', target => {console.log('wth'); this.update('page_created', target)})
-    // this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
-    // this.currentBrowser.on('targetdestroyed', target => this.update('destroyed',target))
-    this.currentBrowser.on('disconnected', () => {
-      this.buttons.setStatusButtonText('Launch')
-      Browser.activeBrowser = undefined
-    })
-    pages.forEach(page => {
-      page.on('load', () => this.checkPage(page))
+    const waitABit = new Promise(resolve => setTimeout(() => resolve(), 3000))
+    waitABit.then(() => {
+      this.currentBrowser.on('targetcreated', target => this.update('page_created', target))
+      this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
+      // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
+      this.currentBrowser.on('disconnected', () => {
+        this.buttons.setStatusButtonText('Launch')
+        Browser.activeBrowser = undefined
+      })
+      pages.forEach(page => this.setupPage(page))
+      pages.forEach(page => page.on('load', () => this.setupPage(page)))
     })
   }
 
@@ -65,101 +73,106 @@ export class Browser {
     if (this.currentPage) this.currentPage.goBack()
   }
 
-  private checkPage(page: puppeteer.Page) {
-    this.pageExposeFunc(page)
-    let isMusicPage = false
-    if (page.url().includes('youtube.com/watch')) {
-      this.youtubeClickListener(page)
-      isMusicPage = true
+  private setupPage(page: puppeteer.Page) {
+    // @ts-ignore
+    if (!page._pageBindings.has('onPlayClick')) {
+      page.exposeFunction('onPlayClick', _e => {
+        this.update('click', page.target())
+      })
     }
-    if (isMusicPage) page.on('close', target => this.update('page_closed', target))
-  }
 
-  private updateCurrentPage(page: puppeteer.Page, action: string) {
-    if (action === 'closed') this.updatePages()
-    else if (action === 'switched')
-      this.currentPage = page
-    this.checkPage(page)
+    page.evaluate((type) => {
+      // @ts-ignore
+      document.addEventListener(type, e => {
+        // @ts-ignore
+        window.onPlayClick({ type })
+      })
+    }, 'click')
+
+    const cssPath = path.join(this.context.extensionPath, 'out', 'resrc', 'style.css')
+    const uiHtml = fs.readFileSync(path.join(this.context.extensionPath, 'out', 'resrc', 'ui.html'), 'utf8')
+    page.addStyleTag({ path: cssPath })
+    // page.addStyleTag({content: '#columns {background: red !important;}'})
+
+    // @ts-ignore
+    page.evaluateOnNewDocument(uiHtml => {
+      window.onload = () => {
+        const div = document.createElement('div')
+        div.innerHTML = uiHtml
+        document.getElementsByTagName('body')[0].appendChild(div)
+      }
+    }, uiHtml)
+
+    page.on('close', async () => {
+      await new Promise(resolve => setTimeout(() => resolve(), 1000))
+      if (Browser.activeBrowser) this.update('page_closed', page.target())
+    })
   }
 
   private async updatePages() {
     this.pages = await this.currentBrowser.pages()
+    return this.pages[0]
   }
 
-  private async loadEventCheck() {
-    const element = await this.currentPage.$('.ytp-play-button')
-    const text = await this.currentPage.evaluate(element =>
-      element.getAttribute('aria-label'), element)
-    if (text.includes('Pause')) {
-      this.buttons.setPlayButton('pause')
+  private async changeEventCheck(page: puppeteer.Page) {
+    const pStatus = await this.getPlayingStatus(page)
+    console.log(pStatus.brand, pStatus.status)
+    if (pStatus.brand !== 'other') {
+      if (this.currentPage === page) {
+        this.currentMusicPageBrand = pStatus.brand
+        this.buttons.setPlayButton(pStatus.status)
+      }
+      else {
+        if (pStatus.status === 'play') {
+          this.pause()
+          this.currentMusicPageBrand = pStatus.brand
+          this.buttons.setPlayButton(pStatus.status)
+        }
+      }
     }
   }
 
-  private pageExposeFunc(page: puppeteer.Page) {
-    // @ts-ignore
-    if (!page._pageBindings.has('onPlayClick')) {
-      page.exposeFunction('onPlayClick', e => {
-        const signal = e.isPlaying ? 'pause_clicked' : 'play_clicked'
-        this.update(signal, page.target())
-      })
+  private async closeEventUpdate() {
+    this.buttons.setPlayButton('pause')
+    this.currentPage = await this.updatePages()
+    const pStatus = await this.getPlayingStatus(this.currentPage)
+    if (pStatus.brand !== 'other') {
+      this.currentMusicPageBrand = pStatus.brand
+      this.buttons.setPlayButton(pStatus.status)
     }
   }
 
-  private youtubeClickListener(page: puppeteer.Page) {
-    page.evaluate((type, css) => {
-      const element = document.querySelector(css)
-      if (element)
-        // @ts-ignore
-        element.addEventListener(type, e => {
-          // Can't get immediate reponse
-          const waitAbit = new Promise(resolve => setTimeout(() => resolve(), 1))
-          waitAbit.then(() => { // return after element updated
-            const state = e.target.getAttribute('aria-label')
-            // @ts-ignore
-            window.onPlayClick({ type, isPlaying: state.includes('Play') })
-          })
-        })
-    }, 'click', '.ytp-play-button')
+  private async getPlayingStatus(page: puppeteer.Page) {
+    await new Promise(resolve => setTimeout(() => resolve(), 100))
+    const pageBrand = this.musicPageCheck(page.url())
+    if (pageBrand === 'youtube') {
+      const element = await this.currentPage.$('.ytp-play-button')
+      const text = await this.currentPage.evaluate(element =>
+        { console.log(element.getAttribute('aria-label'))
+          return element.getAttribute('aria-label')}, element)
+      const stt = text.includes('Play') ? 'play' : 'pause'
+      return { brand: pageBrand, status: stt }
+    }
+    return { brand: pageBrand, status: '' }
   }
 
-  private async checkPageOrder() {
-    console.log('---------------------')
-
-    let hello = await this.currentBrowser.pages()
-    hello.forEach((page, index) => {
-      console.log(page.url())
-      console.log(index)
-    })
-    console.log('---------------------')
+  private musicPageCheck(url: string) {
+    if (url.includes('youtube.com/watch')) return 'youtube'
+    else return 'other'
   }
 
-  private async update(event: string, target: any) {
-
+  private async update(event: string, target: puppeteer.Target) {
+    console.log(event)
     const page = await target.page()
     if (event === 'page_closed') {
-      if (page === this.currentPage)
-        this.updateCurrentPage(page, 'closed')
-      else
-        this.updatePages()
-    }
-    else if (event === 'play_clicked') {
-      if (page === this.currentPage)
-        this.buttons.setPlayButton('pause')
-      else {
-        this.pause()
-        this.updateCurrentPage(page, 'switched')
-      }
-    }
-    else if (event === 'pause_clicked') {
-      this.buttons.setPlayButton('play')
+      if (this.currentPage === page) this.closeEventUpdate()
+      else this.updatePages()
     }
     else if (event === 'page_created') {
-      if (page) {
-        page.on('load', () => this.checkPage(page))
-      }
-      else {
-        this.loadEventCheck()
-      }
+      if (page) page.on('load', () => this.setupPage(page))
+    }
+    else if (event === 'page_changed' || event === 'click') {
+      this.changeEventCheck(page)
     }
   }
 }

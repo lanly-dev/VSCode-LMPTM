@@ -8,7 +8,7 @@ import { Browser } from './browser'
 
 export function activate(context: vscode.ExtensionContext) {
   const buttons = new Buttons
-  const d1 = vscode.commands.registerCommand('lmptm.browserlaunch', () => browserLaunch(buttons))
+  const d1 = vscode.commands.registerCommand('lmptm.browserlaunch', () => browserLaunch(buttons, context))
   const d2 = vscode.commands.registerCommand('lmptm.play', play)
   const d3 = vscode.commands.registerCommand('lmptm.pause', pause)
   const d4 = vscode.commands.registerCommand('lmptm.skip', skip)
@@ -16,12 +16,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.concat([d1, d2, d3, d4, d5])
 }
 
-function browserLaunch(buttons: Buttons) {
+function browserLaunch(buttons: Buttons, context: vscode.ExtensionContext) {
   const chromePath = whichChrome.Chrome || whichChrome.Chromium
   if (!chromePath) {
     vscode.window.showErrorMessage(`No Chrome or Chromium installation found! 😕`)
   } else {
-    Browser.launch(buttons)
+    Browser.launch(buttons, context)
   }
 }
 
