@@ -22,15 +22,12 @@ export class Buttons {
     this.backButton.text = '⏮️'
     this.statusButton.text = 'Launch'
 
-    this.playButton.show()
-    this.skipButton.show()
-    this.backButton.show()
-    this.statusButton.show()
-
     this.statusButton.command = 'lmptm.browserlaunch'
     this.playButton.command = 'lmptm.play'
     this.backButton.command = 'lmptm.back'
     this.skipButton.command = 'lmptm.skip'
+
+    this.statusButton.show()
   }
 
   setStatusButtonText(text: string) {
@@ -45,6 +42,17 @@ export class Buttons {
     else {
       this.playButton.text = '⏸️'
       this.playButton.command = 'lmptm.pause'
+    }
+  }
+  dipslayPlayback(flag: boolean) {
+    if (flag) {
+      this.playButton.show()
+      this.skipButton.show()
+      this.backButton.show()
+    } else {
+      this.playButton.hide()
+      this.skipButton.hide()
+      this.backButton.hide()
     }
   }
 }

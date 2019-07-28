@@ -56,6 +56,7 @@ export class Browser {
     this.currentBrowser.on('disconnected', () => {
       this.buttons.setStatusButtonText('Launch')
       Browser.activeBrowser = undefined
+      this.buttons.dipslayPlayback(false)
     })
     this.launchPages()
   }
@@ -100,6 +101,7 @@ export class Browser {
         await this.selectedPage.keyboard.up('ShiftLeft')
         break
     }
+    this.changeEventCheck()
   }
 
   async back() {
@@ -114,13 +116,15 @@ export class Browser {
         this.selectedPage.goBack()
         break
     }
+    this.changeEventCheck()
   }
 
   private async launchPages() {
     const page1 = await this.currentBrowser.newPage()
     const page2 = await this.currentBrowser.newPage()
-    await page1.goto('https://soundcloud.com')
-    await page2.goto('https://youtube.com')
+    const p1 = page1.goto('https://soundcloud.com')
+    const p2 = page2.goto('https://youtube.com')
+    await Promise.all([p1, p2])
     this.injectCode(page1)
     this.injectCode(page2)
     this.pages = await this.currentBrowser.pages()
@@ -175,6 +179,7 @@ export class Browser {
           if (this.selectedPage) this.resetButton()
           this.selectedPage = page
           this.setupMusicPage()
+          this.buttons.dipslayPlayback(true)
         }
         if (e.brand !== this.selectedMusicPageBrand) {
           this.selectedMusicPageBrand = e.brand
@@ -217,26 +222,25 @@ export class Browser {
     this.selectedPage.evaluate(() => reset())
   }
 
-  private async changeEventCheck(page: puppeteer.Page) {
-    const pStatus = await this.getPlayingStatus(page)
+  private async changeEventCheck(page?: puppeteer.Page) {
+    if (!this.selectedPage) return
+    if (page && page !== this.selectedPage) return
+    const pStatus = await this.getPlayingStatus(this.selectedPage)
     console.log(pStatus.brand, pStatus.status)
     if (pStatus.brand !== 'other') {
-      if (this.selectedPage === page) {
-        this.selectedMusicPageBrand = pStatus.brand
-        this.buttons.setPlayButton(pStatus.status)
-      }
-      else {
-        if (pStatus.status === 'play') {
-          this.pause()
-          this.selectedMusicPageBrand = pStatus.brand
-          this.buttons.setPlayButton(pStatus.status)
-        }
+      this.selectedMusicPageBrand = pStatus.brand
+      this.buttons.setPlayButton(pStatus.status)
+      if (pStatus.brand === 'youtube') { // when user click on buffer line
+        await this.sleep(500)
+        const pStatus2 = await this.getPlayingStatus(this.selectedPage)
+        this.buttons.setPlayButton(pStatus2.status)
       }
     }
   }
 
   private async closeEventUpdate() {
-    this.buttons.setPlayButton('pause')
+    this.buttons.setPlayButton('play')
+    this.buttons.dipslayPlayback(false)
     this.selectedPage = undefined
     this.selectedMusicPageBrand = undefined
   }
@@ -249,8 +253,7 @@ export class Browser {
     else if (pageBrand === 'soundcloud') {
       const element = await this.selectedPage.$('.playControl')
       const text = await this.selectedPage.evaluate(element => {
-        console.log(element.getAttribute('aria-label'))
-        return element.getAttribute('aria-label')
+        return element.getAttribute('title')
       }, element)
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
@@ -258,9 +261,9 @@ export class Browser {
     else if (pageBrand === 'youtube') {
       const element = await this.selectedPage.$('.ytp-play-button')
       const text = await this.selectedPage.evaluate(element => {
-        console.log(element.getAttribute('aria-label'))
         return element.getAttribute('aria-label')
       }, element)
+      if (!text) return { brand: pageBrand, status: 'pause' } // When replay
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
     }
@@ -288,9 +291,8 @@ export class Browser {
       page.on('load', () => this.setupPageWatcher(page))
     }
     else if (event === 'page_changed' || event === 'click') {
-      if (page === this.selectedPage) {
-        this.changeEventCheck(page)
-      }
+      this.changeEventCheck(page)
+
     }
   }
 

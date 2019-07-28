@@ -12,6 +12,7 @@ function check() {
   else {
     button.className = 'btn-float error'
     button.innerHTML = '<i class="fas fa-times-circle"></i> Nevermind! 😓'
+    button.disabled = true
 
     if (!flag) {
       flag = true
@@ -19,6 +20,7 @@ function check() {
         button.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
         button.className = 'btn-float'
         flag = false
+        button.disabled = false
       }, 3000)
     }
   }
