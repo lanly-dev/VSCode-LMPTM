@@ -22,11 +22,21 @@
 .youtube {
   background-color: white;
   color:red;
-  width: 100px;
+  width: 2em;
+  font-size: 3em;
+  height: 1.5em;
+}
+
+.soundcloud {
+  background-color: #f50;
+  color: white;
+  width: 2em;
+  font-size: 2.5em;
+  height: 1.5em;
 }
 
 .error {
   background-color: red;
   color:white;
-  width: 120px;
+  width: 10em;
 }

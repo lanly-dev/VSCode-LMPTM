@@ -61,33 +61,73 @@ export class Browser {
   }
 
   play() {
-    if (this.selectedPage) this.selectedPage.keyboard.press('k')
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'soundcloud':
+        this.selectedPage.keyboard.press('Space')
+        break
+      case 'youtube':
+        this.selectedPage.keyboard.press('k')
+        break
+    }
     this.buttons.setPlayButton('pause')
   }
 
   pause() {
-    if (this.selectedPage) this.selectedPage.keyboard.press('k')
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'soundcloud':
+        this.selectedPage.keyboard.press('Space')
+        break
+      case 'youtube':
+        this.selectedPage.keyboard.press('k')
+        break
+    }
     this.buttons.setPlayButton('play')
   }
 
   async skip() {
-    if (this.selectedPage) {
-      await this.selectedPage.keyboard.down('ShiftLeft')
-      await this.selectedPage.keyboard.press('n')
-      await this.selectedPage.keyboard.up('ShiftLeft')
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'soundcloud':
+        await this.selectedPage.keyboard.down('ShiftLeft')
+        await this.selectedPage.keyboard.press('ArrowRight')
+        await this.selectedPage.keyboard.up('ShiftLeft')
+        break
+      case 'youtube':
+        await this.selectedPage.keyboard.down('ShiftLeft')
+        await this.selectedPage.keyboard.press('n')
+        await this.selectedPage.keyboard.up('ShiftLeft')
+        break
     }
   }
 
-  back() {
-    if (this.selectedPage) this.selectedPage.goBack()
+  async back() {
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'soundcloud':
+        await this.selectedPage.keyboard.down('ShiftLeft')
+        await this.selectedPage.keyboard.press('ArrowLeft')
+        await this.selectedPage.keyboard.up('ShiftLeft')
+        break
+      case 'youtube':
+        this.selectedPage.goBack()
+        break
+    }
   }
 
   private async launchPages() {
-    const page = await this.currentBrowser.newPage()
-    await page.goto('https://youtube.com')
+    const page1 = await this.currentBrowser.newPage()
+    const page2 = await this.currentBrowser.newPage()
+    await page1.goto('https://soundcloud.com')
+    await page2.goto('https://youtube.com')
+    this.injectCode(page1)
+    this.injectCode(page2)
     this.pages = await this.currentBrowser.pages()
+  }
 
-    // The button doesn't show up
+  // The button doesn't show up on the 1st launch
+  private injectCode(page: puppeteer.Page) {
     page.evaluate(uiHtmlPath => {
       do {
         // @ts-ignore
@@ -117,7 +157,6 @@ export class Browser {
       }
     }, Browser.uiHtmlPath)
 
-    page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.4.1.min.js' })
     page.addStyleTag({ path: Browser.cssPath })
     page.addScriptTag({ path: Browser.jsPath })
     page.addStyleTag({ path: Browser.faCssPath })
@@ -204,8 +243,19 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicPageCheck(page.url())
+    if (pageBrand === 'other' || !this.selectedPage)
+      return { brand: pageBrand, status: '' }
 
-    if (pageBrand === 'youtube' && this.selectedPage) {
+    else if (pageBrand === 'soundcloud') {
+      const element = await this.selectedPage.$('.playControl')
+      const text = await this.selectedPage.evaluate(element => {
+        console.log(element.getAttribute('aria-label'))
+        return element.getAttribute('aria-label')
+      }, element)
+      const stt = text.includes('Play') ? 'play' : 'pause'
+      return { brand: pageBrand, status: stt }
+    }
+    else if (pageBrand === 'youtube') {
       const element = await this.selectedPage.$('.ytp-play-button')
       const text = await this.selectedPage.evaluate(element => {
         console.log(element.getAttribute('aria-label'))
@@ -214,11 +264,12 @@ export class Browser {
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
     }
-    return { brand: pageBrand, status: '' }
+    else return { brand: pageBrand, status: '' }
   }
 
   private musicPageCheck(url: string) {
     if (url.includes('youtube.com/watch')) return 'youtube'
+    else if (url.includes('soundcloud.com')) return 'soundcloud'
     else return 'other'
   }
 
