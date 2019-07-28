@@ -1,13 +1,20 @@
 let flag = false
+const button = document.querySelector('.btn-float')
+const data = sessionStorage.getItem('lmptm')
+button.addEventListener('click', check)
+if(data == 'youtube') youtube(button)
+else if (data == 'soundcloud') soundcloud(button)
 
 function check() {
   const button = document.querySelector('.btn-float')
   if (window.location.href.includes('youtube.com/watch')) {
     window.pageSelected({ brand: 'youtube' })
-    youtube()
+    sessionStorage.setItem('lmptm','youtube')
+    youtube(button)
   } else if (window.location.href.includes('soundcloud.com')) {
     window.pageSelected({ brand: 'soundcloud' })
-    soundcloud()
+    sessionStorage.setItem('lmptm','soundcloud')
+    soundcloud(button)
   }
   else {
     button.className = 'btn-float error'
@@ -19,25 +26,26 @@ function check() {
       setTimeout(() => {
         button.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
         button.className = 'btn-float'
-        flag = false
         button.disabled = false
-      }, 3000)
+        flag = false
+      },3000)
     }
   }
+}
 
-  function youtube() {
-    button.className = 'btn-float youtube'
-    button.innerHTML = '<i class="fab fa-youtube"></i>'
-  }
+function youtube(button) {
+  button.className = 'btn-float youtube'
+  button.innerHTML = '<i class="fab fa-youtube"></i>'
+}
 
-  function soundcloud() {
-    button.className = 'btn-float soundcloud'
-    button.innerHTML = '<i class="fab fa-soundcloud"></i>'
-  }
+function soundcloud(button) {
+  button.className = 'btn-float soundcloud'
+  button.innerHTML = '<i class="fab fa-soundcloud"></i>'
 }
 
 function reset() {
   const button = document.querySelector('.btn-float')
   button.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
   button.className = 'btn-float'
+  sessionStorage.removeItem('lmptm')
 }

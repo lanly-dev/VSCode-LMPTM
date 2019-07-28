@@ -1,4 +1,3 @@
-import { URL } from 'url'
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 import * as path from 'path'
@@ -16,6 +15,10 @@ export class Browser {
   public static uiHtmlPath: string
   public static faCssPath: string
   public static faJsPath: string
+  public static playButtonCss = {
+    soundcloud: '.playControl',
+    youtube: '.ytp-play-button'
+  }
   private currentBrowser: puppeteer.Browser
   private pages: puppeteer.Page[] | undefined
   private selectedPage: puppeteer.Page | undefined
@@ -191,20 +194,22 @@ export class Browser {
   private setupMusicPage() {
     const page = this.selectedPage
     if (!page) return
-    // @ts-ignore
-    if (!page._pageBindings.has('onUserClick')) {
-      page.exposeFunction('onUserClick', _e => {
-        this.update('click', page.target())
-      })
-    }
+    const brand = this.musicBrandCheck(page.url())
+    if (brand === 'other') return
 
-    page.evaluate((type) => {
-      // @ts-ignore
-      document.addEventListener(type, e => {
+    page.exposeFunction('onPlayingChangeEvent', () => {
+      this.update('play_event', page.target())
+    })
+
+    page.evaluate(playButtonCss => {
+      const target = document.querySelector(playButtonCss)
+      const observer = new MutationObserver(() => {
         // @ts-ignore
-        window.onUserClick({ type })
+        onPlayingChangeEvent()
       })
-    }, 'click')
+      // @ts-ignore
+      observer.observe(target, { attributes: true })
+    }, Browser.playButtonCss[brand])
 
     page.on('close', async () => {
       await new Promise(resolve => setTimeout(() => resolve(), 1000))
@@ -230,11 +235,6 @@ export class Browser {
     if (pStatus.brand !== 'other') {
       this.selectedMusicPageBrand = pStatus.brand
       this.buttons.setPlayButton(pStatus.status)
-      if (pStatus.brand === 'youtube') { // when user click on buffer line
-        await this.sleep(500)
-        const pStatus2 = await this.getPlayingStatus(this.selectedPage)
-        this.buttons.setPlayButton(pStatus2.status)
-      }
     }
   }
 
@@ -246,12 +246,12 @@ export class Browser {
   }
 
   private async getPlayingStatus(page: puppeteer.Page) {
-    const pageBrand = this.musicPageCheck(page.url())
+    const pageBrand = this.musicBrandCheck(page.url())
     if (pageBrand === 'other' || !this.selectedPage)
       return { brand: pageBrand, status: '' }
 
     else if (pageBrand === 'soundcloud') {
-      const element = await this.selectedPage.$('.playControl')
+      const element = await this.selectedPage.$(Browser.playButtonCss.soundcloud)
       const text = await this.selectedPage.evaluate(element => {
         return element.getAttribute('title')
       }, element)
@@ -259,18 +259,18 @@ export class Browser {
       return { brand: pageBrand, status: stt }
     }
     else if (pageBrand === 'youtube') {
-      const element = await this.selectedPage.$('.ytp-play-button')
+      const element = await this.selectedPage.$(Browser.playButtonCss.youtube)
       const text = await this.selectedPage.evaluate(element => {
         return element.getAttribute('aria-label')
       }, element)
-      if (!text) return { brand: pageBrand, status: 'pause' } // When replay
+      if (!text) return { brand: pageBrand, status: 'play' } // When replay
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
     }
     else return { brand: pageBrand, status: '' }
   }
 
-  private musicPageCheck(url: string) {
+  private musicBrandCheck(url: string) {
     if (url.includes('youtube.com/watch')) return 'youtube'
     else if (url.includes('soundcloud.com')) return 'soundcloud'
     else return 'other'
@@ -288,11 +288,14 @@ export class Browser {
       // this.closeEventUpdate()
     }
     else if (event === 'page_created') {
-      page.on('load', () => this.setupPageWatcher(page))
-    }
-    else if (event === 'page_changed' || event === 'click') {
-      this.changeEventCheck(page)
+      page.on('load', () => {
+        this.injectCode(page)
+        this.setupPageWatcher(page)
+      })
 
+    }
+    else if (event === 'page_changed' || event === 'play_event') {
+      this.changeEventCheck(page)
     }
   }
 
