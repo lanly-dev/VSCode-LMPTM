@@ -1,9 +1,31 @@
-let flag = false
+
 const button = document.querySelector('.btn-float')
-const data = sessionStorage.getItem('lmptm')
 button.addEventListener('click', check)
-if(data == 'youtube') youtube(button)
-else if (data == 'soundcloud') soundcloud(button)
+
+// Duplicate tab solution
+let clear = false
+let loadCount = sessionStorage.getItem('load')
+if (loadCount == null) loadCount = 0
+else loadCount++
+sessionStorage.setItem('load', loadCount)
+let unloadCount = sessionStorage.getItem('unload')
+if (unloadCount == null) unloadCount = 0
+
+window.addEventListener('beforeunload',() => {
+  if (clear) {
+    sessionStorage.removeItem('load')
+    sessionStorage.removeItem('unload')
+    return
+  }
+  sessionStorage.setItem('unload', unloadCount++)
+})
+
+let flag = false
+if (loadCount == unloadCount) {
+  const data = sessionStorage.getItem('lmptm')
+  if (data == 'youtube') youtube(button)
+  else if (data == 'soundcloud') soundcloud(button)
+}
 
 function check() {
   const button = document.querySelector('.btn-float')
@@ -11,10 +33,12 @@ function check() {
     window.pageSelected({ brand: 'youtube' })
     sessionStorage.setItem('lmptm','youtube')
     youtube(button)
+    clear = true
   } else if (window.location.href.includes('soundcloud.com')) {
     window.pageSelected({ brand: 'soundcloud' })
     sessionStorage.setItem('lmptm','soundcloud')
     soundcloud(button)
+    clear = true
   }
   else {
     button.className = 'btn-float error'
