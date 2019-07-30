@@ -13,7 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
   const d3 = vscode.commands.registerCommand('lmptm.pause', pause)
   const d4 = vscode.commands.registerCommand('lmptm.skip', skip)
   const d5 = vscode.commands.registerCommand('lmptm.back', back)
-  context.subscriptions.concat([d1, d2, d3, d4, d5])
+  const d6 = vscode.commands.registerCommand('lmptm.showTitle', showTitle)
+  context.subscriptions.concat([d1, d2, d3, d4, d5, d6])
 }
 
 function browserLaunch(buttons: Buttons, context: vscode.ExtensionContext) {
@@ -43,6 +44,11 @@ function skip() {
 function back() {
   if (Browser.activeBrowser)
     Browser.activeBrowser.back()
+}
+
+async function showTitle() {
+  if (Browser.activeBrowser)
+    vscode.window.showInformationMessage(await Browser.activeBrowser.getTabTitle())
 }
 
 export function deactivate() { }

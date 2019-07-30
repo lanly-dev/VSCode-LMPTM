@@ -5,8 +5,6 @@ export class Buttons {
   private skipButton: StatusBarItem
   private backButton: StatusBarItem
   private statusButton: StatusBarItem
-  private broswerLaunched: true | false
-  private getPlayState: string
 
   constructor() {
     this.skipButton = window.createStatusBarItem(StatusBarAlignment.Right, 1)
@@ -14,13 +12,10 @@ export class Buttons {
     this.backButton = window.createStatusBarItem(StatusBarAlignment.Right, 3)
     this.statusButton = window.createStatusBarItem(StatusBarAlignment.Right, 4)
 
-    this.getPlayState = 'playing'
-    this.broswerLaunched = false
-
     this.playButton.text = '▶️'
     this.skipButton.text = '⏭️'
     this.backButton.text = '⏮️'
-    this.statusButton.text = 'Launch'
+    this.statusButton.text = 'Launch 🚀'
 
     this.statusButton.command = 'lmptm.browserlaunch'
     this.playButton.command = 'lmptm.play'
@@ -31,7 +26,15 @@ export class Buttons {
   }
 
   setStatusButtonText(text: string) {
-    this.statusButton.text = text
+    if(text === 'Launch 🚀'){
+      this.statusButton.text = text
+      this.statusButton.command = 'lmptm.browserlaunch'
+    } else if (text.length > 30) {
+      this.statusButton.text = `${text.substring(0, 15)}...`
+    } else {
+      this.statusButton.text = text
+      this.statusButton.command = 'lmptm.showTitle'
+    }
   }
 
   setPlayButton(text: string) {

@@ -10,6 +10,7 @@ import { Buttons } from './buttons'
 export class Browser {
 
   public static activeBrowser: Browser | undefined
+  public static launched: boolean = false
   public static cssPath: string
   public static jsPath: string
   public static uiHtmlPath: string
@@ -28,14 +29,15 @@ export class Browser {
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     const chromePath = whichChrome.Chrome || whichChrome.Chromium
 
-    if (!Browser.activeBrowser) {
+    if (!Browser.activeBrowser && !Browser.launched) {
+      Browser.launched = true
       puppeteer.launch({
         executablePath: chromePath,
         headless: false,
         defaultViewport: null,
         args: ['--incognito', '--window-size=500,500']
       }).then(async browser => {
-        buttons.setStatusButtonText('Running')
+        buttons.setStatusButtonText('Running 🎵')
         Browser.cssPath = path.join(context.extensionPath, 'out', 'resrc', 'style.css')
         Browser.jsPath = path.join(context.extensionPath, 'out', 'resrc', 'script.js')
         Browser.faCssPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css')
@@ -44,6 +46,7 @@ export class Browser {
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons)
+        Browser.launched = false
       })
     }
   }
@@ -57,7 +60,7 @@ export class Browser {
     this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
     this.currentBrowser.on('disconnected', () => {
-      this.buttons.setStatusButtonText('Launch')
+      this.buttons.setStatusButtonText('Launch 🚀')
       Browser.activeBrowser = undefined
       this.buttons.dipslayPlayback(false)
     })
@@ -122,6 +125,11 @@ export class Browser {
     this.changeEventCheck()
   }
 
+  getTabTitle() {
+    // @ts-ignore
+    return this.selectedPage.title()
+  }
+
   private async launchPages() {
     const page1 = await this.currentBrowser.newPage()
     const page2 = await this.currentBrowser.newPage()
@@ -176,13 +184,14 @@ export class Browser {
 
     // @ts-ignore
     if (!page._pageBindings.has('pageSelected')) {
-      page.exposeFunction('pageSelected', e => {
+      page.exposeFunction('pageSelected', async e => {
         this.update('pageSelected', page.target())
         if (page !== this.selectedPage) {
           if (this.selectedPage) this.resetButton()
           this.selectedPage = page
           this.setupMusicPage()
           this.buttons.dipslayPlayback(true)
+          this.buttons.setStatusButtonText(await this.selectedPage.title())
         }
         if (e.brand !== this.selectedMusicPageBrand) {
           this.selectedMusicPageBrand = e.brand
@@ -212,7 +221,7 @@ export class Browser {
     }, Browser.playButtonCss[brand])
 
     page.on('close', async () => {
-      await new Promise(resolve => setTimeout(() => resolve(), 1000))
+      await this.sleep()
       if (Browser.activeBrowser) this.update('music_page_closed', page.target())
     })
   }
@@ -231,18 +240,11 @@ export class Browser {
     if (!this.selectedPage) return
     if (page && page !== this.selectedPage) return
     const pStatus = await this.getPlayingStatus(this.selectedPage)
-    console.log(pStatus.brand, pStatus.status)
     if (pStatus.brand !== 'other') {
       this.selectedMusicPageBrand = pStatus.brand
       this.buttons.setPlayButton(pStatus.status)
+      this.buttons.setStatusButtonText(await this.selectedPage.title())
     }
-  }
-
-  private async closeEventUpdate() {
-    this.buttons.setPlayButton('play')
-    this.buttons.dipslayPlayback(false)
-    this.selectedPage = undefined
-    this.selectedMusicPageBrand = undefined
   }
 
   private async getPlayingStatus(page: puppeteer.Page) {
@@ -276,8 +278,14 @@ export class Browser {
     else return 'other'
   }
 
+  private async closeEventUpdate() {
+    this.buttons.setPlayButton('play')
+    this.buttons.dipslayPlayback(false)
+    this.selectedPage = undefined
+    this.selectedMusicPageBrand = undefined
+  }
+
   private async update(event: string, target: puppeteer.Target) {
-    console.log(event)
     const page = await target.page()
     if (!page) return
     if (event === 'page_closed') {
@@ -292,7 +300,6 @@ export class Browser {
         this.injectCode(page)
         this.setupPageWatcher(page)
       })
-
     }
     else if (event === 'page_changed' || event === 'play_event') {
       this.changeEventCheck(page)
