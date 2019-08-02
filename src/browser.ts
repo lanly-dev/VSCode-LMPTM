@@ -18,6 +18,7 @@ export class Browser {
   public static faJsPath: string
   public static playButtonCss = {
     soundcloud: '.playControl',
+    spotify: '.spoticon-play-16',
     youtube: '.ytp-play-button'
   }
   private currentBrowser: puppeteer.Browser
@@ -28,14 +29,15 @@ export class Browser {
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     const chromePath = whichChrome.Chrome || whichChrome.Chromium
-
+    console.log(Browser.launched)
     if (!Browser.activeBrowser && !Browser.launched) {
       Browser.launched = true
       puppeteer.launch({
         executablePath: chromePath,
         headless: false,
         defaultViewport: null,
-        args: ['--incognito', '--window-size=500,500']
+        args: ['--incognito', '--window-size=500,500'],
+        ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
       }).then(async browser => {
         buttons.setStatusButtonText('Running 🎵')
         Browser.cssPath = path.join(context.extensionPath, 'out', 'resrc', 'style.css')
@@ -73,6 +75,10 @@ export class Browser {
       case 'soundcloud':
         this.selectedPage.keyboard.press('Space')
         break
+      case 'spotify':
+        // @ts-ignore
+        this.selectedPage.evaluate(() => spotifyAction('play'))
+        break
       case 'youtube':
         this.selectedPage.keyboard.press('k')
         break
@@ -85,6 +91,10 @@ export class Browser {
     switch (this.selectedMusicPageBrand) {
       case 'soundcloud':
         this.selectedPage.keyboard.press('Space')
+        break
+      case 'spotify':
+        // @ts-ignore
+        this.selectedPage.evaluate(() => spotifyAction('pause'))
         break
       case 'youtube':
         this.selectedPage.keyboard.press('k')
@@ -100,6 +110,10 @@ export class Browser {
         await this.selectedPage.keyboard.down('ShiftLeft')
         await this.selectedPage.keyboard.press('ArrowRight')
         await this.selectedPage.keyboard.up('ShiftLeft')
+        break
+      case 'spotify':
+        // @ts-ignore
+        this.selectedPage.evaluate(() => spotifyAction('skip'))
         break
       case 'youtube':
         await this.selectedPage.keyboard.down('ShiftLeft')
@@ -118,6 +132,10 @@ export class Browser {
         await this.selectedPage.keyboard.press('ArrowLeft')
         await this.selectedPage.keyboard.up('ShiftLeft')
         break
+      case 'spotify':
+        // @ts-ignore
+        this.selectedPage.evaluate(() => spotifyAction('back'))
+        break
       case 'youtube':
         this.selectedPage.goBack()
         break
@@ -133,11 +151,14 @@ export class Browser {
   private async launchPages() {
     const page1 = await this.currentBrowser.newPage()
     const page2 = await this.currentBrowser.newPage()
+    const page3 = await this.currentBrowser.newPage()
     const p1 = page1.goto('https://soundcloud.com')
     const p2 = page2.goto('https://youtube.com')
-    await Promise.all([p1, p2])
+    const p3 = page3.goto('https://open.spotify.com')
+    await Promise.all([p1, p2, p3])
     this.injectCode(page1)
     this.injectCode(page2)
+    this.injectCode(page3)
     this.pages = await this.currentBrowser.pages()
   }
 
@@ -249,22 +270,24 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
-    if (pageBrand === 'other' || !this.selectedPage)
+    if (pageBrand === 'other' || !this.selectedPage) {
       return { brand: pageBrand, status: '' }
 
-    else if (pageBrand === 'soundcloud') {
+    } else if (pageBrand === 'soundcloud') {
       const element = await this.selectedPage.$(Browser.playButtonCss.soundcloud)
-      const text = await this.selectedPage.evaluate(element => {
-        return element.getAttribute('title')
-      }, element)
+      const text = await this.selectedPage.evaluate(element => element.getAttribute('title'), element)
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
-    }
-    else if (pageBrand === 'youtube') {
+
+    } else if (pageBrand === 'spotify') {
+      const element = await this.selectedPage.$(Browser.playButtonCss.spotify)
+      const text = await this.selectedPage.evaluate(element => element.getAttribute('title'), element)
+      const stt = text.includes('Play') ? 'play' : 'pause'
+      return { brand: pageBrand, status: stt }
+
+    } else if (pageBrand === 'youtube') {
       const element = await this.selectedPage.$(Browser.playButtonCss.youtube)
-      const text = await this.selectedPage.evaluate(element => {
-        return element.getAttribute('aria-label')
-      }, element)
+      const text = await this.selectedPage.evaluate(element => element.getAttribute('aria-label'), element)
       if (!text) return { brand: pageBrand, status: 'play' } // When replay
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
@@ -273,8 +296,9 @@ export class Browser {
   }
 
   private musicBrandCheck(url: string) {
-    if (url.includes('youtube.com/watch')) return 'youtube'
-    else if (url.includes('soundcloud.com')) return 'soundcloud'
+    if (url.includes('soundcloud.com')) return 'soundcloud'
+    else if (url.includes('open.spotify.com')) return 'spotify'
+    else if (url.includes('youtube.com/watch')) return 'youtube'
     else return 'other'
   }
 
@@ -288,22 +312,52 @@ export class Browser {
   private async update(event: string, target: puppeteer.Target) {
     const page = await target.page()
     if (!page) return
+
     if (event === 'page_closed') {
       if (page === this.selectedPage) this.closeEventUpdate()
       else this.updatePages()
     }
-    else if (event === 'music_page_closed') {
-      // this.closeEventUpdate()
-    }
+
     else if (event === 'page_created') {
+      // console.log('page_create', this.musicBrandCheck(page.url()))
+      page.setBypassCSP(true)
+      // if (this.musicBrandCheck(page.url()) === 'spotify') {
+      //   page.setBypassCSP(true)
+      //   page.goto('https://open.spotify.com')
+      //   page.evaluate(() => sessionStorage.setItem('bypassCSP', 'yes'))
+      // }
+      if ((this.musicBrandCheck(page.url()) === 'spotify')) {
+        page.goto(page.url())
+      }
+
       page.on('load', () => {
         this.injectCode(page)
         this.setupPageWatcher(page)
       })
     }
-    else if (event === 'page_changed' || event === 'play_event') {
+
+    else if (event === 'page_changed') {
+      // console.log('page_change', this.musicBrandCheck(page.url()))
+      // console.log('page_change', page.url())
+      if (this.musicBrandCheck(page.url()) === 'spotify') await this.disableCSP(page)
+      else if (page === this.selectedPage) {
+        page.setBypassCSP(false)
+        // await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'no'))
+      }
       this.changeEventCheck(page)
     }
+
+    else if (event === 'play_event') this.changeEventCheck(page)
+    else if (event === 'music_page_closed') { }
+  }
+
+  private async disableCSP(page: puppeteer.Page) {
+    const cspFlag = await page.evaluate(() => sessionStorage.getItem('bypassCSP'))
+    if (cspFlag) return
+    page.setBypassCSP(true)
+    // await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'yes'))
+    await this.sleep()
+    page.reload()
   }
 
   private async sleep(ms: number = 1000) {
