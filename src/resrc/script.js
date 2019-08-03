@@ -1,9 +1,6 @@
 const btnPick = document.querySelector('.btn-pick-float')
-// const btnCSP = document.querySelector('.btn-csp-float')
 btnPick.addEventListener('click',check)
-// btnCSP.addEventListener('click',csp)
 
-if(sessionStorage.getItem('bypassCSP')) btnCSP.style.display = 'block'
 
 // Duplicate tab solution
 let clear = false
@@ -13,6 +10,7 @@ else loadCount++
 sessionStorage.setItem('load',loadCount)
 let unloadCount = sessionStorage.getItem('unload')
 if (unloadCount == null) unloadCount = 0
+else unloadCount = parseInt(unloadCount)
 
 window.addEventListener('beforeunload',() => {
   if (clear) {
@@ -20,7 +18,7 @@ window.addEventListener('beforeunload',() => {
     sessionStorage.removeItem('unload')
     return
   }
-  sessionStorage.setItem('unload',unloadCount++)
+  sessionStorage.setItem('unload',unloadCount + 1)
 })
 
 let flagPick = false
@@ -108,19 +106,3 @@ function reset() {
   btnPick.className = 'btn-pick-float'
   sessionStorage.removeItem('lmptm')
 }
-
-// function csp() {
-//   const btnCSP = document.querySelector('.btn-csp-float')
-//   btnCSP.innerHTML = '<p>⚠️ CSP disabled, <a href="https://en.wikipedia.org/wiki/Content_Security_Policy">More info!</a></p>'
-//   btnCSP.className = 'btn-csp-float info-csp'
-//   btnCSP.disabled = true
-//   if (!flagCSP) {
-//     flagCSP = true
-//     setTimeout(() => {
-//       btnCSP.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'
-//       btnCSP.className = 'btn-csp-float'
-//       btnCSP.disabled = false
-//       flagCSP = false
-//     },3000)
-//   }
-// }

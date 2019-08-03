@@ -29,7 +29,6 @@ export class Browser {
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     const chromePath = whichChrome.Chrome || whichChrome.Chromium
-    console.log(Browser.launched)
     if (!Browser.activeBrowser && !Browser.launched) {
       Browser.launched = true
       puppeteer.launch({
@@ -198,6 +197,7 @@ export class Browser {
     page.addStyleTag({ path: Browser.faCssPath })
     page.addScriptTag({ path: Browser.faJsPath })
 
+    page.removeAllListeners('close')
     page.on('close', async () => {
       await new Promise(resolve => setTimeout(() => resolve(), 1000))
       if (Browser.activeBrowser) this.update('page_closed', page.target())
@@ -227,9 +227,12 @@ export class Browser {
     const brand = this.musicBrandCheck(page.url())
     if (brand === 'other') return
 
-    page.exposeFunction('onPlayingChangeEvent', () => {
-      this.update('play_event', page.target())
-    })
+    // @ts-ignore
+    if (!page._pageBindings.has('onPlayingChangeEvent')) {
+      page.exposeFunction('onPlayingChangeEvent', () => {
+        this.update('play_event', page.target())
+      })
+    }
 
     page.evaluate(playButtonCss => {
       const target = document.querySelector(playButtonCss)
@@ -240,11 +243,6 @@ export class Browser {
       // @ts-ignore
       observer.observe(target, { attributes: true })
     }, Browser.playButtonCss[brand])
-
-    page.on('close', async () => {
-      await this.sleep()
-      if (Browser.activeBrowser) this.update('music_page_closed', page.target())
-    })
   }
 
   private async updatePages() {
@@ -319,31 +317,25 @@ export class Browser {
     }
 
     else if (event === 'page_created') {
-      // console.log('page_create', this.musicBrandCheck(page.url()))
-      page.setBypassCSP(true)
-      // if (this.musicBrandCheck(page.url()) === 'spotify') {
-      //   page.setBypassCSP(true)
-      //   page.goto('https://open.spotify.com')
-      //   page.evaluate(() => sessionStorage.setItem('bypassCSP', 'yes'))
-      // }
+      page.setMaxListeners(3)
       if ((this.musicBrandCheck(page.url()) === 'spotify')) {
+        this.setPageBypassCSP(page, 'true')
         page.goto(page.url())
-      }
+      } else this.setPageBypassCSP(page, 'false')
 
-      page.on('load', () => {
+      page.on('load', async () => {
+        if (this.musicBrandCheck(page.url()) === 'spotify')
+          await this.checkSpotifyCSP(page)
         this.injectCode(page)
         this.setupPageWatcher(page)
       })
     }
 
     else if (event === 'page_changed') {
-      // console.log('page_change', this.musicBrandCheck(page.url()))
-      // console.log('page_change', page.url())
-      if (this.musicBrandCheck(page.url()) === 'spotify') await this.disableCSP(page)
-      else if (page === this.selectedPage) {
-        page.setBypassCSP(false)
-        // await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'no'))
-      }
+      if (page.url() === 'chrome-search://local-ntp/local-ntp.html') await this.sleep(5000)
+      const notSpotify = !(this.musicBrandCheck(page.url()) === 'spotify')
+      if (notSpotify) this.setPageBypassCSP(page, 'false')
+      else await this.checkSpotifyCSP(page)
       this.changeEventCheck(page)
     }
 
@@ -351,12 +343,16 @@ export class Browser {
     else if (event === 'music_page_closed') { }
   }
 
-  private async disableCSP(page: puppeteer.Page) {
+  private async setPageBypassCSP(page: puppeteer.Page, flag: string) {
+    if (page.url() === 'about:blank') return
+    page.setBypassCSP(flag === 'true')
+    await page.evaluate(theFlag => sessionStorage.setItem('bypassCSP', theFlag), flag)
+  }
+
+  private async checkSpotifyCSP(page: puppeteer.Page) {
     const cspFlag = await page.evaluate(() => sessionStorage.getItem('bypassCSP'))
-    if (cspFlag) return
-    page.setBypassCSP(true)
-    // await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'yes'))
-    await this.sleep()
+    if (cspFlag === 'true') return
+    await this.setPageBypassCSP(page, 'true')
     page.reload()
   }
 
