@@ -35,12 +35,24 @@
   height: 1.5em;
 }
 
+.spotify-info {
+  width: 20em;
+  height: 3.5em;
+  font-size: 1em;
+}
+
 .youtube {
   background-color: white;
   color:red;
   width: 2em;
   font-size: 3em;
   height: 1.5em;
+}
+
+.youtube-info {
+  width: 14em;
+  height: 2em;
+  font-size: 1em;
 }
 
 .error {

@@ -38,31 +38,32 @@ function check() {
     clear = true
 
   } else if (window.location.href.includes('open.spotify.com')) {
+    if (!document.querySelectorAll('.now-playing .cover-art-image')[0]) {
+      btnPick.disabled = true
+      return spotifyInfo(btnPick)
+    }
     window.pageSelected({ brand: 'spotify' })
     sessionStorage.setItem('lmptm','spotify')
     spotify(btnPick)
     clear = true
 
-  } else if (window.location.href.includes('youtube.com/watch')) {
-    window.pageSelected({ brand: 'youtube' })
-    sessionStorage.setItem('lmptm','youtube')
-    youtube(btnPick)
-    clear = true
+  } else if (window.location.href.includes('youtube.com')) {
+    if (window.location.href.includes('youtube.com/watch')) {
+      window.pageSelected({ brand: 'youtube' })
+      sessionStorage.setItem('lmptm','youtube')
+      youtube(btnPick)
+      clear = true
+    } else {
+      btnPick.disabled = true
+      youtubeInfo(btnPick)
+    }
 
   } else {
     btnPick.className = 'btn-pick-float error'
     btnPick.innerHTML = '<i class="fas fa-times-circle"></i> Nevermind! 😓'
     btnPick.disabled = true
 
-    if (!flagPick) {
-      flagPick = true
-      setTimeout(() => {
-        btnPick.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
-        btnPick.className = 'btn-pick-float'
-        btnPick.disabled = false
-        flagPick = false
-      },3000)
-    }
+    btnReset(btnPick)
   }
 }
 
@@ -81,6 +82,18 @@ function youtube(btnPick) {
   btnPick.innerHTML = '<i class="fab fa-youtube"></i>'
 }
 
+function spotifyInfo(btnPick) {
+  btnPick.className = 'btn-pick-float spotify spotify-info'
+  btnPick.innerHTML = 'Please log in and make sure the playing queue is not empty! 😉'
+  btnReset(btnPick)
+}
+
+function youtubeInfo(btnPick) {
+  btnPick.className = 'btn-pick-float youtube youtube-info'
+  btnPick.innerHTML = 'Please pick a video! 😉'
+  btnReset(btnPick)
+}
+
 function spotifyAction(action) {
   switch (action) {
     case 'play':
@@ -94,6 +107,14 @@ function spotifyAction(action) {
       document.querySelector('.spoticon-skip-back-16').click()
       break
   }
+}
+
+function btnReset(btnPick) {
+  setTimeout(() => {
+    btnPick.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
+    btnPick.className = 'btn-pick-float'
+    btnPick.disabled = false
+  },3000)
 }
 
 function reset() {

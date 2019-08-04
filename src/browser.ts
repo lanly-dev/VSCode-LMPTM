@@ -24,7 +24,7 @@ export class Browser {
   private currentBrowser: puppeteer.Browser
   private pages: puppeteer.Page[] | undefined
   private selectedPage: puppeteer.Page | undefined
-  private selectedMusicPageBrand: String | undefined
+  private selectedMusicPageBrand: string | undefined
   private buttons: Buttons
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
@@ -155,9 +155,6 @@ export class Browser {
     const p2 = page2.goto('https://youtube.com')
     const p3 = page3.goto('https://open.spotify.com')
     await Promise.all([p1, p2, p3])
-    this.injectHtml(page1)
-    this.injectHtml(page2)
-    this.injectHtml(page3)
     this.pages = await this.currentBrowser.pages()
   }
 
@@ -176,7 +173,6 @@ export class Browser {
       } while (!document.getElementsByTagName('body')[0])
     }, Browser.uiHtmlPath)
   }
-
   private addScripts(page: puppeteer.Page) {
     page.addStyleTag({ path: Browser.cssPath })
     page.addScriptTag({ path: Browser.jsPath })
@@ -213,12 +209,11 @@ export class Browser {
         if (page !== this.selectedPage) {
           if (this.selectedPage) this.resetButton()
           this.selectedPage = page
+          this.selectedMusicPageBrand = e.brand
           this.setupMusicPage()
           this.buttons.dipslayPlayback(true)
           this.buttons.setStatusButtonText(await this.selectedPage.title())
-        }
-        if (e.brand !== this.selectedMusicPageBrand) {
-          this.selectedMusicPageBrand = e.brand
+          this.changeEventCheck()
         }
       })
     }
@@ -227,8 +222,8 @@ export class Browser {
   private setupMusicPage() {
     const page = this.selectedPage
     if (!page) return
-    const brand = this.musicBrandCheck(page.url())
-    if (brand === 'other') return
+    const brand = this.selectedMusicPageBrand
+    if (!brand) return
 
     // @ts-ignore
     if (!page._pageBindings.has('onPlayingChangeEvent')) {
@@ -245,7 +240,25 @@ export class Browser {
       })
       // @ts-ignore
       observer.observe(target, { attributes: true })
+      // @ts-ignore
     }, Browser.playButtonCss[brand])
+
+    if (brand === 'spotify') {
+      page.evaluate(() => {
+        const id = setInterval(() => {
+          if (document.querySelectorAll('.now-playing .cover-art-image')[0]) {
+            const target = document.querySelectorAll('.now-playing .cover-art-image')[0]
+            const observer = new MutationObserver(() => {
+              // @ts-ignore
+              onPlayingChangeEvent()
+            })
+            // @ts-ignore
+            observer.observe(target, { attributes: true })
+            clearInterval(id)
+          }
+        }, 3000)
+      })
+    }
   }
 
   private async updatePages() {
@@ -330,6 +343,7 @@ export class Browser {
 
       page.on('load', async () => {
         if (this.musicBrandCheck(page.url()) === 'spotify') await this.checkSpotifyCSP(page)
+        this.injectHtml(page)
         this.addScripts(page)
         this.setupMusicPage()
       })
