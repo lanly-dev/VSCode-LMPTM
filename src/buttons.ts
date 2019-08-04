@@ -31,6 +31,7 @@ export class Buttons {
       this.statusButton.command = 'lmptm.browserlaunch'
     } else if (text === 'Running 🎵') {
       this.statusButton.text = text
+      this.statusButton.command = undefined
     } else if (text.length > 30) {
       this.statusButton.text = `${text.substring(0, 15)}...`
       this.statusButton.command = 'lmptm.showTitle'

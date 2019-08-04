@@ -234,10 +234,8 @@ export class Browser {
 
     page.evaluate(playButtonCss => {
       const target = document.querySelector(playButtonCss)
-      const observer = new MutationObserver(() => {
-        // @ts-ignore
-        onPlayingChangeEvent()
-      })
+      // @ts-ignore
+      const observer = new MutationObserver(() => onPlayingChangeEvent())
       // @ts-ignore
       observer.observe(target, { attributes: true })
       // @ts-ignore
@@ -248,10 +246,8 @@ export class Browser {
         const id = setInterval(() => {
           if (document.querySelectorAll('.now-playing .cover-art-image')[0]) {
             const target = document.querySelectorAll('.now-playing .cover-art-image')[0]
-            const observer = new MutationObserver(() => {
-              // @ts-ignore
-              onPlayingChangeEvent()
-            })
+            // @ts-ignore
+            const observer = new MutationObserver(() => onPlayingChangeEvent())
             // @ts-ignore
             observer.observe(target, { attributes: true })
             clearInterval(id)
@@ -271,14 +267,19 @@ export class Browser {
     this.selectedPage.evaluate(() => reset())
   }
 
-  private async changeEventCheck(page?: puppeteer.Page) {
+  private async changeEventCheck() {
     if (!this.selectedPage) return
-    if (page && page !== this.selectedPage) return
     const pStatus = await this.getPlayingStatus(this.selectedPage)
     if (pStatus.brand !== 'other') {
       this.selectedMusicPageBrand = pStatus.brand
       this.buttons.setPlayButton(pStatus.status)
       this.buttons.setStatusButtonText(await this.selectedPage.title())
+    } else {
+      if (this.selectedPage.url().includes('youtube.com')) this.resetButton()
+      this.buttons.setStatusButtonText('Running 🎵')
+      this.buttons.dipslayPlayback(false)
+      this.selectedPage = undefined
+      this.selectedMusicPageBrand = undefined
     }
   }
 
@@ -345,14 +346,16 @@ export class Browser {
         if (this.musicBrandCheck(page.url()) === 'spotify') await this.checkSpotifyCSP(page)
         this.injectHtml(page)
         this.addScripts(page)
-        this.setupMusicPage()
+        if (!(this.musicBrandCheck(page.url()) === 'other')) this.setupMusicPage()
       })
     }
 
-    else if (event === 'page_changed') this.changeEventCheck(page)
+    else if (event === 'page_changed') {
+      await page.waitForNavigation()
+      this.changeEventCheck()
+    }
 
-    else if (event === 'play_event') this.changeEventCheck(page)
-    else if (event === 'music_page_closed') { }
+    else if (event === 'play_event') this.changeEventCheck()
   }
 
   private async setPageBypassCSP(page: puppeteer.Page, flag: string) {

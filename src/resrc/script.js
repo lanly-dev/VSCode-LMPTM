@@ -21,12 +21,7 @@ window.addEventListener('beforeunload',() => {
 })
 
 let flagPick = false
-if (loadCount == unloadCount) {
-  const data = sessionStorage.getItem('lmptm')
-  if (data == 'spotify') spotify(btnPick)
-  else if (data == 'soundcloud') soundcloud(btnPick)
-  else if (data == 'youtube') youtube(btnPick)
-}
+if (loadCount == unloadCount) verifyPage()
 
 function check() {
   const btnPick = document.querySelector('.btn-pick-float')
@@ -63,8 +58,17 @@ function check() {
     btnPick.innerHTML = '<i class="fas fa-times-circle"></i> Nevermind! 😓'
     btnPick.disabled = true
 
-    btnReset(btnPick)
+    btnTimeoutReset(btnPick)
   }
+}
+
+function verifyPage() {
+  const data = sessionStorage.getItem('lmptm')
+  if(!data) return
+  if (data == 'spotify' && window.location.href.includes('open.spotify.com')) spotify(btnPick)
+  else if (data == 'soundcloud' && window.location.href.includes('soundcloud.com')) soundcloud(btnPick)
+  else if (data == 'youtube' && window.location.href.includes('youtube.com/watch')) youtube(btnPick)
+  else reset()
 }
 
 function soundcloud(btnPick) {
@@ -85,13 +89,13 @@ function youtube(btnPick) {
 function spotifyInfo(btnPick) {
   btnPick.className = 'btn-pick-float spotify spotify-info'
   btnPick.innerHTML = 'Please log in and make sure the playing queue is not empty! 😉'
-  btnReset(btnPick)
+  btnTimeoutReset(btnPick)
 }
 
 function youtubeInfo(btnPick) {
   btnPick.className = 'btn-pick-float youtube youtube-info'
   btnPick.innerHTML = 'Please pick a video! 😉'
-  btnReset(btnPick)
+  btnTimeoutReset(btnPick)
 }
 
 function spotifyAction(action) {
@@ -109,7 +113,7 @@ function spotifyAction(action) {
   }
 }
 
-function btnReset(btnPick) {
+function btnTimeoutReset(btnPick) {
   setTimeout(() => {
     btnPick.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
     btnPick.className = 'btn-pick-float'
