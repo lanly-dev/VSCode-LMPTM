@@ -39,11 +39,11 @@ export class Browser {
         ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
       }).then(async browser => {
         buttons.setStatusButtonText('Running 🎵')
-        Browser.cssPath = path.join(context.extensionPath, 'out', 'resrc', 'style.css')
-        Browser.jsPath = path.join(context.extensionPath, 'out', 'resrc', 'script.js')
+        Browser.cssPath = path.join(context.extensionPath, 'out', 'scripts', 'style.css')
+        Browser.jsPath = path.join(context.extensionPath, 'out', 'scripts', 'script.js')
         Browser.faCssPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css')
         Browser.faJsPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'js', 'all.min.js')
-        Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'out', 'resrc', 'ui.html'), 'utf8')
+        Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'out', 'scripts', 'ui.html'), 'utf8')
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons)
