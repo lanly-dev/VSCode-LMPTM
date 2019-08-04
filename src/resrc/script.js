@@ -1,7 +1,6 @@
 const btnPick = document.querySelector('.btn-pick-float')
 btnPick.addEventListener('click',check)
 
-
 // Duplicate tab solution
 let clear = false
 let loadCount = sessionStorage.getItem('load')
@@ -22,7 +21,6 @@ window.addEventListener('beforeunload',() => {
 })
 
 let flagPick = false
-// let flagCSP = false
 if (loadCount == unloadCount) {
   const data = sessionStorage.getItem('lmptm')
   if (data == 'spotify') spotify(btnPick)
@@ -86,10 +84,8 @@ function youtube(btnPick) {
 function spotifyAction(action) {
   switch (action) {
     case 'play':
-      document.querySelector('.spoticon-play-16').click()
-      break
     case 'pause':
-      document.querySelector('.spoticon-pause-16').click()
+      (document.querySelector(".spoticon-play-16") || document.querySelector(".spoticon-pause-16")).click()
       break
     case 'skip':
       document.querySelector('.spoticon-skip-forward-16').click()

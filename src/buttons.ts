@@ -26,11 +26,14 @@ export class Buttons {
   }
 
   setStatusButtonText(text: string) {
-    if(text === 'Launch 🚀'){
+    if (text === 'Launch 🚀') {
       this.statusButton.text = text
       this.statusButton.command = 'lmptm.browserlaunch'
+    } else if (text === 'Running 🎵') {
+      this.statusButton.text = text
     } else if (text.length > 30) {
       this.statusButton.text = `${text.substring(0, 15)}...`
+      this.statusButton.command = 'lmptm.showTitle'
     } else {
       this.statusButton.text = text
       this.statusButton.command = 'lmptm.showTitle'

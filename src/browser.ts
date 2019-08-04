@@ -18,7 +18,7 @@ export class Browser {
   public static faJsPath: string
   public static playButtonCss = {
     soundcloud: '.playControl',
-    spotify: '.spoticon-play-16',
+    spotify: '.control-button--circled',
     youtube: '.ytp-play-button'
   }
   private currentBrowser: puppeteer.Browser
@@ -155,14 +155,14 @@ export class Browser {
     const p2 = page2.goto('https://youtube.com')
     const p3 = page3.goto('https://open.spotify.com')
     await Promise.all([p1, p2, p3])
-    this.injectCode(page1)
-    this.injectCode(page2)
-    this.injectCode(page3)
+    this.injectHtml(page1)
+    this.injectHtml(page2)
+    this.injectHtml(page3)
     this.pages = await this.currentBrowser.pages()
   }
 
   // The button doesn't show up on the 1st launch
-  private injectCode(page: puppeteer.Page) {
+  private injectHtml(page: puppeteer.Page) {
     page.evaluate(uiHtmlPath => {
       do {
         // @ts-ignore
@@ -175,6 +175,13 @@ export class Browser {
         }
       } while (!document.getElementsByTagName('body')[0])
     }, Browser.uiHtmlPath)
+  }
+
+  private addScripts(page: puppeteer.Page) {
+    page.addStyleTag({ path: Browser.cssPath })
+    page.addScriptTag({ path: Browser.jsPath })
+    page.addStyleTag({ path: Browser.faCssPath })
+    page.addScriptTag({ path: Browser.faJsPath })
   }
 
   private async setupPageWatcher(page: puppeteer.Page) {
@@ -192,10 +199,6 @@ export class Browser {
       }
     }, Browser.uiHtmlPath)
 
-    page.addStyleTag({ path: Browser.cssPath })
-    page.addScriptTag({ path: Browser.jsPath })
-    page.addStyleTag({ path: Browser.faCssPath })
-    page.addScriptTag({ path: Browser.faJsPath })
 
     page.removeAllListeners('close')
     page.on('close', async () => {
@@ -303,6 +306,7 @@ export class Browser {
   private async closeEventUpdate() {
     this.buttons.setPlayButton('play')
     this.buttons.dipslayPlayback(false)
+    this.buttons.setStatusButtonText('Running 🎵')
     this.selectedPage = undefined
     this.selectedMusicPageBrand = undefined
   }
@@ -322,22 +326,16 @@ export class Browser {
         this.setPageBypassCSP(page, 'true')
         page.goto(page.url())
       } else this.setPageBypassCSP(page, 'false')
+      await this.setupPageWatcher(page)
 
       page.on('load', async () => {
-        if (this.musicBrandCheck(page.url()) === 'spotify')
-          await this.checkSpotifyCSP(page)
-        this.injectCode(page)
-        this.setupPageWatcher(page)
+        if (this.musicBrandCheck(page.url()) === 'spotify') await this.checkSpotifyCSP(page)
+        this.addScripts(page)
+        this.setupMusicPage()
       })
     }
 
-    else if (event === 'page_changed') {
-      if (page.url() === 'chrome-search://local-ntp/local-ntp.html') await this.sleep(5000)
-      const notSpotify = !(this.musicBrandCheck(page.url()) === 'spotify')
-      if (notSpotify) this.setPageBypassCSP(page, 'false')
-      else await this.checkSpotifyCSP(page)
-      this.changeEventCheck(page)
-    }
+    else if (event === 'page_changed') this.changeEventCheck(page)
 
     else if (event === 'play_event') this.changeEventCheck(page)
     else if (event === 'music_page_closed') { }
@@ -353,7 +351,7 @@ export class Browser {
     const cspFlag = await page.evaluate(() => sessionStorage.getItem('bypassCSP'))
     if (cspFlag === 'true') return
     await this.setPageBypassCSP(page, 'true')
-    page.reload()
+    await page.reload()
   }
 
   private async sleep(ms: number = 1000) {
