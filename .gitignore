@@ -1,6 +1,7 @@
 .vscode-test
 *.vsix
+icon/res/
 node_modules
 out
 package-lock.json
-ref
+src/ref
