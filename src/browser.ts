@@ -48,6 +48,10 @@ export class Browser {
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons)
         Browser.launched = false
+      }, error => {
+        vscode.window.showErrorMessage(error.message)
+        vscode.window.showInformationMessage('Missing Chrome? 🤔')
+        Browser.launched = false
       })
     }
   }

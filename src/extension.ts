@@ -19,11 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 function browserLaunch(buttons: Buttons, context: vscode.ExtensionContext) {
   const chromePath = whichChrome.Chrome || whichChrome.Chromium
-  if (!chromePath) {
-    vscode.window.showErrorMessage(`No Chrome or Chromium installation found! 😕`)
-  } else {
-    Browser.launch(buttons, context)
-  }
+  if (!chromePath) vscode.window.showInformationMessage('Missing Chrome? 🤔')
+  else Browser.launch(buttons, context)
 }
 
 function play() {
