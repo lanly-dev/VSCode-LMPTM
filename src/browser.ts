@@ -38,7 +38,7 @@ export class Browser {
         args: ['--incognito', '--window-size=500,500'],
         ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
       }).then(async browser => {
-        buttons.setStatusButtonText('Running 🎵')
+        buttons.setStatusButtonText('Running $(browser)')
         Browser.cssPath = path.join(context.extensionPath, 'out', 'scripts', 'style.css')
         Browser.jsPath = path.join(context.extensionPath, 'out', 'scripts', 'script.js')
         Browser.faCssPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css')
@@ -65,7 +65,7 @@ export class Browser {
     this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
     this.currentBrowser.on('disconnected', () => {
-      this.buttons.setStatusButtonText('Launch 🚀')
+      this.buttons.setStatusButtonText('Launch $(rocket)')
       Browser.activeBrowser = undefined
       this.buttons.dipslayPlayback(false)
     })
@@ -280,7 +280,7 @@ export class Browser {
       this.buttons.setStatusButtonText(await this.selectedPage.title())
     } else {
       if (this.selectedPage.url().includes('youtube.com')) this.resetButton()
-      this.buttons.setStatusButtonText('Running 🎵')
+      this.buttons.setStatusButtonText('Running $(browser)')
       this.buttons.dipslayPlayback(false)
       this.selectedPage = undefined
       this.selectedMusicPageBrand = undefined
@@ -324,7 +324,7 @@ export class Browser {
   private async closeEventUpdate() {
     this.buttons.setPlayButton('play')
     this.buttons.dipslayPlayback(false)
-    this.buttons.setStatusButtonText('Running 🎵')
+    this.buttons.setStatusButtonText('Running $(browser)')
     this.selectedPage = undefined
     this.selectedMusicPageBrand = undefined
   }

@@ -12,10 +12,10 @@ export class Buttons {
     this.backButton = window.createStatusBarItem(StatusBarAlignment.Right, 3)
     this.statusButton = window.createStatusBarItem(StatusBarAlignment.Right, 4)
 
-    this.playButton.text = '▶️'
-    this.skipButton.text = '⏭️'
-    this.backButton.text = '⏮️'
-    this.statusButton.text = 'Launch 🚀'
+    this.playButton.text = '$(play)'
+    this.skipButton.text = '$(chevron-right)'
+    this.backButton.text = '$(chevron-left)'
+    this.statusButton.text = 'Launch $(rocket)'
 
     this.statusButton.command = 'lmptm.browserlaunch'
     this.playButton.command = 'lmptm.play'
@@ -26,10 +26,10 @@ export class Buttons {
   }
 
   setStatusButtonText(text: string) {
-    if (text === 'Launch 🚀') {
+    if (text === 'Launch $(rocket)') {
       this.statusButton.text = text
       this.statusButton.command = 'lmptm.browserlaunch'
-    } else if (text === 'Running 🎵') {
+    } else if (text === 'Running $(browser)') {
       this.statusButton.text = text
       this.statusButton.command = undefined
     } else if (text.length > 30) {
@@ -43,11 +43,11 @@ export class Buttons {
 
   setPlayButton(text: string) {
     if (text === 'play') {
-      this.playButton.text = '▶️'
+      this.playButton.text = '$(play)'
       this.playButton.command = 'lmptm.play'
     }
     else {
-      this.playButton.text = '⏸️'
+      this.playButton.text = '$(primitive-square)'
       this.playButton.command = 'lmptm.pause'
     }
   }
