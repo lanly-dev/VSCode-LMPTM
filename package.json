@@ -1,26 +1,34 @@
 {
-  "name": "let-me-play-the-music",
-  "displayName": "LetMePlayTheMusic",
-  "description": "",
-  "version": "0.0.1",
+  "name": "letmeplaythemusic",
+  "displayName": "Let Me Play The Music",
+  "description": "Control playback from the popular music sites",
+  "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
+  "version": "1.0.0",
+  "publisher": "lanly-dev",
   "engines": {
     "vscode": "^1.35.0"
   },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Music",
+    "Playback",
+    "Browser",
+    "Souncloud",
+    "Spotify",
+    "Youtube"
+  ],
+  "icon": "icon/lmptm.png",
+  "galleryBanner": {
+    "color": "#000f33",
+    "theme": "dark"
+  },
   "activationEvents": [
     "*"
   ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "extension.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -43,8 +51,16 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.10.1",
     "@types/puppeteer-core": "^1.9.0",
-    "karma-chrome-launcher": "^3.0.0",
+    "karma-chrome-launcher": "^2.2.0",
     "puppeteer-core": "^1.19.0",
     "which-chrome": "^0.1.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lanly-dev/VSCode-LMPTM.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lanly-dev/VSCode-LMPTM/issues"
+  },
+  "license": "MIT"
 }

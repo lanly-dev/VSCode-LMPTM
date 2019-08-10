@@ -4,6 +4,5 @@ All notable changes to the "LetMePlayTheMusic" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-
+## [1.0.0] - August 2019
 - Initial release

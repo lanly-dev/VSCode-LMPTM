@@ -5,6 +5,8 @@
 **/*.ts
 **/tsconfig.json
 **/tslint.json
+clearOutFiles.ts
+copyStaticAssets.ts
 icon/res/
 out/test/**
 src/**
