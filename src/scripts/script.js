@@ -73,27 +73,27 @@ function verifyPage() {
 
 function soundcloud(btnPick) {
   btnPick.className = 'btn-pick-float soundcloud'
-  btnPick.innerHTML = '<i class="fab fa-soundcloud"></i>'
+  btnPick.innerHTML = '<span class="souncloud"></span>'
 }
 
 function spotify(btnPick) {
   btnPick.className = 'btn-pick-float spotify'
-  btnPick.innerHTML = '<i class="fab fa-spotify"></i>'
+  btnPick.innerHTML = '<span class="spotify"></span>'
 }
 
 function youtube(btnPick) {
   btnPick.className = 'btn-pick-float youtube'
-  btnPick.innerHTML = '<i class="fab fa-youtube"></i>'
+  btnPick.innerHTML = '<span class="youtube"></span>'
 }
 
 function spotifyInfo(btnPick) {
-  btnPick.className = 'btn-pick-float spotify spotify-info'
+  btnPick.className = 'btn-pick-float spotify-info'
   btnPick.innerHTML = 'Please log in and make sure the playing queue is not empty! 😉'
   btnTimeoutReset(btnPick)
 }
 
 function youtubeInfo(btnPick) {
-  btnPick.className = 'btn-pick-float youtube youtube-info'
+  btnPick.className = 'btn-pick-float youtube-info'
   btnPick.innerHTML = 'Please pick a video! 😉'
   btnTimeoutReset(btnPick)
 }
@@ -115,7 +115,7 @@ function spotifyAction(action) {
 
 function btnTimeoutReset(btnPick) {
   setTimeout(() => {
-    btnPick.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
+    btnPick.innerHTML = '⛏️ Pick?'
     btnPick.className = 'btn-pick-float'
     btnPick.disabled = false
   },3000)
@@ -123,7 +123,7 @@ function btnTimeoutReset(btnPick) {
 
 function reset() {
   const btnPick = document.querySelector('.btn-pick-float')
-  btnPick.innerHTML = '<i class="fas fa-mouse-pointer"></i> Pick?'
+  btnPick.innerHTML = '⛏️ Pick?'
   btnPick.className = 'btn-pick-float'
   sessionStorage.removeItem('lmptm')
 }
