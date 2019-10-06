@@ -1,11 +1,10 @@
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 import * as path from 'path'
-import * as fs from 'fs';
+import * as fs from 'fs'
 
-// @ts-ignore
-import * as whichChrome from 'which-chrome'
 import { Buttons } from './buttons'
+import { WhichChrome } from './whichChrome'
 
 export class Browser {
 
@@ -27,12 +26,14 @@ export class Browser {
   private selectedMusicPageBrand: string | undefined
   private buttons: Buttons
 
+  // @ts-ignore
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
-    const chromePath = whichChrome.Chrome || whichChrome.Chromium
+    const cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+    if (!cPath) return void vscode.window.showInformationMessage('Missing Chrome? 🤔')
     if (!Browser.activeBrowser && !Browser.launched) {
       Browser.launched = true
       puppeteer.launch({
-        executablePath: chromePath,
+        executablePath: cPath,
         headless: false,
         defaultViewport: null,
         args: ['--incognito', '--window-size=500,500'],
