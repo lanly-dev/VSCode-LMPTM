@@ -8,7 +8,6 @@
 clearOutFiles.ts
 copyStaticAssets.ts
 icon/res/
-out/media/
 out/test/
 src/
 vsc-extension-quickstart.md
