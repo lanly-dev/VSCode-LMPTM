@@ -1,4 +1,4 @@
-.vscode-test
+.vscode-test/
 *.vsix
 icon/res/
 node_modules
