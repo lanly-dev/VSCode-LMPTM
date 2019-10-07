@@ -1,5 +1,5 @@
-.vscode-test/
 *.vsix
+dist/
 icon/res/
 node_modules
 out

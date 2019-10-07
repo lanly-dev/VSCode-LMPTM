@@ -32,26 +32,25 @@
   "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "test-compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile",
-    "test": "node ./out/test/runTest.js",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
+    "lint": "tslint -p ./",
     "copy-static-assets": "ts-node tasks.ts copy",
     "clean-out-files": "ts-node tasks.ts clean"
   },
   "devDependencies": {
-    "@types/glob": "^7.1.1",
-    "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.11",
     "@types/shelljs": "^0.8.5",
     "@types/vscode": "^1.38.0",
-    "glob": "^7.1.4",
-    "mocha": "^6.1.4",
     "shelljs": "^0.8.3",
+    "ts-loader": "^6.2.0",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3",
-    "vscode-test": "^1.2.0"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
     "@types/puppeteer-core": "^1.9.0",

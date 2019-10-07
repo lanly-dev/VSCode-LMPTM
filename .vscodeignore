@@ -1,5 +1,4 @@
 .gitignore
-.vscode-test/
 .vscode/
 **/*.map
 **/*.ts
@@ -8,6 +7,6 @@
 clearOutFiles.ts
 copyStaticAssets.ts
 icon/res/
-out/test/
+out/
 src/
 vsc-extension-quickstart.md
