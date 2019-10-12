@@ -4,6 +4,7 @@ interface Paths {
   [key: string]: string;
 }
 
+// @ts-ignore
 const karmaChromeLauncher = require('karma-chrome-launcher')
 
 export class WhichChrome {

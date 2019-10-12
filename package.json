@@ -28,7 +28,7 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/extension.js",
+	"main": "./dist/extension",
   "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
