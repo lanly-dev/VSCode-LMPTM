@@ -28,10 +28,10 @@
   "activationEvents": [
     "*"
   ],
-	"main": "./dist/extension",
+  "main": "./dist/extension",
   "contributes": {},
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "webpack --mode production",
     "test-compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "webpack": "webpack --mode development",
@@ -44,6 +44,7 @@
     "@types/node": "^12.7.11",
     "@types/shelljs": "^0.8.5",
     "@types/vscode": "^1.38.0",
+    "copy-webpack-plugin": "^5.0.4",
     "shelljs": "^0.8.3",
     "ts-loader": "^6.2.0",
     "ts-node": "^8.4.1",

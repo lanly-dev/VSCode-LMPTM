@@ -13,8 +13,6 @@ export class Browser {
   public static cssPath: string
   public static jsPath: string
   public static uiHtmlPath: string
-  public static faCssPath: string
-  public static faJsPath: string
   public static playButtonCss = {
     soundcloud: '.playControl',
     spotify: '.control-button--circled',
@@ -32,23 +30,23 @@ export class Browser {
     if (!cPath) return void vscode.window.showInformationMessage('Missing Chrome? 🤔')
     if (!Browser.activeBrowser && !Browser.launched) {
       Browser.launched = true
+      //@ts-ignore
       puppeteer.launch({
         executablePath: cPath,
         headless: false,
         defaultViewport: null,
         args: ['--incognito', '--window-size=500,500'],
         ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
-      }).then(async browser => {
+      }).then(async (browser: puppeteer.Browser) => {
         buttons.setStatusButtonText('Running $(browser)')
-        Browser.cssPath = path.join(context.extensionPath, 'out', 'scripts', 'style.css')
-        Browser.jsPath = path.join(context.extensionPath, 'out', 'scripts', 'script.js')
-        Browser.faCssPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css')
-        Browser.faJsPath = path.join(context.extensionPath, 'node_modules', '@fortawesome', 'fontawesome-free', 'js', 'all.min.js')
-        Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'out', 'scripts', 'ui.html'), 'utf8')
+        Browser.cssPath = path.join(context.extensionPath, 'dist', 'scripts', 'style.css')
+        Browser.jsPath = path.join(context.extensionPath, 'dist', 'scripts', 'script.js')
+        Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'dist', 'scripts', 'ui.html'), 'utf8')
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons)
         Browser.launched = false
+        //@ts-ignore
       }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Missing Chrome? 🤔')
@@ -181,8 +179,6 @@ export class Browser {
   private addScripts(page: puppeteer.Page) {
     page.addStyleTag({ path: Browser.cssPath })
     page.addScriptTag({ path: Browser.jsPath })
-    page.addStyleTag({ path: Browser.faCssPath })
-    page.addScriptTag({ path: Browser.faJsPath })
   }
 
   private async setupPageWatcher(page: puppeteer.Page) {

@@ -7,6 +7,7 @@
 'use strict'
 
 const path = require('path')
+const CopyPlugin = require('copy-webpack-plugin')
 
 // @ts-ignore
 /**@type {import('webpack').Configuration}*/
@@ -28,10 +29,11 @@ const config = {
   externals: {
     vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: 'commonjs bufferutil', // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
-    'utf-8-validate': 'commonjs utf-8-validate'
+    'utf-8-validate': 'commonjs utf-8-validate',
+    'supports-color': 'commonjs supports-color'
   },
   resolve: { // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', 'css']
   },
   module: {
     rules: [{
@@ -46,7 +48,13 @@ const config = {
         }
       }]
     }]
-  }
+  },
+  plugins: [
+    new CopyPlugin([
+      { from: 'src/scripts/ui.html',to: './scripts' },
+      { from: 'src/scripts/style.css',to: './scripts' }
+    ], { copyUnmodified: true })
+  ]
 }
 
 module.exports = config
