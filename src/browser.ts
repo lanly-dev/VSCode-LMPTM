@@ -1,7 +1,10 @@
+// @ts-ignore
+import { PuppeteerBlocker } from '@cliqz/adblocker-puppeteer'
+import fetch from 'node-fetch'
+import * as fs from 'fs'
+import * as path from 'path'
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
-import * as path from 'path'
-import * as fs from 'fs'
 
 import { Buttons } from './buttons'
 import { WhichChrome } from './whichChrome'
@@ -176,6 +179,7 @@ export class Browser {
       } while (!document.getElementsByTagName('body')[0])
     }, Browser.uiHtmlPath)
   }
+
   private addScripts(page: puppeteer.Page) {
     page.addStyleTag({ path: Browser.cssPath })
     page.addScriptTag({ path: Browser.jsPath })
@@ -344,6 +348,7 @@ export class Browser {
       await this.setupPageWatcher(page)
 
       page.on('load', async () => {
+        PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker: PuppeteerBlocker) => blocker.enableBlockingInPage(page))
         if (this.musicBrandCheck(page.url()) === 'spotify') await this.checkSpotifyCSP(page)
         this.injectHtml(page)
         this.addScripts(page)

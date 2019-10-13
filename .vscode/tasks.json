@@ -28,7 +28,7 @@
     },
     {
       "type": "npm",
-      "script": "clean-out-files",
+      "script": "clean-output",
       "isBackground": false
     }
   ]
