@@ -27,6 +27,10 @@ function check() {
   const btnPick = document.querySelector('.btn-pick-float')
 
   if (window.location.href.includes('soundcloud.com')) {
+    if (!document.querySelectorAll('.m-visible')[0]) {
+      btnPick.disabled = true
+      return void soundcloudInfo(btnPick)
+    }
     window.pageSelected({ brand: 'soundcloud' })
     sessionStorage.setItem('lmptm','soundcloud')
     soundcloud(btnPick)
@@ -35,7 +39,7 @@ function check() {
   } else if (window.location.href.includes('open.spotify.com')) {
     if (!document.querySelectorAll('.now-playing .cover-art-image')[0]) {
       btnPick.disabled = true
-      return spotifyInfo(btnPick)
+      return void spotifyInfo(btnPick)
     }
     window.pageSelected({ brand: 'spotify' })
     sessionStorage.setItem('lmptm','spotify')
@@ -84,6 +88,13 @@ function spotify(btnPick) {
 function youtube(btnPick) {
   btnPick.className = 'btn-pick-float youtube'
   btnPick.innerHTML = '<span class="youtube"></span>'
+}
+
+
+function soundcloudInfo(btnPick) {
+  btnPick.className = 'btn-pick-float soundcloud-info'
+  btnPick.innerHTML = 'Please pick a song 😉'
+  btnTimeoutReset(btnPick)
 }
 
 function spotifyInfo(btnPick) {

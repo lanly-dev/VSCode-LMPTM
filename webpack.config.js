@@ -8,6 +8,7 @@
 
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
+const Terser = require('terser')
 
 // @ts-ignore
 /**@type {import('webpack').Configuration}*/
@@ -16,16 +17,15 @@ const config = {
 
   // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   entry: {
-    extension: './src/extension.ts',
-    'scripts/script': './src/scripts/script.js'
+    extension: './src/extension.ts'
   },
   output: { // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname,'dist'),
     filename: '[name].js',
     libraryTarget: 'commonjs2',
     devtoolModuleFilenameTemplate: '../[resource-path]'
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
   externals: {
     vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: 'commonjs bufferutil', // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
@@ -33,7 +33,7 @@ const config = {
     'supports-color': 'commonjs supports-color'
   },
   resolve: { // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js', 'css']
+    extensions: ['.ts','.js','css']
   },
   module: {
     rules: [{
@@ -51,9 +51,14 @@ const config = {
   },
   plugins: [
     new CopyPlugin([
-      { from: 'src/scripts/ui.html',to: './scripts' },
-      { from: 'src/scripts/style.css',to: './scripts' }
-    ], { copyUnmodified: true })
+      {
+        from: 'src/scripts/script.js',to: './scripts',transform(content,path) {
+          return Terser.minify(content.toString()).code.toString()
+        }
+      },
+      { from: 'src/scripts/style.css',to: './scripts' },
+      { from: 'src/scripts/ui.html',to: './scripts' }
+    ])
   ]
 }
 
