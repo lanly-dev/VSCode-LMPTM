@@ -11,3 +11,4 @@ icon/res/
 out/
 src/
 vsc-extension-quickstart.md
+webpack.config.js

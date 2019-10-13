@@ -3,7 +3,7 @@
   "displayName": "Let Me Play The Music",
   "description": "Control playback from the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "lanly-dev",
   "engines": {
     "vscode": "^1.39.0"
