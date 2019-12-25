@@ -12,33 +12,41 @@ import { WhichChrome } from './whichChrome'
 export class Browser {
 
   public static activeBrowser: Browser | undefined
-  public static launched: boolean = false
   public static cssPath: string
   public static jsPath: string
+  public static launched: boolean = false
   public static uiHtmlPath: string
   public static playButtonCss = {
     soundcloud: '.playControl',
     spotify: '.control-button--circled',
     youtube: '.ytp-play-button'
   }
-  private currentBrowser: puppeteer.Browser
-  private pages: puppeteer.Page[] | undefined
-  private selectedPage: puppeteer.Page | undefined
-  private selectedMusicPageBrand: string | undefined
   private buttons: Buttons
+  private currentBrowser: puppeteer.Browser
+  private incognitoContext: puppeteer.BrowserContext
+  private pages: puppeteer.Page[] | undefined
+  private selectedMusicPageBrand: string | undefined
+  private selectedPage: puppeteer.Page | undefined
 
   // @ts-ignore
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
-    const cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
-    if (!cPath) return void vscode.window.showInformationMessage('Missing Chrome? 🤔')
     if (!Browser.activeBrowser && !Browser.launched) {
+      const args = ['--window-size=500,500']
+      if(vscode.workspace.getConfiguration().get('lmptm.userData')) {
+        args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataPath')}`)
+      }
+
+      let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
+      if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+      if (!cPath) return void vscode.window.showInformationMessage('Missing Chrome? 🤔')
+
       Browser.launched = true
       //@ts-ignore
       puppeteer.launch({
         executablePath: cPath,
         headless: false,
         defaultViewport: null,
-        args: ['--incognito', '--window-size=500,500'],
+        args: args,
         ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
       }).then(async (browser: puppeteer.Browser) => {
         buttons.setStatusButtonText('Running $(browser)')
@@ -47,7 +55,7 @@ export class Browser {
         Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'dist', 'scripts', 'ui.html'), 'utf8')
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
-        Browser.activeBrowser = new Browser(browser, buttons)
+        Browser.activeBrowser = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
         Browser.launched = false
         //@ts-ignore
       }, error => {
@@ -58,11 +66,13 @@ export class Browser {
     }
   }
 
-  constructor(browser: puppeteer.Browser, buttons: Buttons) {
+  constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext ) {
+
     this.buttons = buttons
     this.currentBrowser = browser
     this.pages = undefined
     this.selectedPage = undefined
+    this.incognitoContext = incognitoContext
     this.currentBrowser.on('targetcreated', target => this.update('page_created', target))
     this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
@@ -154,14 +164,20 @@ export class Browser {
   }
 
   private async launchPages() {
-    const page1 = await this.currentBrowser.newPage()
-    const page2 = await this.currentBrowser.newPage()
-    const page3 = await this.currentBrowser.newPage()
+    const page1 = await this.newPage()
+    const page2 = await this.newPage()
+    const page3 = await this.newPage()
     const p1 = page1.goto('https://soundcloud.com')
     const p2 = page2.goto('https://youtube.com')
     const p3 = page3.goto('https://open.spotify.com')
     await Promise.all([p1, p2, p3])
     this.pages = await this.currentBrowser.pages()
+  }
+
+  private async newPage() {
+    const needIncognito = vscode.workspace.getConfiguration().get('lmptm.incognitoMode')
+    if(needIncognito) return this.incognitoContext.newPage()
+    else return this.currentBrowser.newPage()
   }
 
   // The button doesn't show up on the 1st launch

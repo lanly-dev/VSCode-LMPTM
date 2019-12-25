@@ -5,10 +5,9 @@ interface Paths {
 }
 
 // @ts-ignore
-const karmaChromeLauncher = require('karma-chrome-launcher')
+import * as karmaChromeLauncher from 'karma-chrome-launcher'
 
 export class WhichChrome {
-
   public static getPaths() {
     const chromePaths: Paths = {}
     Object.keys(karmaChromeLauncher).forEach(key => {

@@ -29,7 +29,35 @@
     "*"
   ],
   "main": "./dist/extension",
-  "contributes": {},
+  "contributes": {
+    "configuration": [
+      {
+        "title": "LMPTM",
+        "properties": {
+          "lmptm.browserPath": {
+            "type": "string",
+            "default": null,
+            "markdownDescription": "Specifies custom browser executable file path."
+          },
+          "lmptm.incognitoMode": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Specifies whether to make browser in incognito/private mode."
+          },
+          "lmptm.userData": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Specifies if the extension could store browser's user-data."
+          },
+          "lmptm.userDataPath": {
+            "type": "string",
+            "default": "./lmptm/userData",
+            "markdownDescription": "Specifies custom user-data directory path, this will be ignored if **User Data** setting disabled."
+          }
+        }
+      }
+    ]
+  },
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
     "test-compile": "tsc -p ./",
@@ -41,7 +69,7 @@
     "clean-output": "ts-node tasks.ts clean"
   },
   "devDependencies": {
-    "@types/node": "^12.12.17",
+    "@types/node": "^13.1.0",
     "@types/node-fetch": "^2.5.4",
     "@types/puppeteer-core": "^2.0.0",
     "@types/shelljs": "^0.8.6",
@@ -51,16 +79,16 @@
     "ts-loader": "^6.2.1",
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.3",
-    "webpack": "^4.41.2",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@cliqz/adblocker-puppeteer": "^1.4.0",
+    "@cliqz/adblocker-puppeteer": "^1.4.1",
     "karma-chrome-launcher": "^3.1.0",
     "node-fetch": "^2.6.0",
     "puppeteer-core": "^2.0.0",
-    "terser": "^4.4.2"
+    "terser": "^4.4.3"
   },
   "repository": {
     "type": "git",
