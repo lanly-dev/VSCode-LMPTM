@@ -3,10 +3,10 @@
   "displayName": "Let Me Play The Music",
   "description": "Control playback from the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.39.0"
+    "vscode": "^1.41.0"
   },
   "extensionKind": [
     "ui"
@@ -44,12 +44,12 @@
           "lmptm.incognitoMode": {
             "type": "boolean",
             "default": true,
-            "markdownDescription": "Specifies whether to make browser in incognito/private mode."
+            "markdownDescription": "Specifies whether to launch browser in incognito/private mode."
           },
           "lmptm.userData": {
             "type": "boolean",
             "default": false,
-            "markdownDescription": "Specifies if the extension could store browser's user-data."
+            "markdownDescription": "Specifies if the extension could store browser's user data, if enabled, user data directory setting is required"
           },
           "lmptm.userDataDirectory": {
             "type": "string",
