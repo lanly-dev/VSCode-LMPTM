@@ -8,7 +8,9 @@
   "engines": {
     "vscode": "^1.39.0"
   },
-  "extensionKind": ["ui"],
+  "extensionKind": [
+    "ui"
+  ],
   "categories": [
     "Other"
   ],
@@ -49,10 +51,9 @@
             "default": false,
             "markdownDescription": "Specifies if the extension could store browser's user-data."
           },
-          "lmptm.userDataPath": {
+          "lmptm.userDataDirectory": {
             "type": "string",
-            "default": "./lmptm/userData",
-            "markdownDescription": "Specifies custom user-data directory path, this will be ignored if **User Data** setting disabled."
+            "markdownDescription": "Specifies [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting disabled."
           }
         }
       }
@@ -69,7 +70,7 @@
     "clean-output": "ts-node tasks.ts clean"
   },
   "devDependencies": {
-    "@types/node": "^13.1.0",
+    "@types/node": "^13.1.1",
     "@types/node-fetch": "^2.5.4",
     "@types/puppeteer-core": "^2.0.0",
     "@types/shelljs": "^0.8.6",
@@ -80,7 +81,7 @@
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4",
-    "webpack": "^4.41.4",
+    "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {

@@ -32,13 +32,15 @@ export class Browser {
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     if (!Browser.activeBrowser && !Browser.launched) {
       const args = ['--window-size=500,500']
-      if(vscode.workspace.getConfiguration().get('lmptm.userData')) {
-        args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataPath')}`)
+      if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
+        const uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
+        if (uddir) args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')}`)
+        else return vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
       }
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
-      if (!cPath) return void vscode.window.showInformationMessage('Missing Chrome? 🤔')
+      if (!cPath) return void vscode.window.showInformationMessage('Missing Browser! 🤔')
 
       Browser.launched = true
       //@ts-ignore
@@ -66,7 +68,7 @@ export class Browser {
     }
   }
 
-  constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext ) {
+  constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext) {
 
     this.buttons = buttons
     this.currentBrowser = browser
@@ -176,7 +178,7 @@ export class Browser {
 
   private async newPage() {
     const needIncognito = vscode.workspace.getConfiguration().get('lmptm.incognitoMode')
-    if(needIncognito) return this.incognitoContext.newPage()
+    if (needIncognito) return this.incognitoContext.newPage()
     else return this.currentBrowser.newPage()
   }
 
