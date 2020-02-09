@@ -65,7 +65,8 @@
     "watch": "tsc -watch -p ./",
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",
-    "lint": "tslint -p ./",
+    "lint": "eslint . --ext ts",
+    "lint-fix": "eslint . --ext ts --fix",
     "copy-static-assets": "ts-node tasks.ts copy",
     "clean-output": "ts-node tasks.ts clean"
   },

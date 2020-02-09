@@ -1,4 +1,3 @@
-// @ts-ignore
 import { PuppeteerBlocker } from '@cliqz/adblocker-puppeteer'
 import fetch from 'node-fetch'
 import * as fs from 'fs'
@@ -43,7 +42,7 @@ export class Browser {
       if (!cPath) return void vscode.window.showInformationMessage('Missing Browser! 🤔')
 
       Browser.launched = true
-      //@ts-ignore
+      // @ts-ignore
       puppeteer.launch({
         executablePath: cPath,
         headless: false,
@@ -59,7 +58,7 @@ export class Browser {
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
         Browser.launched = false
-        //@ts-ignore
+        // @ts-ignore
       }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Missing Chrome? 🤔')
@@ -308,6 +307,7 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
+    // eslint-disable-next-line
     if (pageBrand === 'other' || !this.selectedPage) {
       return { brand: pageBrand, status: '' }
 
