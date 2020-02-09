@@ -38,7 +38,6 @@ Required Chromium-based browser
 - Remove adblocker
 - Enable adding extensions for browser
 - Add ignoreDisableSync setting option in order to able to launch [Brave](https://brave.com) browser
-- Switch tslint to eslint
 
 ### 1.2.0
 - Able to launch other Chromium-based browsers
