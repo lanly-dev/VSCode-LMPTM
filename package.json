@@ -70,26 +70,28 @@
     "clean-output": "ts-node tasks.ts clean"
   },
   "devDependencies": {
-    "@types/node": "^13.1.1",
+    "@types/node": "^13.7.0",
     "@types/node-fetch": "^2.5.4",
     "@types/puppeteer-core": "^2.0.0",
     "@types/shelljs": "^0.8.6",
-    "@types/vscode": "^1.41.0",
+    "@types/vscode": "^1.42.0",
     "copy-webpack-plugin": "^5.1.1",
     "shelljs": "^0.8.3",
     "ts-loader": "^6.2.1",
-    "ts-node": "^8.5.4",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.4",
+    "ts-node": "^8.6.2",
+    "eslint": "^6.8.0",
+    "@typescript-eslint/parser": "^2.19.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "typescript": "^3.7.5",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@cliqz/adblocker-puppeteer": "^1.4.1",
+    "@cliqz/adblocker-puppeteer": "^1.5.0",
     "karma-chrome-launcher": "^3.1.0",
     "node-fetch": "^2.6.0",
-    "puppeteer-core": "^2.0.0",
-    "terser": "^4.4.3"
+    "puppeteer-core": "^2.1.1",
+    "terser": "^4.6.3"
   },
   "repository": {
     "type": "git",

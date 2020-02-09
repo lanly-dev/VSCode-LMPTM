@@ -1,13 +1,13 @@
 .gitignore
 .vscode/
-node_modules
+**/.eslintrc.json
 **/*.map
 **/*.ts
 **/tsconfig.json
-**/tslint.json
 clearOutFiles.ts
 copyStaticAssets.ts
 icon/res/
+node_modules
 out/
 src/
 vsc-extension-quickstart.md
