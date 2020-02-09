@@ -1,5 +1,3 @@
-import { PuppeteerBlocker } from '@cliqz/adblocker-puppeteer'
-import fetch from 'node-fetch'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as puppeteer from 'puppeteer-core'
@@ -31,11 +29,13 @@ export class Browser {
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     if (!Browser.activeBrowser && !Browser.launched) {
       const args = ['--window-size=500,500']
+      const iArgs = ['--disable-extensions'] // enable extension
       if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
         const uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
         if (uddir) args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')}`)
         else return vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
       }
+      if (vscode.workspace.getConfiguration().get('lmptm.ignoreDisableSync')) iArgs.push('--disable-sync')
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
@@ -48,7 +48,7 @@ export class Browser {
         headless: false,
         defaultViewport: null,
         args: args,
-        ignoreDefaultArgs: ['--mute-audio', '--hide-scrollbars']
+        ignoreDefaultArgs: iArgs
       }).then(async (browser: puppeteer.Browser) => {
         buttons.setStatusButtonText('Running $(browser)')
         Browser.cssPath = path.join(context.extensionPath, 'dist', 'scripts', 'style.css')
@@ -366,7 +366,6 @@ export class Browser {
       await this.setupPageWatcher(page)
 
       page.on('load', async () => {
-        PuppeteerBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker: PuppeteerBlocker) => blocker.enableBlockingInPage(page))
         if (this.musicBrandCheck(page.url()) === 'spotify') await this.checkSpotifyCSP(page)
         this.injectHtml(page)
         this.addScripts(page)

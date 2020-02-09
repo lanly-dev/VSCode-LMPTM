@@ -21,16 +21,24 @@ Required Chromium-based browser
 
 ## Extension Settings
 
-* `lmptm.browserPath`: Specifies custom browser executable file path.
-* `lmptm.incognitoMode`: Specifies whether to launch browser in incognito/private mode.
-* `lmptm.userData`: Specifies if the extension could store browser's user data, if enabled, user data directory setting is required.
-* `lmptm.userDataDirectory`: Specifies [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting disabled.
+* `lmptm.browserPath`: Specify custom browser executable file path.
+* `lmptm.ignoreDisableSync`: Ignore --disable-sync, this option is specifically for [Brave](https://brave.com) browser.
+* `lmptm.incognitoMode`: Specify whether to launch browser in incognito/private mode.
+* `lmptm.userData`: Specify if the extension could store browser's user data, if enabled, user data directory setting is required.
+* `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting disabled.
 
 ## Known Issues
 
-Errors may pop up (mostly happen in console) or functioning incorrectly if navigating too fast
+- Errors may pop up (mostly happen in console) or functioning incorrectly if navigating too fast
+- Does not work with Opera browser
 
 ## Release Notes
+
+### 1.3.0
+- Remove adblocker
+- Enable adding extensions for browser
+- Add ignoreDisableSync setting option in order to able to launch [Brave](https://brave.com) browser
+- Switch tslint to eslint
 
 ### 1.2.0
 - Able to launch other Chromium-based browsers
