@@ -25,7 +25,6 @@ export class Browser {
   private selectedMusicPageBrand: string | undefined
   private selectedPage: puppeteer.Page | undefined
 
-  // @ts-ignore
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     if (!Browser.activeBrowser && !Browser.launched) {
       const args = ['--window-size=500,500']
@@ -33,18 +32,23 @@ export class Browser {
       if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
         const uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
         if (uddir) args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')}`)
-        else return vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
+        else {
+          vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
+          return
+        }
       }
       if (vscode.workspace.getConfiguration().get('lmptm.ignoreDisableSync')) iArgs.push('--disable-sync')
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
-      if (!cPath) return void vscode.window.showInformationMessage('Missing Browser! 🤔')
-
+      if (!cPath) {
+        vscode.window.showInformationMessage('Missing Browser! 🤔')
+        return
+      }
       Browser.launched = true
-      // @ts-ignore
+
       puppeteer.launch({
-        executablePath: cPath,
+        executablePath: String(cPath),
         headless: false,
         defaultViewport: null,
         args: args,
@@ -68,7 +72,6 @@ export class Browser {
   }
 
   constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext) {
-
     this.buttons = buttons
     this.currentBrowser = browser
     this.pages = undefined

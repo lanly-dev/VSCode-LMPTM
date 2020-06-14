@@ -45,8 +45,7 @@ export class Buttons {
     if (text === 'play') {
       this.playButton.text = '$(play)'
       this.playButton.command = 'lmptm.play'
-    }
-    else {
+    } else {
       this.playButton.text = '$(primitive-square)'
       this.playButton.command = 'lmptm.pause'
     }
