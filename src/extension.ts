@@ -6,32 +6,21 @@ export function activate(context: ExtensionContext) {
   const buttons = new Buttons()
   context.subscriptions.concat([
     commands.registerCommand('lmptm.browserlaunch', () => Browser.launch(buttons, context)),
-    commands.registerCommand('lmptm.play', play),
-    commands.registerCommand('lmptm.pause', pause),
-    commands.registerCommand('lmptm.skip', skip),
-    commands.registerCommand('lmptm.back', back),
-    commands.registerCommand('lmptm.showTitle', showTitle),
+    commands.registerCommand('lmptm.play', () => Browser.activeBrowser?.play()),
+    commands.registerCommand('lmptm.pause', () => Browser.activeBrowser?.pause()),
+    commands.registerCommand('lmptm.skip', () => Browser.activeBrowser?.skip()),
+    commands.registerCommand('lmptm.back', () => Browser.activeBrowser?.back()),
+    commands.registerCommand('lmptm.forward', () => Browser.activeBrowser?.forward()),
+    commands.registerCommand('lmptm.backward', () => Browser.activeBrowser?.backward()),
+    commands.registerCommand('lmptm.toggle', () => Browser.activeBrowser?.toggle()),
+    commands.registerCommand('lmptm.showTitle', showTitle)
   ])
 }
 
-function play() {
-  if (Browser.activeBrowser) Browser.activeBrowser.play()
-}
-
-function pause() {
-  if (Browser.activeBrowser) Browser.activeBrowser.pause()
-}
-
-function skip() {
-  if (Browser.activeBrowser) Browser.activeBrowser.skip()
-}
-
-function back() {
-  if (Browser.activeBrowser) Browser.activeBrowser.back()
-}
-
 async function showTitle() {
-  if (Browser.activeBrowser) window.showInformationMessage(await Browser.activeBrowser.getTabTitle())
+  const title = Browser.activeBrowser?.getTabTitle()
+  if (title) window.showInformationMessage(await title)
+  else window.showErrorMessage('Failed to retrieve title')
 }
 
 export function deactivate() {}

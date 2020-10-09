@@ -7,13 +7,15 @@ Doesn't want to or lazy to install the extra official players to the system?
 Want to stay focus on your programing instead of those distracting actions and feelings above?
 
 If yes, you are in luck!  
-This extension launches a Chrome/Chromium browser to the 3 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
+This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
+
+Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment-661796089) - you could use this extension to follow programming tutorials on Youtube with the handy seek forward/backward key shortcuts.
 
 [How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
 
 ## Features
 
-Supports Soundcloud, Spotify and Youtube
+Supports Soundcloud, Spotify, Youtube and Youtube Music
 
 ## Requirements
 
@@ -24,15 +26,22 @@ Required Chromium-based browser
 * `lmptm.browserPath`: Specify custom browser executable file path.
 * `lmptm.ignoreDisableSync`: Ignore --disable-sync, this option is specifically for [Brave](https://brave.com) browser.
 * `lmptm.incognitoMode`: Specify whether to launch browser in incognito/private mode.
+* `lmptm.startPages`: Starting tabs.
 * `lmptm.userData`: Specify if the extension could store browser's user data, if enabled, user data directory setting is required.
-* `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting disabled.
+* `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting is unchecked.
 
 ## Known Issues
-
-- Errors may pop up (mostly happen in console) or functioning incorrectly if navigating too fast
+- Work only with English version of the supported music sites
 - Does not work with Opera browser
+- Won't be able to login Youtube and Spotify(email method)
 
 ## Release Notes
+
+### 1.4.0
+- Add key shorcuts
+- Add seek 5s forward/backward for Youtube shortcuts
+- Add support for [Youtube Music](https://music.youtube.com/)
+- Add startPages settings
 
 ### 1.3.0
 - Remove adblocker

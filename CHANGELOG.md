@@ -4,11 +4,23 @@ All notable changes to the "LetMePlayTheMusic" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how to structure this file.
 
+### TODO
+- Extention setting scope
+- I18n?
+- Site English version issue
+
+## [1.4.0] - October 2020
+- Add key shortcuts [#7](https://github.com/lanly-dev/VSCode-LMPTM/issues/7)
+- Add seek 5s forward/backward key shortcuts for Youtube [#8](https://github.com/lanly-dev/VSCode-LMPTM/issues/8)
+- Add support for Youtube Music
+- Add startPages settings
+- 
+
 ## [1.3.0] - February 2020
 - Add [ignoreDisableSync](https://github.com/puppeteer/puppeteer/blob/0b1777e73cb1e83ece9e09b7b51d11b798def06f/lib/Launcher.js#L277) setting [#3](https://github.com/lanly-dev/VSCode-LMPTM/issues/3#issuecomment-572180371), [#5](https://github.com/lanly-dev/VSCode-LMPTM/issues/5)
 - Remove [Adblocker](https://github.com/cliqz-oss/adblocker/tree/master/packages/adblocker-puppeteer) - New version breaks webpack build
 - Ignore [disable extension flag from puppeteer](https://github.com/puppeteer/puppeteer/blob/0b1777e73cb1e83ece9e09b7b51d11b798def06f/lib/Launcher.js#L270)
-- Switch tslint to eslint
+- Switch tslint to eslint in development
 - 11 files, 141.77KB, 1.42.0
 
 ## [1.2.0] - December 2019

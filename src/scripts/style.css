@@ -76,6 +76,14 @@
   width: 8em;
 }
 
+.ytmusic-info {
+  background-color: white;
+  color:red;
+  font-size: 1.5em;
+  height: 3.5em;
+  width: 15em;
+}
+
 .error {
   background-color: red;
   color:white;

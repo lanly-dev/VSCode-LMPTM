@@ -6,8 +6,9 @@ import * as vscode from 'vscode'
 import { Buttons } from './buttons'
 import { WhichChrome } from './whichChrome'
 
-export class Browser {
+const seekMsg = 'Seeking backward/forward is only work for Youtube video'
 
+export class Browser {
   public static activeBrowser: Browser | undefined
   public static cssPath: string
   public static jsPath: string
@@ -16,7 +17,8 @@ export class Browser {
   public static playButtonCss = {
     soundcloud: '.playControl',
     spotify: '.control-button--circled',
-    youtube: '.ytp-play-button'
+    youtube: '.ytp-play-button',
+    ytmusic: '#play-pause-button'
   }
   private buttons: Buttons
   private currentBrowser: puppeteer.Browser
@@ -45,13 +47,27 @@ export class Browser {
         vscode.window.showInformationMessage('Missing Browser! 🤔')
         return
       }
-      Browser.launched = true
 
+      const links: any = vscode.workspace.getConfiguration().get('lmptm.startPages')
+      if(links.length) {
+        let invalid = false
+        links.forEach((e: string) => {
+          try { new URL(e) } catch (err) {
+            invalid = true
+            return
+          }})
+        if (invalid){
+          vscode.window.showErrorMessage('You may have an invalid url on startPages setting! 🤔')
+          return
+        }
+      }
+
+      Browser.launched = true
       puppeteer.launch({
+        args,
+        defaultViewport: null,
         executablePath: String(cPath),
         headless: false,
-        defaultViewport: null,
-        args: args,
         ignoreDefaultArgs: iArgs
       }).then(async (browser: puppeteer.Browser) => {
         buttons.setStatusButtonText('Running $(browser)')
@@ -62,7 +78,7 @@ export class Browser {
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         Browser.activeBrowser = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
         Browser.launched = false
-        // @ts-ignore
+
       }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Missing Chrome? 🤔')
@@ -92,6 +108,7 @@ export class Browser {
     if (!this.selectedPage) return
     switch (this.selectedMusicPageBrand) {
       case 'soundcloud':
+      case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
         break
       case 'spotify':
@@ -109,6 +126,7 @@ export class Browser {
     if (!this.selectedPage) return
     switch (this.selectedMusicPageBrand) {
       case 'soundcloud':
+      case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
         break
       case 'spotify':
@@ -139,6 +157,9 @@ export class Browser {
         await this.selectedPage.keyboard.press('n')
         await this.selectedPage.keyboard.up('ShiftLeft')
         break
+      case 'ytmusic':
+        await this.selectedPage.keyboard.press('j')
+        break
     }
     this.changeEventCheck()
   }
@@ -158,23 +179,57 @@ export class Browser {
       case 'youtube':
         this.selectedPage.goBack()
         break
+      case 'ytmusic':
+        await this.selectedPage.keyboard.press('j')
+        break
     }
     this.changeEventCheck()
   }
 
+  async forward() {
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'youtube':
+        await this.selectedPage.keyboard.press('ArrowRight')
+        break
+      default: { vscode.window.showInformationMessage(seekMsg) }
+    }
+    this.changeEventCheck()
+  }
+
+  async backward() {
+    if (!this.selectedPage) return
+    switch (this.selectedMusicPageBrand) {
+      case 'youtube':
+        await this.selectedPage.keyboard.press('ArrowLeft')
+        break
+      default: { vscode.window.showInformationMessage(seekMsg) }
+    }
+    this.changeEventCheck()
+  }
+
+  async toggle() {
+    if (this.selectedPage) {
+      const pStt = await this.getPlayingStatus(this.selectedPage)
+      pStt.status === 'play' ? this.pause() : this.play()
+    }
+  }
+
   getTabTitle() {
-    // @ts-ignore
-    return this.selectedPage.title()
+    return this.selectedPage?.title()
   }
 
   private async launchPages() {
-    const page1 = await this.newPage()
-    const page2 = await this.newPage()
-    const page3 = await this.newPage()
-    const p1 = page1.goto('https://soundcloud.com')
-    const p2 = page2.goto('https://youtube.com')
-    const p3 = page3.goto('https://open.spotify.com')
-    await Promise.all([p1, p2, p3])
+    const links: any  = vscode.workspace.getConfiguration().get('lmptm.startPages')
+    if (links.length) {
+      const p: any = []
+      links.forEach(async (e: string) => {
+        const pg = await this.newPage()
+        await pg.setDefaultNavigationTimeout(0)
+        p.push(pg.goto(e))
+      })
+      await Promise.all(p)
+    }
     this.pages = await this.currentBrowser.pages()
   }
 
@@ -206,7 +261,6 @@ export class Browser {
   }
 
   private async setupPageWatcher(page: puppeteer.Page) {
-    // @ts-ignore
     page.evaluateOnNewDocument(uiHtmlPath => {
       window.onload = () => {
         // @ts-ignore
@@ -219,7 +273,6 @@ export class Browser {
         }
       }
     }, Browser.uiHtmlPath)
-
 
     page.removeAllListeners('close')
     page.on('close', async () => {
@@ -261,7 +314,6 @@ export class Browser {
       const target = document.querySelector(playButtonCss)
       // @ts-ignore
       const observer = new MutationObserver(() => onPlayingChangeEvent())
-      // @ts-ignore
       observer.observe(target, { attributes: true })
       // @ts-ignore
     }, Browser.playButtonCss[brand])
@@ -273,7 +325,6 @@ export class Browser {
             const target = document.querySelectorAll('.now-playing .cover-art-image')[0]
             // @ts-ignore
             const observer = new MutationObserver(() => onPlayingChangeEvent())
-            // @ts-ignore
             observer.observe(target, { attributes: true })
             clearInterval(id)
           }
@@ -289,7 +340,7 @@ export class Browser {
 
   private resetButton() {
     // @ts-ignore
-    this.selectedPage.evaluate(() => reset())
+    this.selectedPage?.evaluate(() => reset())
   }
 
   private async changeEventCheck() {
@@ -298,9 +349,10 @@ export class Browser {
     if (pStatus.brand !== 'other') {
       this.selectedMusicPageBrand = pStatus.brand
       this.buttons.setPlayButton(pStatus.status)
-      this.buttons.setStatusButtonText(await this.selectedPage.title())
+      if(this.selectedPage)
+        this.buttons.setStatusButtonText(await this.selectedPage.title())
     } else {
-      if (this.selectedPage.url().includes('youtube.com')) this.resetButton()
+      if (this.selectedPage.url().includes('www.youtube.com')) this.resetButton() // See line 400
       this.buttons.setStatusButtonText('Running $(browser)')
       this.buttons.dipslayPlayback(false)
       this.selectedPage = undefined
@@ -310,11 +362,10 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
-    // eslint-disable-next-line
-    if (pageBrand === 'other' || !this.selectedPage) {
-      return { brand: pageBrand, status: '' }
 
-    } else if (pageBrand === 'soundcloud') {
+    if (pageBrand === 'other' || !this.selectedPage) return { brand: pageBrand, status: '' }
+
+    else if (pageBrand === 'soundcloud') {
       const element = await this.selectedPage.$(Browser.playButtonCss.soundcloud)
       const text = await this.selectedPage.evaluate(element => element.getAttribute('title'), element)
       const stt = text.includes('Play') ? 'play' : 'pause'
@@ -332,14 +383,22 @@ export class Browser {
       if (!text) return { brand: pageBrand, status: 'play' } // When replay
       const stt = text.includes('Play') ? 'play' : 'pause'
       return { brand: pageBrand, status: stt }
-    }
-    else return { brand: pageBrand, status: '' }
+
+    } else if (pageBrand === 'ytmusic') {
+      const element = await this.selectedPage.$(Browser.playButtonCss.ytmusic)
+      const text = await this.selectedPage.evaluate(element => element.getAttribute('aria-label'), element)
+      if (!text) return { brand: pageBrand, status: 'play' }
+      const stt = text.includes('Play') ? 'play' : 'pause'
+      return { brand: pageBrand, status: stt }
+
+    } else return { brand: pageBrand, status: '' }
   }
 
   private musicBrandCheck(url: string) {
     if (url.includes('soundcloud.com')) return 'soundcloud'
     else if (url.includes('open.spotify.com')) return 'spotify'
-    else if (url.includes('youtube.com/watch')) return 'youtube'
+    else if (url.includes('www.youtube.com/watch')) return 'youtube'
+    else if (url.includes('music.youtube.com')) return 'ytmusic'
     else return 'other'
   }
 
@@ -361,7 +420,6 @@ export class Browser {
     }
 
     else if (event === 'page_created') {
-      page.setMaxListeners(3)
       if ((this.musicBrandCheck(page.url()) === 'spotify')) {
         this.setPageBypassCSP(page, 'true')
         page.goto(page.url())
@@ -397,7 +455,7 @@ export class Browser {
     await page.reload()
   }
 
-  private async sleep(ms: number = 1000) {
-    await new Promise(resolve => setTimeout(() => resolve(), ms))
-  }
+  // private async sleep(ms: number = 1000) {
+  //   await new Promise(resolve => setTimeout(() => resolve(), ms))
+  // }
 }

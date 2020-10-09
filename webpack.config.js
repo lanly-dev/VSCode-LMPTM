@@ -60,8 +60,8 @@ const config = {
         {
           from: 'src/scripts/script.js',
           to: 'scripts',
-          transform(content, path) {
-            return Terser.minify(content.toString()).code.toString()
+          async transform(content, path) {
+            return (await Terser.minify(content.toString())).code
           },
         },
         { from: 'src/scripts/style.css', to: 'scripts' },
