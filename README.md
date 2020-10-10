@@ -15,7 +15,7 @@ Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment
 
 ## Features
 
-Supports Soundcloud, Spotify, Youtube and Youtube Music
+Supports SoundCloud, Spotify, Youtube and Youtube Music
 
 ## Requirements
 
@@ -33,7 +33,7 @@ Required Chromium-based browser
 ## Known Issues
 - Work only with English version of the supported music sites
 - Does not work with Opera browser
-- Won't be able to login Youtube and Spotify(email method)
+- Won't be able to login Youtube and SoundCLoud(email method)
 
 ## Release Notes
 

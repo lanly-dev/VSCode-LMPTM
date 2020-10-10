@@ -6,7 +6,7 @@ import * as vscode from 'vscode'
 import { Buttons } from './buttons'
 import { WhichChrome } from './whichChrome'
 
-const seekMsg = 'Seeking backward/forward is only work for Youtube video'
+const seekMsg = 'Seeking backward/forward function is only work for Youtube videos'
 
 export class Browser {
   public static activeBrowser: Browser | undefined
