@@ -5,8 +5,8 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "watch",
-      "problemMatcher": "$tsc-watch",
+      "script": "wp-watch",
+      "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
       "isBackground": true,
       "presentation": {
         "reveal": "never"
@@ -17,8 +17,16 @@
       }
     },
     {
+      "label": "ts-watch",
       "type": "npm",
-      "script": "compile",
+      "script": "ts-watch",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": { "reveal": "never" }
+    },
+    {
+      "type": "npm",
+      "script": "test-compile",
       "dependsOn": ["npm: copy-static-assets"]
     },
     {

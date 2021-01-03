@@ -4,8 +4,6 @@
 **/*.map
 **/*.ts
 **/tsconfig.json
-clearOutFiles.ts
-copyStaticAssets.ts
 icon/res/
 node_modules
 out/

@@ -1,74 +1,55 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
 // @ts-check
 'use strict'
-
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
-const Terser = require('terser')
+const TerserPlugin = require('terser-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 
 /**@type {import('webpack').Configuration}*/
 const config = {
+  mode: 'none',
   target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
-
-  // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
-  entry: {
-    extension: './src/extension.ts',
-  },
+  entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    libraryTarget: 'commonjs2',
-    devtoolModuleFilenameTemplate: '../[resource-path]',
+    filename: 'extension.js',
+    libraryTarget: 'commonjs2'
   },
-  // devtool: 'source-map',
+  devtool: 'source-map',
   externals: {
     vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: 'commonjs bufferutil', // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
-    'utf-8-validate': 'commonjs utf-8-validate',
-    'supports-color': 'commonjs supports-color',
+    'utf-8-validate': 'commonjs utf-8-validate'
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js', 'css'],
+    extensions: ['.ts', '.js', 'css']
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              compilerOptions: {
-                module: 'es6', // override `tsconfig.json` so that TypeScript emits native JavaScript modules.
-              },
-            },
-          },
-        ],
-      },
-    ],
+        use: [{ loader: 'ts-loader' }]
+      }
+    ]
   },
   plugins: [
+    // @ts-ignore
     new CopyPlugin({
       patterns: [
-        {
-          from: 'src/scripts/script.js',
-          to: 'scripts',
-          async transform(content, path) {
-            return (await Terser.minify(content.toString())).code
-          },
-        },
+        { from: 'src/scripts/script.js', to: 'scripts' },
         { from: 'src/scripts/style.css', to: 'scripts' },
-        { from: 'src/scripts/ui.html', to: 'scripts' },
-      ],
-    }),
+        { from: 'src/scripts/ui.html', to: 'scripts' }
+      ]
+    })
   ],
+  // optimization: {
+  //   minimize: true,
+  //   // @ts-ignore
+  //   minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
+  // }
 }
 
 module.exports = config
