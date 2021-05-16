@@ -11,7 +11,7 @@
   position: fixed;
   text-align: center;
   transition: 200ms;
-  z-index: 2202;
+  z-index: 2147483645;
   box-shadow:
     1px 0px #3a587f, 0px 1px #4171ae,
     2px 1px #3a587f, 1px 2px #4171ae,

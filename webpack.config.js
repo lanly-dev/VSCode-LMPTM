@@ -40,8 +40,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         { from: 'src/scripts/script.js', to: 'scripts' },
-        { from: 'src/scripts/style.css', to: 'scripts' },
-        { from: 'src/scripts/ui.html', to: 'scripts' }
+        { from: 'src/scripts/style.css', to: 'scripts' }
       ]
     })
   ],

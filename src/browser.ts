@@ -1,19 +1,19 @@
-import * as fs from 'fs'
 import * as path from 'path'
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 
 import { Buttons } from './buttons'
+import { Treeview } from './treeview'
 import { WhichChrome } from './whichChrome'
 
-const seekMsg = 'Seeking backward/forward function is only work for Youtube videos'
+const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos'
+const PICK_MSG = '⛏️ Pick?'
 
 export class Browser {
   public static activeBrowser: Browser | undefined
   public static cssPath: string
   public static jsPath: string
   public static launched: boolean = false
-  public static uiHtmlPath: string
   public static playButtonCss = {
     soundcloud: '.playControl',
     spotify: '.control-button--circled',
@@ -49,14 +49,15 @@ export class Browser {
       }
 
       const links: any = vscode.workspace.getConfiguration().get('lmptm.startPages')
-      if(links.length) {
+      if (links.length) {
         let invalid = false
         links.forEach((e: string) => {
           try { new URL(e) } catch (err) {
             invalid = true
             return
-          }})
-        if (invalid){
+          }
+        })
+        if (invalid) {
           vscode.window.showErrorMessage('You may have an invalid url on startPages setting! 🤔')
           return
         }
@@ -73,12 +74,12 @@ export class Browser {
         buttons.setStatusButtonText('Running $(browser)')
         Browser.cssPath = path.join(context.extensionPath, 'dist', 'scripts', 'style.css')
         Browser.jsPath = path.join(context.extensionPath, 'dist', 'scripts', 'script.js')
-        Browser.uiHtmlPath = fs.readFileSync(path.join(context.extensionPath, 'dist', 'scripts', 'ui.html'), 'utf8')
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
-        Browser.activeBrowser = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
+        const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
+        Browser.activeBrowser = b
         Browser.launched = false
-
+        Treeview.refresh()
       }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Missing Chrome? 🤔')
@@ -97,10 +98,13 @@ export class Browser {
     this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
     this.currentBrowser.on('disconnected', () => {
+      Treeview.refresh()
       this.buttons.setStatusButtonText('Launch $(rocket)')
       Browser.activeBrowser = undefined
       this.buttons.dipslayPlayback(false)
+      // console.debug('CLOSE')
     })
+    // this.currentBrowser.process().once('close', () => console.debug('CLOSE!!!!!!!!'))
     this.launchPages()
   }
 
@@ -192,7 +196,7 @@ export class Browser {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowRight')
         break
-      default: { vscode.window.showInformationMessage(seekMsg) }
+      default: { vscode.window.showInformationMessage(SEEK_MSG) }
     }
     this.changeEventCheck()
   }
@@ -203,7 +207,7 @@ export class Browser {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowLeft')
         break
-      default: { vscode.window.showInformationMessage(seekMsg) }
+      default: { vscode.window.showInformationMessage(SEEK_MSG) }
     }
     this.changeEventCheck()
   }
@@ -219,8 +223,25 @@ export class Browser {
     return this.selectedPage?.title()
   }
 
+  async getDetails() {
+    if (!this.pages) return
+    const details: any[] = []
+    for (const p of this.pages) {
+      const d: any = {}
+      try { // prevent error shows when browser is closed
+        d.title = await p.title()
+        const { brand, status } = await this.getPlayingStatus(p)
+        if (this.selectedPage && this.selectedPage === p) d.selected = true
+        d.brand = brand
+        d.status = status
+        details.push(d)
+      } catch (error) { break }
+    }
+    return details
+  }
+
   private async launchPages() {
-    const links: any  = vscode.workspace.getConfiguration().get('lmptm.startPages')
+    const links: any = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (links.length) {
       const p: any = []
       links.forEach(async (e: string) => {
@@ -241,18 +262,19 @@ export class Browser {
 
   // The button doesn't show up on the 1st launch
   private injectHtml(page: puppeteer.Page) {
-    page.evaluate(uiHtmlPath => {
+    page.evaluate((pickMsg: string) => {
       do {
         // @ts-ignore
         if (!window['injected']) {
-          const div = document.createElement('div')
-          div.innerHTML = uiHtmlPath
-          document.getElementsByTagName('body')[0].appendChild(div)
+          const b = document.createElement('button')
+          b.innerHTML = pickMsg
+          b.className = 'btn-pick-float'
+          document.body.appendChild(b)
           // @ts-ignore
           window['injected'] = true
         }
       } while (!document.getElementsByTagName('body')[0])
-    }, Browser.uiHtmlPath)
+    }, PICK_MSG)
   }
 
   private addScripts(page: puppeteer.Page) {
@@ -261,33 +283,35 @@ export class Browser {
   }
 
   private async setupPageWatcher(page: puppeteer.Page) {
-    page.evaluateOnNewDocument(uiHtmlPath => {
+    page.evaluateOnNewDocument((pickMsg : string) => {
       window.onload = () => {
         // @ts-ignore
         if (!window['injected']) {
-          const div = document.createElement('div')
-          div.innerHTML = uiHtmlPath
-          document.getElementsByTagName('body')[0].appendChild(div)
+          const b = document.createElement('button')
+          b.innerHTML = pickMsg
+          b.className = 'btn-pick-float'
+          document.body.appendChild(b)
           // @ts-ignore
           window['injected'] = true
         }
       }
-    }, Browser.uiHtmlPath)
+    }, PICK_MSG)
 
     page.removeAllListeners('close')
     page.on('close', async () => {
-      await new Promise(resolve => setTimeout(() => resolve(), 1000))
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
       if (Browser.activeBrowser) this.update('page_closed', page.target())
     })
 
     // @ts-ignore
     if (!page._pageBindings.has('pageSelected')) {
-      page.exposeFunction('pageSelected', async e => {
+      // @ts-ignore
+      page.exposeFunction('pageSelected', async ({ brand }) => {
         this.update('pageSelected', page.target())
         if (page !== this.selectedPage) {
           if (this.selectedPage) this.resetButton()
           this.selectedPage = page
-          this.selectedMusicPageBrand = e.brand
+          this.selectedMusicPageBrand = brand
           this.setupMusicPage()
           this.buttons.dipslayPlayback(true)
           this.buttons.setStatusButtonText(await this.selectedPage.title())
@@ -349,7 +373,7 @@ export class Browser {
     if (pStatus.brand !== 'other') {
       this.selectedMusicPageBrand = pStatus.brand
       this.buttons.setPlayButton(pStatus.status)
-      if(this.selectedPage)
+      if (this.selectedPage)
         this.buttons.setStatusButtonText(await this.selectedPage.title())
     } else {
       if (this.selectedPage.url().includes('www.youtube.com')) this.resetButton() // See line 400
@@ -362,36 +386,32 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
+    let stt
 
     if (pageBrand === 'other' || !this.selectedPage) return { brand: pageBrand, status: '' }
 
     else if (pageBrand === 'soundcloud') {
       const element = await this.selectedPage.$(Browser.playButtonCss.soundcloud)
-      const text = await this.selectedPage.evaluate(element => element.getAttribute('title'), element)
-      const stt = text.includes('Play') ? 'play' : 'pause'
-      return { brand: pageBrand, status: stt }
+      let text = await this.selectedPage.evaluate(element => element?.getAttribute('title'), element)
+      if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'spotify') {
       const element = await this.selectedPage.$(Browser.playButtonCss.spotify)
-      const text = await this.selectedPage.evaluate(element => element.getAttribute('title'), element)
-      const stt = text.includes('Play') ? 'play' : 'pause'
-      return { brand: pageBrand, status: stt }
+      let text = await this.selectedPage.evaluate(element => element?.getAttribute('title'), element)
+      if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'youtube') {
       const element = await this.selectedPage.$(Browser.playButtonCss.youtube)
-      const text = await this.selectedPage.evaluate(element => element.getAttribute('aria-label'), element)
-      if (!text) return { brand: pageBrand, status: 'play' } // When replay
-      const stt = text.includes('Play') ? 'play' : 'pause'
-      return { brand: pageBrand, status: stt }
+      let text = await this.selectedPage.evaluate(element => element?.getAttribute('aria-label'), element)
+      if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'ytmusic') {
       const element = await this.selectedPage.$(Browser.playButtonCss.ytmusic)
-      const text = await this.selectedPage.evaluate(element => element.getAttribute('aria-label'), element)
-      if (!text) return { brand: pageBrand, status: 'play' }
-      const stt = text.includes('Play') ? 'play' : 'pause'
-      return { brand: pageBrand, status: stt }
+      let text = await this.selectedPage.evaluate(element => element?.getAttribute('aria-label'), element)
+      if (text) stt = text.includes('Play') ? 'play' : 'pause'
+    }
 
-    } else return { brand: pageBrand, status: '' }
+    return { brand: pageBrand, status: stt }
   }
 
   private musicBrandCheck(url: string) {
@@ -411,13 +431,10 @@ export class Browser {
   }
 
   private async update(event: string, target: puppeteer.Target) {
+    vscode.commands.executeCommand('lmptm.tvRefresh')
     const page = await target.page()
     if (!page) return
-
-    if (event === 'page_closed') {
-      if (page === this.selectedPage) this.closeEventUpdate()
-      else this.updatePages()
-    }
+    if (event === 'page_closed' && page === this.selectedPage) this.closeEventUpdate()
 
     else if (event === 'page_created') {
       if ((this.musicBrandCheck(page.url()) === 'spotify')) {
@@ -440,6 +457,7 @@ export class Browser {
     }
 
     else if (event === 'play_event') this.changeEventCheck()
+    this.updatePages()
   }
 
   private async setPageBypassCSP(page: puppeteer.Page, flag: string) {

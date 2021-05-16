@@ -17,7 +17,7 @@ export class Buttons {
     this.backButton.text = '$(chevron-left)'
     this.statusButton.text = 'Launch $(rocket)'
 
-    this.statusButton.command = 'lmptm.browserlaunch'
+    this.statusButton.command = 'lmptm.browserLaunch'
     this.playButton.command = 'lmptm.play'
     this.backButton.command = 'lmptm.back'
     this.skipButton.command = 'lmptm.skip'
@@ -28,7 +28,7 @@ export class Buttons {
   setStatusButtonText(text: string) {
     if (text === 'Launch $(rocket)') {
       this.statusButton.text = text
-      this.statusButton.command = 'lmptm.browserlaunch'
+      this.statusButton.command = 'lmptm.browserLaunch'
     } else if (text === 'Running $(browser)') {
       this.statusButton.text = text
       this.statusButton.command = undefined
@@ -41,7 +41,7 @@ export class Buttons {
     }
   }
 
-  setPlayButton(text: string) {
+  setPlayButton(text: string | undefined) {
     if (text === 'play') {
       this.playButton.text = '$(play)'
       this.playButton.command = 'lmptm.play'
@@ -50,6 +50,7 @@ export class Buttons {
       this.playButton.command = 'lmptm.pause'
     }
   }
+
   dipslayPlayback(flag: boolean) {
     if (flag) {
       this.playButton.show()
