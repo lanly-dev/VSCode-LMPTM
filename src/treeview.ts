@@ -1,14 +1,14 @@
-import { Event, EventEmitter, TreeDataProvider, TreeItem, window } from 'vscode'
 import { Browser } from './browser'
+import { Event, EventEmitter, ThemeIcon, TreeDataProvider, TreeItem, window } from 'vscode'
 
 export interface Entry {
-  title: string
   brand: string
+  title: string
   status: string
 }
 
-export class Treeview implements TreeDataProvider<Entry> {
-  public static tv: Treeview
+export class TreeviewProvider implements TreeDataProvider<Entry> {
+  public static tvProvider: TreeviewProvider
 
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>()
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event
@@ -16,13 +16,15 @@ export class Treeview implements TreeDataProvider<Entry> {
   private browser: Browser | undefined
 
   public static create() {
-    const tv = new Treeview()
-    window.createTreeView('LMPTM', { treeDataProvider: tv })
-    this.tv = tv
+    const treeDataProvider = new TreeviewProvider()
+    const tv = window.createTreeView('LMPTM', { treeDataProvider })
+    // tv.onDidChangeSelection(({ selection }) => {})
+    console.debug(tv.description)
+    this.tvProvider = treeDataProvider
   }
 
   public static refresh() {
-    this.tv.refresh()
+    this.tvProvider.refresh()
   }
 
   constructor() {
@@ -42,12 +44,22 @@ export class Treeview implements TreeDataProvider<Entry> {
 
   private getItem(element: Entry) {
     // console.debug(element)
-    return new TreeItem(element.title)
+
+    return new tabItem(element)
   }
 
   refresh(): void {
     this.browser = Browser.activeBrowser
     this._onDidChangeTreeData.fire(undefined)
     // console.debug('refresh')
+  }
+}
+
+class tabItem extends TreeItem {
+  constructor(e: Entry) {
+    const { title, status } = e
+    super(title)
+    if (status) this.iconPath = status === 'play' ? new ThemeIcon('debug-pause') : new ThemeIcon('debug-start')
+    this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }
   }
 }

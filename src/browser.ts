@@ -3,7 +3,7 @@ import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 
 import { Buttons } from './buttons'
-import { Treeview } from './treeview'
+import { TreeviewProvider } from './treeview'
 import { WhichChrome } from './whichChrome'
 
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos'
@@ -79,7 +79,7 @@ export class Browser {
         const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
         Browser.activeBrowser = b
         Browser.launched = false
-        Treeview.refresh()
+        TreeviewProvider.refresh()
       }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Missing Chrome? 🤔')
@@ -98,10 +98,10 @@ export class Browser {
     this.currentBrowser.on('targetchanged', target => this.update('page_changed', target))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed',target))
     this.currentBrowser.on('disconnected', () => {
-      Treeview.refresh()
+      TreeviewProvider.refresh()
       this.buttons.setStatusButtonText('Launch $(rocket)')
       Browser.activeBrowser = undefined
-      this.buttons.dipslayPlayback(false)
+      this.buttons.displayPlayback(false)
       // console.debug('CLOSE')
     })
     // this.currentBrowser.process().once('close', () => console.debug('CLOSE!!!!!!!!'))
@@ -226,9 +226,10 @@ export class Browser {
   async getDetails() {
     if (!this.pages) return
     const details: any[] = []
-    for (const p of this.pages) {
+    for (const [i, p] of this.pages.entries()) {
       const d: any = {}
       try { // prevent error shows when browser is closed
+        d.index = i
         d.title = await p.title()
         const { brand, status } = await this.getPlayingStatus(p)
         if (this.selectedPage && this.selectedPage === p) d.selected = true
@@ -238,6 +239,22 @@ export class Browser {
       } catch (error) { break }
     }
     return details
+  }
+
+  async pickTab(e: any) {
+    if (!this.pages) return
+    const { index, brand } = e
+    const pickedTab = this.pages[index]
+    this.pause()
+    this.update('pageSelected', pickedTab.target())
+    if (pickedTab !== this.selectedPage) {
+      if (this.selectedPage) this.resetButton()
+      this.selectedPage = pickedTab
+      this.selectedMusicPageBrand = brand
+      this.buttons.displayPlayback(true)
+      this.buttons.setStatusButtonText(await this.selectedPage.title())
+      this.changeEventCheck()
+    }
   }
 
   private async launchPages() {
@@ -307,13 +324,14 @@ export class Browser {
     if (!page._pageBindings.has('pageSelected')) {
       // @ts-ignore
       page.exposeFunction('pageSelected', async ({ brand }) => {
+        this.pause()
         this.update('pageSelected', page.target())
         if (page !== this.selectedPage) {
           if (this.selectedPage) this.resetButton()
           this.selectedPage = page
           this.selectedMusicPageBrand = brand
           this.setupMusicPage()
-          this.buttons.dipslayPlayback(true)
+          this.buttons.displayPlayback(true)
           this.buttons.setStatusButtonText(await this.selectedPage.title())
           this.changeEventCheck()
         }
@@ -378,7 +396,7 @@ export class Browser {
     } else {
       if (this.selectedPage.url().includes('www.youtube.com')) this.resetButton() // See line 400
       this.buttons.setStatusButtonText('Running $(browser)')
-      this.buttons.dipslayPlayback(false)
+      this.buttons.displayPlayback(false)
       this.selectedPage = undefined
       this.selectedMusicPageBrand = undefined
     }
@@ -386,27 +404,28 @@ export class Browser {
 
   private async getPlayingStatus(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
+    const { soundcloud, spotify, youtube, ytmusic } = Browser.playButtonCss
     let stt
 
     if (pageBrand === 'other' || !this.selectedPage) return { brand: pageBrand, status: '' }
 
     else if (pageBrand === 'soundcloud') {
-      const element = await this.selectedPage.$(Browser.playButtonCss.soundcloud)
+      const element = await this.selectedPage.$(soundcloud)
       let text = await this.selectedPage.evaluate(element => element?.getAttribute('title'), element)
       if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'spotify') {
-      const element = await this.selectedPage.$(Browser.playButtonCss.spotify)
+      const element = await this.selectedPage.$(spotify)
       let text = await this.selectedPage.evaluate(element => element?.getAttribute('title'), element)
       if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'youtube') {
-      const element = await this.selectedPage.$(Browser.playButtonCss.youtube)
+      const element = await this.selectedPage.$(youtube)
       let text = await this.selectedPage.evaluate(element => element?.getAttribute('aria-label'), element)
       if (text) stt = text.includes('Play') ? 'play' : 'pause'
 
     } else if (pageBrand === 'ytmusic') {
-      const element = await this.selectedPage.$(Browser.playButtonCss.ytmusic)
+      const element = await this.selectedPage.$(ytmusic)
       let text = await this.selectedPage.evaluate(element => element?.getAttribute('aria-label'), element)
       if (text) stt = text.includes('Play') ? 'play' : 'pause'
     }
@@ -424,14 +443,13 @@ export class Browser {
 
   private async closeEventUpdate() {
     this.buttons.setPlayButton('play')
-    this.buttons.dipslayPlayback(false)
+    this.buttons.displayPlayback(false)
     this.buttons.setStatusButtonText('Running $(browser)')
     this.selectedPage = undefined
     this.selectedMusicPageBrand = undefined
   }
 
   private async update(event: string, target: puppeteer.Target) {
-    vscode.commands.executeCommand('lmptm.tvRefresh')
     const page = await target.page()
     if (!page) return
     if (event === 'page_closed' && page === this.selectedPage) this.closeEventUpdate()
@@ -457,6 +475,8 @@ export class Browser {
     }
 
     else if (event === 'play_event') this.changeEventCheck()
+
+    TreeviewProvider.refresh()
     this.updatePages()
   }
 

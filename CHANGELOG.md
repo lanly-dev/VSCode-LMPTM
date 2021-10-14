@@ -5,8 +5,14 @@ All notable changes to the "LetMePlayTheMusic" extension will be documented in t
 Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how to structure this file.
 
 ### TODO
-- I18n?
+- Brave setting removal
+- I18n
+- Look into mediaSession playbackState
+- Playwright vs Puppeteer option
+- Shelljs vs Execa
 - Site English version issue
+- Support for other site
+- Treeview
 
 ## [1.4.0] - October 2020
 - Add key shortcuts [#7](https://github.com/lanly-dev/VSCode-LMPTM/issues/7)
@@ -23,7 +29,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - 11 files, 141.77KB, 1.42.0
 
 ## [1.2.0] - December 2019
-- Add browser execuatble file setting [#3](https://github.com/lanly-dev/VSCode-LMPTM/issues/3)
+- Add browser executable file setting [#3](https://github.com/lanly-dev/VSCode-LMPTM/issues/3)
 - Add Incognito/Private mode setting
 - Add [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md) setting [#4](https://github.com/lanly-dev/VSCode-LMPTM/issues/4)
 - 11 files, 192KB, 1.41.0

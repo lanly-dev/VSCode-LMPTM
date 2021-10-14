@@ -9,7 +9,8 @@
       "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
       "isBackground": true,
       "presentation": {
-        "reveal": "never"
+        "reveal": "never",
+				"group": "watcher"
       },
       "group": {
         "kind": "build",

@@ -1,18 +1,20 @@
 import { commands, window, ExtensionContext } from 'vscode'
 import { Browser } from './browser'
 import { Buttons } from './buttons'
-import { Treeview } from './treeview'
+import { TreeviewProvider } from './treeview'
 
 export function activate(context: ExtensionContext) {
   const buttons = new Buttons()
   const fn = ["play", "pause", "skip", "back", "forward", "backward", "toggle"] as const
-  Treeview.create()
-  const disposables = fn.map(n => commands.registerCommand(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))
+  const rc = commands.registerCommand
+  TreeviewProvider.create()
+  const disposables = fn.map(n => rc(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))
   context.subscriptions.concat(disposables)
   context.subscriptions.concat([
-    commands.registerCommand('lmptm.browserLaunch', () => Browser.launch(buttons, context)),
-    commands.registerCommand('lmptm.tvRefresh', () => Treeview.refresh()),
-    commands.registerCommand('lmptm.showTitle', showTitle)
+    rc('lmptm.browserLaunch', () => Browser.launch(buttons, context)),
+    rc('lmptm.tvRefresh', () => TreeviewProvider.refresh()),
+    rc('lmptm.showTitle', showTitle),
+    rc('lmptm.click', selection => click(selection))
   ])
 }
 
@@ -20,6 +22,10 @@ async function showTitle() {
   const title = Browser.activeBrowser?.getTabTitle()
   if (title) window.showInformationMessage(await title)
   else window.showErrorMessage('Failed to retrieve title')
+}
+
+function click(selection: any) {
+  Browser.activeBrowser?.pickTab(selection[0])
 }
 
 export function deactivate() { }

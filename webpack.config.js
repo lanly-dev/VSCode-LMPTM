@@ -44,11 +44,11 @@ const config = {
       ]
     })
   ],
-  // optimization: {
-  //   minimize: true,
-  //   // @ts-ignore
-  //   minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
-  // }
+  optimization: {
+    minimize: true,
+    // @ts-ignore
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
+  }
 }
 
 module.exports = config

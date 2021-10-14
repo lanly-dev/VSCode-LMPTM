@@ -51,7 +51,7 @@ export class Buttons {
     }
   }
 
-  dipslayPlayback(flag: boolean) {
+  displayPlayback(flag: boolean) {
     if (flag) {
       this.playButton.show()
       this.skipButton.show()

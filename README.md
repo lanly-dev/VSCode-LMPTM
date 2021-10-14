@@ -2,11 +2,11 @@
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/lanly-dev.letmeplaythemusic.svg)](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
 
-Tired or get annoyed from switching windows in order to pause or skip a song?  
-Doesn't want to or lazy to install the extra official players to the system?  
+Tired or get annoyed from switching windows in order to pause or skip a song?\
+Doesn't want to or lazy to install the extra official players to the system?\
 Want to stay focus on your programing instead of those distracting actions and feelings above?
 
-If yes, you are in luck!  
+If yes, you are in luck!\
 This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
 
 Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment-661796089) - you could use this extension to follow programming tutorials on Youtube with the handy seek forward/backward key shortcuts.
@@ -33,12 +33,12 @@ Required Chromium-based browser
 ## Known Issues
 - Work only with English version of the supported music sites
 - Does not work with Opera browser
-- Won't be able to login Youtube and SoundCLoud(email method)
+- Won't be able to login Youtube and SoundCloud(email method)
 
 ## Release Notes
 
 ### 1.4.0
-- Add key shorcuts
+- Add key shortcuts
 - Add seek 5s forward/backward for Youtube shortcuts
 - Add support for [Youtube Music](https://music.youtube.com/)
 - Add startPages settings

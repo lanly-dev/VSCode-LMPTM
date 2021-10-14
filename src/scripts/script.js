@@ -69,35 +69,25 @@ function check() {
 
   } else {
     btnPick.className = 'btn-pick-float error'
-    btnPick.innerHTML = '<i class="fas fa-times-circle"></i> Nevermind! 😓'
+    btnPick.innerHTML = '<i class="fas fa-times-circle"></i> Never mind! 😓'
     btnPick.disabled = true
     btnTimeoutReset(btnPick)
   }
 }
 
 function verifyPage() {
-  const data = sessionStorage.getItem('lmptm')
-  if (!data) return
-  if (data === 'spotify' && window.location.href.includes('open.spotify.com')) spotify(btnPick)
-  else if (data === 'soundcloud' && window.location.href.includes('soundcloud.com')) soundcloud(btnPick)
-  else if (data === 'youtube' && window.location.href.includes('www.youtube.com/watch')) youtube(btnPick)
-  else if (data === 'ytmusic' && window.location.href.includes('music.youtube.com/watch')) ytmusic(btnPick)
+  const name = sessionStorage.getItem('lmptm')
+  if (!name) return
+  if (name === 'spotify' && window.location.href.includes('open.spotify.com')) changeBtnAttr(name)
+  else if (name === 'soundcloud' && window.location.href.includes('soundcloud.com')) changeBtnAttr(name)
+  else if (name === 'youtube' && window.location.href.includes('www.youtube.com/watch')) changeBtnAttr(name)
+  else if (name === 'ytmusic' && window.location.href.includes('music.youtube.com/watch')) changeBtnAttr('youtube')
   else reset()
 }
 
-function soundcloud(btnPick) {
-  btnPick.className = 'btn-pick-float soundcloud'
-  btnPick.innerHTML = '<span class="souncloud"></span>'
-}
-
-function spotify(btnPick) {
-  btnPick.className = 'btn-pick-float spotify'
-  btnPick.innerHTML = '<span class="spotify"></span>'
-}
-
-function youtube(btnPick) {
-  btnPick.className = 'btn-pick-float youtube'
-  btnPick.innerHTML = '<span class="youtube"></span>'
+function changeBtnAttr(name) {
+  btnPick.className = `btn-pick-float ${name}`
+  btnPick.innerHTML = `<span class="${name}"></span>`
 }
 
 function soundcloudInfo(btnPick) {
