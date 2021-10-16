@@ -10,7 +10,7 @@
       "isBackground": true,
       "presentation": {
         "reveal": "never",
-				"group": "watcher"
+        "group": "watcher"
       },
       "group": {
         "kind": "build",

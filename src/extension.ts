@@ -1,6 +1,7 @@
 import { commands, window, ExtensionContext } from 'vscode'
 import { Browser } from './browser'
 import { Buttons } from './buttons'
+import { Entry } from './interfaces'
 import { TreeviewProvider } from './treeview'
 
 export function activate(context: ExtensionContext) {
@@ -24,8 +25,8 @@ async function showTitle() {
   else window.showErrorMessage('Failed to retrieve title')
 }
 
-function click(selection: any) {
-  Browser.activeBrowser?.pickTab(selection[0])
+function click(selection: Entry) {
+  Browser.activeBrowser?.pickTab(selection)
 }
 
-export function deactivate() { }
+// export function deactivate() { }

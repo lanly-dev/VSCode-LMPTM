@@ -1,25 +1,21 @@
 import { Browser } from './browser'
 import { Event, EventEmitter, ThemeIcon, TreeDataProvider, TreeItem, window } from 'vscode'
-
-export interface Entry {
-  brand: string
-  title: string
-  status: string
-}
+import { Entry } from './interfaces'
 
 export class TreeviewProvider implements TreeDataProvider<Entry> {
   public static tvProvider: TreeviewProvider
 
-  private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>()
+  private _onDidChangeTreeData: EventEmitter<unknown> = new EventEmitter<unknown>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event
 
   private browser: Browser | undefined
 
   public static create() {
     const treeDataProvider = new TreeviewProvider()
-    const tv = window.createTreeView('LMPTM', { treeDataProvider })
+    window.createTreeView('LMPTM', { treeDataProvider })
+    // const tv = window.createTreeView('LMPTM', { treeDataProvider })
     // tv.onDidChangeSelection(({ selection }) => {})
-    console.debug(tv.description)
     this.tvProvider = treeDataProvider
   }
 
@@ -45,7 +41,7 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
   private getItem(element: Entry) {
     // console.debug(element)
 
-    return new tabItem(element)
+    return new TabItem(element)
   }
 
   refresh(): void {
@@ -55,7 +51,7 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
   }
 }
 
-class tabItem extends TreeItem {
+class TabItem extends TreeItem {
   constructor(e: Entry) {
     const { title, status } = e
     super(title)

@@ -20,7 +20,6 @@ window.addEventListener('beforeunload',() => {
   sessionStorage.setItem('unload',unloadCount + 1)
 })
 
-let flagPick = false
 if (loadCount === unloadCount) verifyPage()
 
 function check() {
@@ -33,7 +32,7 @@ function check() {
     }
     window.pageSelected({ brand: 'soundcloud' })
     sessionStorage.setItem('lmptm','soundcloud')
-    soundcloud(btnPick)
+    changeBtnAttr('soundcloud')
     clear = true
 
   } else if (window.location.href.includes('open.spotify.com')) {
@@ -43,7 +42,7 @@ function check() {
     }
     window.pageSelected({ brand: 'spotify' })
     sessionStorage.setItem('lmptm','spotify')
-    spotify(btnPick)
+    changeBtnAttr('spotify')
     clear = true
 
   } else if (window.location.href.includes('www.youtube.com')) {
@@ -53,7 +52,7 @@ function check() {
     }
     window.pageSelected({ brand: 'youtube' })
     sessionStorage.setItem('lmptm','youtube')
-    youtube(btnPick)
+    changeBtnAttr('youtube')
     clear = true
 
   } else if (window.location.href.includes('music.youtube.com')) {
@@ -64,7 +63,7 @@ function check() {
     }
     window.pageSelected({ brand: 'ytmusic' })
     sessionStorage.setItem('lmptm','ytmusic')
-    youtube(btnPick)
+    changeBtnAttr('youtube')
     clear = true
 
   } else {
@@ -114,6 +113,7 @@ function ytmusicInfo(btnPick) {
   btnTimeoutReset(btnPick)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function spotifyAction(action) {
   switch (action) {
     case 'play':

@@ -133,19 +133,21 @@
     "clean": "npm run clean-output"
   },
   "devDependencies": {
-    "@types/node": "^16.10.3",
+    "@types/karma-chrome-launcher": "^3.1.1",
+    "@types/node": "^16.11.0",
+    "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.9",
     "@types/vscode": "^1.61.0",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-minimizer-webpack-plugin": "^3.1.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.1",
     "shelljs": "^0.8.4",
     "ts-loader": "^9.2.6",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.3",
-    "webpack": "^5.58.1",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4",
+    "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0"
   },
   "dependencies": {

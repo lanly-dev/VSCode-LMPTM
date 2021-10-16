@@ -11,7 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Playwright vs Puppeteer option
 - Shelljs vs Execa
 - Site English version issue
-- Support for other site
+- Support for other sites
 - Treeview
 
 ## [1.4.0] - October 2020

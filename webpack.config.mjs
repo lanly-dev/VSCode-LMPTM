@@ -1,9 +1,8 @@
-// @ts-check
 'use strict'
-const path = require('path')
-const CopyPlugin = require('copy-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+import { resolve } from 'path'
+import CopyPlugin from 'copy-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -12,7 +11,7 @@ const config = {
   entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-    path: path.resolve(__dirname, 'dist'),
+    path: resolve(resolve(), 'dist'),
     filename: 'extension.js',
     libraryTarget: 'commonjs2'
   },
@@ -36,7 +35,6 @@ const config = {
     ]
   },
   plugins: [
-    // @ts-ignore
     new CopyPlugin({
       patterns: [
         { from: 'src/scripts/script.js', to: 'scripts' },
@@ -46,9 +44,8 @@ const config = {
   ],
   optimization: {
     minimize: true,
-    // @ts-ignore
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
   }
 }
 
-module.exports = config
+export default config
