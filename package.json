@@ -133,8 +133,10 @@
     "clean": "npm run clean-output"
   },
   "devDependencies": {
+    "@types/copy-webpack-plugin": "^8.0.1",
+    "@types/css-minimizer-webpack-plugin": "^3.0.2",
     "@types/karma-chrome-launcher": "^3.1.1",
-    "@types/node": "^16.11.0",
+    "@types/node": "^16.11.1",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.9",
     "@types/vscode": "^1.61.0",

@@ -1,9 +1,11 @@
+//@ts-check
 'use strict'
 import { resolve } from 'path'
 import CopyPlugin from 'copy-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 
+//@ts-check
 /**@type {import('webpack').Configuration}*/
 const config = {
   mode: 'none',
