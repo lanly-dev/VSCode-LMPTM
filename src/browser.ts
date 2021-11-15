@@ -44,7 +44,7 @@ export class Browser {
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
-      console.log(cPath)
+
       if (!cPath) {
         vscode.window.showInformationMessage('Missing Browser! 🤔')
         return
@@ -481,7 +481,6 @@ export class Browser {
   private async setPageBypassCSP(page: puppeteer.Page, flag: string) {
     if (page.url() === 'about:blank') return
     page.setBypassCSP(flag === 'true')
-    // @ts-ignore
     await page.evaluate(theFlag => sessionStorage.setItem('bypassCSP', theFlag), flag)
   }
 
