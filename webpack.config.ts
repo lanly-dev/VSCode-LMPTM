@@ -1,13 +1,12 @@
 //@ts-check
 'use strict'
 import { resolve } from 'path'
-import CopyPlugin from 'copy-webpack-plugin'
-import TerserPlugin from 'terser-webpack-plugin'
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import * as CopyPlugin from 'copy-webpack-plugin'
+import * as TerserPlugin from 'terser-webpack-plugin'
+import * as CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 
 //@ts-check
-/**@type {import('webpack').Configuration}*/
-const config = {
+export default {
   mode: 'none',
   target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
   entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
@@ -49,5 +48,3 @@ const config = {
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
   }
 }
-
-export default config
