@@ -15,7 +15,8 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "dependsOn": ["npm: task-clean-output"]
     },
     {
       "label": "ts-watch",
@@ -23,21 +24,24 @@
       "script": "ts-watch",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
-      "presentation": { "reveal": "never" }
+      "presentation": { "reveal": "never" },
+      "dependsOrder": "sequence",
+      "dependsOn": ["npm: task-clean-output", "npm: task-copy-static-assets"]
     },
+    // ↓↓↓↓ For vscode command palette ↓↓↓↓
     {
       "type": "npm",
       "script": "test-compile",
-      "dependsOn": ["npm: copy-static-assets"]
+      "dependsOn": ["npm: task-clean-output"]
     },
     {
       "type": "npm",
-      "script": "copy-static-assets",
+      "script": "task-copy-static-assets",
       "isBackground": false
     },
     {
       "type": "npm",
-      "script": "clean-output",
+      "script": "task-clean-output",
       "isBackground": false
     }
   ]

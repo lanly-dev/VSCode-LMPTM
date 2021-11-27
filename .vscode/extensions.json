@@ -3,7 +3,7 @@
   // for the documentation about the extensions.json format
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "eamodio.tsl-problem-matcher",
+    "amodio.tsl-problem-matcher",
     "ue.alphabetical-sorter",
     "shardulm94.trailing-spaces",
     "streetsidesoftware.code-spell-checker"

@@ -6,16 +6,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Extension Webpack",
+      "name": "Launch Extension webpack",
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      // "preLaunchTask": "${defaultBuildTask}"
-      "preLaunchTask": "npm: webpack"
+      "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Run Extension",
+      "name": "Launch Extension ts-watch",
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],

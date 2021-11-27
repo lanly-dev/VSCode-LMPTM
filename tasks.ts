@@ -6,7 +6,7 @@ if (process.argv[2] === 'clean') {
   console.log('Remove "out" and "dist" directory')
   shell.rm('-rf', 'out')
   shell.rm('-rf', 'dist')
-} else if (process.argv[2] === 'copy') {
+} else if (process.argv[2] === 'copy') { // for Launch Extension ts-watch
   console.log('Copy static assets to "out" directories')
   shell.mkdir('-p', 'out')
   shell.cp('-R', 'src/scripts', 'out/scripts')
