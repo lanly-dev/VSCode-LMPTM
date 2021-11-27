@@ -38,8 +38,8 @@ export default {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: 'src/scripts/script.js', to: 'scripts' },
-        { from: 'src/scripts/style.css', to: 'scripts' }
+        { from: 'src/inject/script.js', to: 'inject' },
+        { from: 'src/inject/style.css', to: 'inject' }
       ]
     })
   ],
