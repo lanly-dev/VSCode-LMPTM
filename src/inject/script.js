@@ -1,7 +1,7 @@
 const btnPick = document.querySelector('.btn-pick-float')
 btnPick.addEventListener('click', check)
 
-// Duplicate tab solution
+// Duplicate tabs solution
 let clear = false
 let loadCount = sessionStorage.getItem('load')
 if (loadCount === null) loadCount = 0
@@ -81,13 +81,13 @@ function verifyPage() {
 }
 
 function changeBtnAttr(name) {
-  btnPick.className = `btn-pick-float ${name}`
-  btnPick.innerHTML = `<span class="${name}"></span>`
+  btnPick.className = `btn-pick-float border-gray ${name}`
+  btnPick.innerHTML = null
 }
 
 function showInfo(btnPick, brand) {
-  btnPick.className = `btn-pick-float ${brand}-info`
-  const msg = 'Something is not right'
+  btnPick.className = `btn-pick-float border-gray ${brand}-info`
+  let msg = 'Something is not right'
   switch (brand) {
     case 'soundcloud':
       msg = 'Please pick a song 😉'
@@ -102,7 +102,7 @@ function showInfo(btnPick, brand) {
       msg = 'Please make sure the playing queue is not empty! 😉'
       break
   }
-  btnPick.innerHTML =  msg
+  btnPick.innerHTML = msg
   btnTimeoutReset(btnPick)
 }
 
@@ -111,7 +111,7 @@ function spotifyAction(action) {
   switch (action) {
     case 'play':
     case 'pause':
-      ;(document.querySelector('.spoticon-play-16') || document.querySelector('.spoticon-pause-16')).click()
+      (document.querySelector('.spoticon-play-16') || document.querySelector('.spoticon-pause-16')).click()
       break
     case 'skip':
       document.querySelector('.spoticon-skip-forward-16').click()
