@@ -4,6 +4,10 @@ All notable changes to the "LetMePlayTheMusic" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how to structure this file.
 
+### Reference
+- https://github.com/microsoft/vscode-generator-code/tree/main/generators/app/templates/ext-command-ts
+- https://github.com/microsoft/vscode-extension-samples
+
 ### TODO
 - Brave setting removal
 - I18n
@@ -13,6 +17,13 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Site English version issue
 - Support for other sites
 - Treeview
+
+## [2.0.0] - ??? 2021
+### Note:
+#### [MediaSession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
+- Soundcloud does update `playbackState` but only call `set` for from press play
+- Spotify does call `set` to update metadata but playbackState always *none*
+- Youtube and ytmusic update `playbackState` consistent with proxy `set` event
 
 ## [1.4.0] - October 2020
 - Add key shortcuts [#7](https://github.com/lanly-dev/VSCode-LMPTM/issues/7)

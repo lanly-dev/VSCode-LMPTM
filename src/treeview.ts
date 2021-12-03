@@ -33,6 +33,7 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
   async getChildren(): Promise<Entry[] | undefined> {
     if (!this.browser) return
     const details = this.browser.getPagesStatus()
+    console.debug('@@@@@@@@', details)
     if (!details) return
     return details
   }
