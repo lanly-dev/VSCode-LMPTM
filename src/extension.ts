@@ -6,7 +6,7 @@ import { TreeviewProvider } from './treeview'
 
 export function activate(context: ExtensionContext) {
   const buttons = new Buttons()
-  const fn = ["play", "pause", "skip", "back", "forward", "backward", "toggle"] as const
+  const fn = ['play', 'pause', 'skip', 'back', 'forward', 'backward', 'toggle'] as const
   const rc = commands.registerCommand
   TreeviewProvider.create()
   const disposables = fn.map(n => rc(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))
@@ -26,7 +26,7 @@ async function showTitle() {
 }
 
 function click(selection: Entry) {
-  Browser.activeBrowser?.pickTab(selection)
+  Browser.activeBrowser?.pickTab(selection.index)
 }
 
 // export function deactivate() { }

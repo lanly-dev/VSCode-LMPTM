@@ -5,9 +5,8 @@ import { Entry } from './interfaces'
 export class TreeviewProvider implements TreeDataProvider<Entry> {
   public static tvProvider: TreeviewProvider
 
-  private _onDidChangeTreeData: EventEmitter<unknown> = new EventEmitter<unknown>()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event
+  private _onDidChangeTreeData: EventEmitter<null> = new EventEmitter<null>()
+  readonly onDidChangeTreeData: Event<null> = this._onDidChangeTreeData.event
 
   private browser: Browser | undefined
 
@@ -33,7 +32,7 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
 
   async getChildren(): Promise<Entry[] | undefined> {
     if (!this.browser) return
-    const details = await this.browser.getDetails()
+    const details = this.browser.getPagesStatus()
     if (!details) return
     return details
   }
@@ -46,16 +45,16 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
 
   refresh(): void {
     this.browser = Browser.activeBrowser
-    this._onDidChangeTreeData.fire(undefined)
+    this._onDidChangeTreeData.fire(null)
     // console.debug('refresh')
   }
 }
 
 class TabItem extends TreeItem {
   constructor(e: Entry) {
-    const { title, status } = e
+    const { title, state } = e
     super(title)
-    if (status) this.iconPath = status === 'play' ? new ThemeIcon('debug-pause') : new ThemeIcon('debug-start')
+    this.iconPath = state === 'playing' ? new ThemeIcon('debug-pause') : new ThemeIcon('debug-start')
     this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }
   }
 }

@@ -2,6 +2,6 @@ export interface Entry {
   brand: string
   index: number
   selected: boolean
-  status?: string
+  state: 'playing' | 'paused' | 'none'
   title: string
 }
