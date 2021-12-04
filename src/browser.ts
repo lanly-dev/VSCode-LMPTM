@@ -263,11 +263,6 @@ export class Browser {
     else return this.currentBrowser.newPage()
   }
 
-  private addScripts(page: puppeteer.Page) {
-    page.addStyleTag({ path: Browser.cssPath })
-    page.addScriptTag({ path: Browser.jsPath })
-  }
-
   private resetButton() {
     // @ts-ignore
     this.selectedPage?.evaluate(() => reset())
@@ -313,6 +308,16 @@ export class Browser {
 
   private async pageChanged(page: puppeteer.Page) {
     await page.waitForNetworkIdle() // this somehow prevents error
+    const pageURL = page.url()
+    const brand = this.musicBrandCheck(pageURL)
+
+    if (brand === 'spotify') {
+      // won't stick to another site (if go to another URL) after set
+      this.setPageBypassCSP(page, true)
+      // this doesn't trigger page_changed again -> no infinity loop
+      page.goto(page.url())
+    }
+
     const title = await page.title()
     console.debug(title)
     if (page === this.selectedPage) {  // or get brand
@@ -321,7 +326,7 @@ export class Browser {
       this.selectedPage = undefined
       this.selectedMusicPageBrand = undefined
     }
-    console.debug(this.pagesStatus)
+
     for (const [i, p] of this.pagesStatus.entries()) {
       if (p.page !== page) continue
       this.pagesStatus[i].title = title
@@ -351,14 +356,14 @@ export class Browser {
 
     // spotify need bypass CSP
     if (brand === 'spotify') {
-      this.setPageBypassCSP(page, 'true')
+      this.setPageBypassCSP(page, true)
       page.goto(page.url())
-    } else this.setPageBypassCSP(page, 'false')
+    }
 
     await this.setupPageWatcher(page)
-
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
+
     const pages = await this.currentBrowser.pages()
     for (const [index, p] of pages.entries()) {
       if (p !== page) continue
@@ -366,8 +371,8 @@ export class Browser {
     }
 
     page.on('load', async () => {
-      if (brand === 'spotify') await this.checkSpotifyCSP(page)
-      this.addScripts(page)
+      page.addStyleTag({ path: Browser.cssPath })
+      page.addScriptTag({ path: Browser.jsPath })
     })
   }
 
@@ -403,6 +408,7 @@ export class Browser {
 
   private pageSelected(page: puppeteer.Page) {
     this.pagesStatus.forEach((e, i, arr) => {
+      console.log(i, arr)
       if (e.page !== page) return
       //TODO:
     })
@@ -410,26 +416,18 @@ export class Browser {
   }
 
   private playbackChanged(page: puppeteer.Page, state: 'playing' | 'paused' | 'none') {
-    console.debug(state)
     this.pagesStatus.forEach((e: Entry) => {
       if (e.page !== page) return
       if (this.selectedPage === page) this.buttons.setPlayButton(state)
-      e.state = state // change by ref?
+      e.state = state // change by ref
     })
-    return
   }
 
-  private async setPageBypassCSP(page: puppeteer.Page, flag: string) {
+  private async setPageBypassCSP(page: puppeteer.Page, flag: boolean) {
     if (page.url() === 'about:blank') return
-    page.setBypassCSP(flag === 'true')
+    page.setBypassCSP(flag)
+    // for debugging
     await page.evaluate(theFlag => sessionStorage.setItem('bypassCSP', theFlag), flag)
-  }
-
-  private async checkSpotifyCSP(page: puppeteer.Page) {
-    const cspFlag = await page.evaluate(() => sessionStorage.getItem('bypassCSP'))
-    if (cspFlag === 'true') return
-    await this.setPageBypassCSP(page, 'true')
-    await page.reload()
   }
 
   // private async sleep(ms: number = 1000) {
