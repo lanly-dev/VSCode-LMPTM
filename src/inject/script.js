@@ -18,7 +18,7 @@ const playButtonAttrs = {
 
 let observer
 const btnPick = document.querySelector('.btn-pick-float')
-btnPick.addEventListener('click', check)
+btnPick.addEventListener('click', click)
 
 // Duplicate tabs solution
 // TODO: need note
@@ -39,7 +39,7 @@ window.addEventListener('beforeunload', () => {
   sessionStorage.setItem('unload', unloadCount + 1)
 })
 
-function check() {
+function click() {
   const btnPick = document.querySelector('.btn-pick-float')
   const href = window.location.href
   let brand
@@ -77,7 +77,7 @@ function check() {
   }
 
   if (brand) {
-    window.pageSelected({ brand })
+    window.pageSelected()
     sessionStorage.setItem('lmptm', brand)
     changeBtnAttr(brand)
     clear = true
@@ -112,6 +112,8 @@ function setupObserver(brand) {
   const { css } = playButtonAttrs[brand]
   if (observer) observer.disconnect()
   const targetE = document.querySelector(css)
+  const state = getPlaybackState(brand, css)
+  window.playbackChanged(state)
   observer = new MutationObserver(() => {
     const state = getPlaybackState(brand, css)
     window.playbackChanged(state)

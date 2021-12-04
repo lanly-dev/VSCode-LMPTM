@@ -237,33 +237,13 @@ export class Browser {
     TreeviewProvider.refresh()
   }
 
-  // private async initPages() {
-  //   //@ts-ignore
-  //   const pages = await this.currentBrowser.pages()
-  //   console.log(pages.length)
-  //   //@ts-ignore
-  //   this.pagesStatus = (await Promise.all(pages.map(async (page: puppeteer.Page) => {
-  //     if (page.url() === 'about:blank') return
-  //     try {
-  //       console.debug('hello', page)
-  //       const { brand, state } = await this._getPlaybackState(page)
-  //       console.debug('hello', page.isClosed())
-  //       const title = await page.title()
-  //       return { page, title, brand, state, picked: false }
-  //     } catch (error) {
-  //       console.debug('&&&&&&&&&&&&&', error)
-  //     }
-  //   }))).filter(Boolean)
-  //   console.log('$$$', this.pagesStatus)
-  // }
-
   private async newPage() {
     const needIncognito = vscode.workspace.getConfiguration().get('lmptm.incognitoMode')
     if (needIncognito) return this.incognitoContext.newPage()
     else return this.currentBrowser.newPage()
   }
 
-  private resetButton() {
+  private resetFloatButton() {
     // @ts-ignore
     this.selectedPage?.evaluate(() => reset())
   }
@@ -401,10 +381,17 @@ export class Browser {
 
 
   private pageSelected(page: puppeteer.Page) {
-    this.pagesStatus.forEach((e, i, arr) => {
-      console.log(i, arr)
+    this.buttons.displayPlayback(true)
+    if (this.selectedPage && this.selectedPage !== page) {
+      this.pause()
+      this.resetFloatButton()
+    }
+    this.pagesStatus.forEach(async e => e.page === this.selectedPage ? e.picked = false : null)
+    this.pagesStatus.forEach(async e => {
       if (e.page !== page) return
-      //TODO:
+      this.selectedPage = e.page
+      this.buttons.setStatusButtonText(await this.selectedPage.title())
+      e.picked = true
     })
     return
   }

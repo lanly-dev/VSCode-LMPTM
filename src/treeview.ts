@@ -33,7 +33,7 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
   async getChildren(): Promise<Entry[] | undefined> {
     if (!this.browser) return
     const details = this.browser.getPagesStatus()
-    console.debug('@@@@@@@@', details)
+    // console.debug('@@@@@@@@', details)
     if (!details) return
     return details
   }
@@ -53,9 +53,10 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
 
 class TabItem extends TreeItem {
   constructor(e: Entry) {
-    const { title, state } = e
+    const { picked, state, title } = e
     super(title)
-    this.iconPath = state === 'playing' ? new ThemeIcon('debug-pause') : new ThemeIcon('debug-start')
+    if (picked && state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'debug-pause' : 'debug-start')
+    else if (state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'primitive-square' : 'play')
     this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }
   }
 }
