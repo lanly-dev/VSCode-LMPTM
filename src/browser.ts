@@ -9,7 +9,6 @@ import { Entry } from './interfaces'
 import { HTTPResponse } from 'puppeteer-core'
 
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos'
-const PICK_MSG = '⛏️ Pick?'
 
 export class Browser {
   public static activeBrowser: Browser | undefined
@@ -272,7 +271,6 @@ export class Browser {
 
   private async update(event: string, page: puppeteer.Page | null, state?: "playing" | "paused" | "none") {
     if (!page) return
-    console.debug('$$$$$$$$$$', event)
     switch (event) {
       case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
@@ -297,12 +295,7 @@ export class Browser {
 
     const title = await page.title()
 
-    if (page === this.selectedPage) {  // or get brand
-      this.buttons.setStatusButtonText('Running $(browser)')
-      this.buttons.displayPlayback(false)
-      this.selectedPage = undefined
-      this.selectedMusicPageBrand = undefined
-    }
+    if (this.selectedPage === page) this.selectedMusicPageBrand = brand
 
     for (const [i, p] of this.pagesStatus.entries()) {
       if (p.page !== page) continue
@@ -334,7 +327,6 @@ export class Browser {
     // Spotify needs bypass CSP
     if (brand === 'spotify') this.spotifyBypassCSP(page)
 
-    await this.setupPageWatcher(page)
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
 
@@ -348,21 +340,6 @@ export class Browser {
       page.addStyleTag({ path: Browser.cssPath })
       page.addScriptTag({ path: Browser.jsPath })
     })
-  }
-
-  private async setupPageWatcher(page: puppeteer.Page) {
-    page.evaluateOnNewDocument((pickMsg: string) => {
-      window.onload = () => {
-        // @ts-ignore
-        if (window['injected']) return
-        const b = document.createElement('button')
-        b.innerHTML = pickMsg
-        b.className = 'btn-pick-float'
-        document.body.appendChild(b)
-        // @ts-ignore
-        window['injected'] = true
-      }
-    }, PICK_MSG)
 
     page.removeAllListeners('close')
     page.on('close', async () => {
@@ -379,7 +356,6 @@ export class Browser {
       page.exposeFunction('playbackChanged', (state: 'playing' | 'paused' | 'none') => this.update('playback_changed', page, state))
   }
 
-
   private pageSelected(page: puppeteer.Page) {
     this.buttons.displayPlayback(true)
     if (this.selectedPage && this.selectedPage !== page) {
@@ -393,7 +369,6 @@ export class Browser {
       this.buttons.setStatusButtonText(await this.selectedPage.title())
       e.picked = true
     })
-    return
   }
 
   private playbackChanged(page: puppeteer.Page, state: 'playing' | 'paused' | 'none') {

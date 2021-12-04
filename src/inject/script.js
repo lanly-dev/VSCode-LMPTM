@@ -3,6 +3,7 @@ const style = 'background:deepskyblue;padding:1px 2px;border-radius:2px'
 const log = (text, ...rest) => console.log(`%c${text}`, style, ...rest)
 log(`LMPTM's script injected successfully!`)
 
+const PICK_MSG = '⛏️ Pick?'
 const playButtonAttrs = {
   soundcloud: { css: '.playControl' },
   spotify: {
@@ -17,7 +18,10 @@ const playButtonAttrs = {
 }
 
 let observer
-const btnPick = document.querySelector('.btn-pick-float')
+const btnPick = document.createElement('button')
+btnPick.innerHTML = PICK_MSG
+btnPick.className = 'btn-pick-float'
+document.body.appendChild(btnPick)
 btnPick.addEventListener('click', click)
 
 // Duplicate tabs solution
