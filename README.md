@@ -4,7 +4,8 @@
 
 Tired or get annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\
-Want to stay focus on your programing instead of those distracting actions and feelings above?
+Or perhaps your keyboard doesn't have the handy media hotkeys?\
+Wanted to stay focus on your programing instead of those shortcomings above?
 
 If yes, you are in luck!\
 This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
@@ -14,15 +15,12 @@ Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment
 [How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
 
 ## Features
-
 Supports SoundCloud, Spotify, Youtube and Youtube Music
 
 ## Requirements
-
 Required Chromium-based browser
 
 ## Extension Settings
-
 * `lmptm.browserPath`: Specify custom browser executable file path.
 * `lmptm.ignoreDisableSync`: Ignore --disable-sync, this option is specifically for [Brave](https://brave.com) browser.
 * `lmptm.incognitoMode`: Specify whether to launch browser in incognito/private mode.
