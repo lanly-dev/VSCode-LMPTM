@@ -307,19 +307,16 @@ export class Browser {
   }
 
   private async pageChanged(page: puppeteer.Page) {
-    await page.waitForNetworkIdle() // this somehow prevents error
+    await page.waitForNetworkIdle() // this somehow prevents navigation error
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)
 
-    if (brand === 'spotify') {
-      // won't stick to another site (if go to another URL) after set
-      this.setPageBypassCSP(page, true)
-      // this doesn't trigger page_changed again -> no infinity loop
-      page.goto(page.url())
-    }
+    // Spotify needs bypass CSP
+    // won't stick to another site (if go to another URL) after set
+    if (brand === 'spotify') this.spotifyBypassCSP(page)
 
     const title = await page.title()
-    console.debug(title)
+
     if (page === this.selectedPage) {  // or get brand
       this.buttons.setStatusButtonText('Running $(browser)')
       this.buttons.displayPlayback(false)
@@ -344,7 +341,7 @@ export class Browser {
       this.selectedPage = undefined
       this.selectedMusicPageBrand = undefined
     }
-    this.pagesStatus.forEach((e: Entry, i, arr) => {
+    this.pagesStatus.forEach((e, i, arr) => {
       if (e.page !== page) return
       arr.splice(i, 1)
     })
@@ -354,11 +351,8 @@ export class Browser {
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
 
-    // spotify need bypass CSP
-    if (brand === 'spotify') {
-      this.setPageBypassCSP(page, true)
-      page.goto(page.url())
-    }
+    // Spotify needs bypass CSP
+    if (brand === 'spotify') this.spotifyBypassCSP(page)
 
     await this.setupPageWatcher(page)
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
@@ -416,18 +410,19 @@ export class Browser {
   }
 
   private playbackChanged(page: puppeteer.Page, state: 'playing' | 'paused' | 'none') {
-    this.pagesStatus.forEach((e: Entry) => {
+    this.pagesStatus.forEach(e => {
       if (e.page !== page) return
       if (this.selectedPage === page) this.buttons.setPlayButton(state)
       e.state = state // change by ref
     })
   }
 
-  private async setPageBypassCSP(page: puppeteer.Page, flag: boolean) {
-    if (page.url() === 'about:blank') return
-    page.setBypassCSP(flag)
+  private async spotifyBypassCSP(page: puppeteer.Page) {
+    page.setBypassCSP(true)
     // for debugging
-    await page.evaluate(theFlag => sessionStorage.setItem('bypassCSP', theFlag), flag)
+    await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'true'))
+    // this doesn't trigger page_changed again -> no infinity loop
+    page.goto(page.url())
   }
 
   // private async sleep(ms: number = 1000) {
