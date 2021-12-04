@@ -4,7 +4,6 @@ export interface Entry {
   brand: string
   index: number
   picked: false
-  selected: boolean
   state: 'playing' | 'paused' | 'none'
   title: string
 }

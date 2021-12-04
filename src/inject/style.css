@@ -77,6 +77,8 @@
   font-size: 1.5em;
 }
 .error {
+  border-color: orangered;
+  box-shadow: 1px 1px orangered;
   background-color: red;
   cursor: progress;
   width: 10em;
