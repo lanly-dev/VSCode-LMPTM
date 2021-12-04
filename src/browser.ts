@@ -6,6 +6,7 @@ import { Buttons } from './buttons'
 import { TreeviewProvider } from './treeview'
 import { WhichChrome } from './whichChrome'
 import { Entry } from './interfaces'
+import { HTTPResponse } from 'puppeteer-core'
 
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos'
 const PICK_MSG = '⛏️ Pick?'
@@ -60,6 +61,7 @@ export class Browser {
       }
 
       Browser.launched = true
+      console.log('###########################################')
       puppeteer.launch({
         args,
         defaultViewport: null,
@@ -74,7 +76,6 @@ export class Browser {
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
         Browser.activeBrowser = b
-        Browser.launched = false
         TreeviewProvider.refresh()
       }, (error: { message: string }) => {
         vscode.window.showErrorMessage(error.message)
@@ -93,10 +94,11 @@ export class Browser {
     this.currentBrowser.on('targetchanged', async (target: puppeteer.Target) => this.update('page_changed', await target.page()))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed', target))
     this.currentBrowser.on('disconnected', () => {
-      TreeviewProvider.refresh()
       this.buttons.setStatusButtonText('Launch $(rocket)')
       Browser.activeBrowser = undefined
       this.buttons.displayPlayback(false)
+      TreeviewProvider.refresh()
+      Browser.launched = false
       // console.debug('CLOSE')
     })
     // this.currentBrowser.process().once('close', () => console.debug('CLOSE!!!!!!!!'))
@@ -224,27 +226,36 @@ export class Browser {
   private async launchPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (links && links.length) {
-      const p: unknown[] = []
+      const p: Promise<HTTPResponse>[] = []
       links.forEach(async (e: string) => {
         const pg = await this.newPage()
         await pg.setDefaultNavigationTimeout(0)
-        p.push(pg.goto(e))
+        await pg.goto(e)
       })
-      await Promise.all(p)
+      await Promise.all(p) // need to wait?
     }
-    await this.initPages()
     TreeviewProvider.refresh()
   }
 
-  private async initPages() {
-    const pages = await this.currentBrowser.pages()
-    //@ts-ignore
-    this.pagesStatus = (await Promise.all(pages.map(async (page: puppeteer.Page) => {
-      const { brand, state } = await this._getPlaybackState(page)
-      const title = await page.title()
-      return { page, title, brand, state, picked: false }
-    }))).filter(Boolean)
-  }
+  // private async initPages() {
+  //   //@ts-ignore
+  //   const pages = await this.currentBrowser.pages()
+  //   console.log(pages.length)
+  //   //@ts-ignore
+  //   this.pagesStatus = (await Promise.all(pages.map(async (page: puppeteer.Page) => {
+  //     if (page.url() === 'about:blank') return
+  //     try {
+  //       console.debug('hello', page)
+  //       const { brand, state } = await this._getPlaybackState(page)
+  //       console.debug('hello', page.isClosed())
+  //       const title = await page.title()
+  //       return { page, title, brand, state, picked: false }
+  //     } catch (error) {
+  //       console.debug('&&&&&&&&&&&&&', error)
+  //     }
+  //   }))).filter(Boolean)
+  //   console.log('$$$', this.pagesStatus)
+  // }
 
   private async newPage() {
     const needIncognito = vscode.workspace.getConfiguration().get('lmptm.incognitoMode')
@@ -288,9 +299,9 @@ export class Browser {
     if (!page) return
     console.debug('$$$$$$$$$$', event)
     switch (event) {
-      case 'page_changed': this.pageChanged(page); break
+      case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
-      case 'page_created': this.pageCreated(page); break
+      case 'page_created': await this.pageCreated(page); break
       case 'page_selected': this.pageSelected(page); break
       case 'playback_changed':
         if (!state) break
@@ -301,20 +312,23 @@ export class Browser {
   }
 
   private async pageChanged(page: puppeteer.Page) {
-    await page.waitForNavigation()
+    await page.waitForNetworkIdle() // this somehow prevents error
+    const title = await page.title()
+    console.debug(title)
     if (page === this.selectedPage) {  // or get brand
       this.buttons.setStatusButtonText('Running $(browser)')
       this.buttons.displayPlayback(false)
       this.selectedPage = undefined
       this.selectedMusicPageBrand = undefined
     }
-    this.pagesStatus.forEach(async (p: Entry, i, arr: Entry[]) => {
-      if (p.page !== page) return
-      arr[i].title = await page.title()
-      arr[i].brand = 'other'
-      arr[i].state = 'none'
-      arr[i].picked = false
-    })
+    console.debug(this.pagesStatus)
+    for (const [i, p] of this.pagesStatus.entries()) {
+      if (p.page !== page) continue
+      this.pagesStatus[i].title = title
+      this.pagesStatus[i].brand = 'other'
+      this.pagesStatus[i].state = 'none'
+      this.pagesStatus[i].picked = false
+    }
   }
 
   private pageClosed(page: puppeteer.Page) {
@@ -332,7 +346,9 @@ export class Browser {
   }
 
   private async pageCreated(page: puppeteer.Page) {
-    const brand = this.musicBrandCheck(page.url())
+    const pageURL = page.url()
+    const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
+
     // spotify need bypass CSP
     if (brand === 'spotify') {
       this.setPageBypassCSP(page, 'true')
@@ -340,6 +356,14 @@ export class Browser {
     } else this.setPageBypassCSP(page, 'false')
 
     await this.setupPageWatcher(page)
+
+    let title = pageURL === 'about:blank' ? pageURL : await page.title()
+    if (title === '') title = 'New Tab'
+    const pages = await this.currentBrowser.pages()
+    for (const [index, p] of pages.entries()) {
+      if (p !== page) continue
+      this.pagesStatus.splice(index, 0, { page, brand, index, state: 'none', picked: false, title })
+    }
 
     page.on('load', async () => {
       if (brand === 'spotify') await this.checkSpotifyCSP(page)
@@ -380,7 +404,7 @@ export class Browser {
   private pageSelected(page: puppeteer.Page) {
     this.pagesStatus.forEach((e, i, arr) => {
       if (e.page !== page) return
-      arr.splice(i, 1)
+      //TODO:
     })
     return
   }

@@ -16,6 +16,7 @@ const playButtonAttrs = {
   ytmusic: { css: '#play-pause-button' }
 }
 
+let observer
 const btnPick = document.querySelector('.btn-pick-float')
 btnPick.addEventListener('click', check)
 
@@ -38,58 +39,48 @@ window.addEventListener('beforeunload', () => {
   sessionStorage.setItem('unload', unloadCount + 1)
 })
 
-
-
 function check() {
   const btnPick = document.querySelector('.btn-pick-float')
   const href = window.location.href
+  let brand
 
   if (href.includes('soundcloud.com')) {
     if (!document.querySelectorAll('.m-visible')[0]) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'soundcloud')
     }
-    setupWatcher()
-    window.pageSelected({ brand: 'soundcloud' })
-    sessionStorage.setItem('lmptm', 'soundcloud')
-    changeBtnAttr('soundcloud')
-    clear = true
+    brand = 'soundcloud'
   } else if (href.includes('open.spotify.com')) {
     if (!document.querySelectorAll('.now-playing .cover-art-image')[0]) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'spotify')
     }
-    window.pageSelected({ brand: 'spotify' })
-    sessionStorage.setItem('lmptm', 'spotify')
-    changeBtnAttr('spotify')
-    clear = true
-    setupWatcher()
+    brand = 'spotify'
   } else if (href.includes('www.youtube.com')) {
     if (!href.includes('/watch')) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'youtube')
     }
-    window.pageSelected({ brand: 'youtube' })
-    sessionStorage.setItem('lmptm', 'youtube')
-    changeBtnAttr('youtube')
-    clear = true
-    setupWatcher()
+    brand = 'youtube'
   } else if (href.includes('music.youtube.com')) {
     const e = 'ytmusic-app-layout[player-visible_] > [slot=player-bar]'
     if (!document.querySelectorAll(e)[0]) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'ytmusic')
     }
-    window.pageSelected({ brand: 'ytmusic' })
-    sessionStorage.setItem('lmptm', 'ytmusic')
-    changeBtnAttr('youtube')
-    clear = true
-    setupWatcher()
+    brand = 'ytmusic'
   } else {
     btnPick.className = 'btn-pick-float error'
     btnPick.innerHTML = 'Never mind! 😓'
     btnPick.disabled = true
     btnTimeoutReset(btnPick)
+  }
+
+  if (brand) {
+    window.pageSelected({ brand })
+    sessionStorage.setItem('lmptm', brand)
+    changeBtnAttr(brand)
+    clear = true
   }
 }
 
@@ -117,13 +108,14 @@ function check() {
 //   })
 // }
 
-function setupObserver(brandData) {
-  const brand = Object.keys(brandData)[0]
-  const { css } = brandData[brand]
+function setupObserver(brand) {
+  const { css } = playButtonAttrs[brand]
+  if (observer) observer.disconnect()
   const targetE = document.querySelector(css)
-  console.log(targetE)
-  const state = getPlaybackState(brand, brandData[brand])
-  const observer = new MutationObserver(() => window.playbackChanged(state))
+  observer = new MutationObserver(() => {
+    const state = getPlaybackState(brand, css)
+    window.playbackChanged(state)
+  })
   if (targetE) observer.observe(targetE, { attributes: true })
 }
 
@@ -134,31 +126,21 @@ function getPlaybackState(brand, attrs) {
   } else return navigator.mediaSession.playbackState // this doesn't get update
 }
 
-function setupWatcher() {
-  const host = window.location.host
-  // only youtube and ytmusic updates mediaSession via `set`
-  const { soundcloud, spotify, youtube, ytmusic } = playButtonAttrs
-  if (host.includes('soundcloud.com')) setupObserver({ soundcloud })
-  else if (host.includes('spotify.com')) setupObserver({ spotify })
-  else if (host.includes('youtube.com')) setupObserver({ youtube })
-  else if (host.includes('music.youtube')) setupObserver({ ytmusic })
-  else log('For later release') // setupMediaSession()
-}
-
 function verifyPage() {
-  const name = sessionStorage.getItem('lmptm')
+  const brand = sessionStorage.getItem('lmptm')
   const href = window.location.href
-  if (!name) return
-  if (name === 'spotify' && href.includes('open.spotify.com')) changeBtnAttr(name)
-  else if (name === 'soundcloud' && href.includes('soundcloud.com')) changeBtnAttr(name)
-  else if (name === 'youtube' && href.includes('www.youtube.com/watch')) changeBtnAttr(name)
-  else if (name === 'ytmusic' && href.includes('music.youtube.com/watch')) changeBtnAttr('youtube')
+  if (!brand) return
+  if (brand === 'spotify' && href.includes('open.spotify.com')) changeBtnAttr(brand)
+  else if (brand === 'soundcloud' && href.includes('soundcloud.com')) changeBtnAttr(brand)
+  else if (brand === 'youtube' && href.includes('www.youtube.com/watch')) changeBtnAttr(brand)
+  else if (brand === 'ytmusic' && href.includes('music.youtube.com/watch')) changeBtnAttr(brand)
   else reset()
 }
 
-function changeBtnAttr(name) {
-  setupWatcher() // Early enough?
-  btnPick.className = `btn-pick-float border-gray ${name}`
+function changeBtnAttr(brand) {
+  setupObserver(brand)
+  if (brand === 'ytmusic') brand = 'youtube'
+  btnPick.className = `btn-pick-float border-gray ${brand}`
   btnPick.innerHTML = null
 }
 
