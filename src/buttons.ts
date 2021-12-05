@@ -41,13 +41,13 @@ export class Buttons {
     }
   }
 
-  setPlayButton(text: string | undefined) {
-    if (text === 'play') {
+  setPlayButton(label: 'playing' | 'paused' | 'none') {
+    if (label === 'playing') {
+      this.playButton.text = '$(primitive-square)'
+      this.playButton.command = 'lmptm.pause'
+    } else {
       this.playButton.text = '$(play)'
       this.playButton.command = 'lmptm.play'
-    } else {
-      this.playButton.text = '$(debug-pause)'
-      this.playButton.command = 'lmptm.pause'
     }
   }
 

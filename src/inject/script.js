@@ -125,11 +125,13 @@ function setupObserver(brand) {
   if (targetE) observer.observe(targetE, { attributes: true })
 }
 
+// NOTE: need this?
 function getPlaybackState(brand, attrs) {
+  console.log('getPlaybackState')
   if (brand === 'spotify') {
     console.log(attrs)
     return 'playing'
-  } else return navigator.mediaSession.playbackState // this doesn't get update
+  } else return navigator.mediaSession.playbackState
 }
 
 function verifyPage() {

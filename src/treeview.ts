@@ -53,10 +53,11 @@ export class TreeviewProvider implements TreeDataProvider<Entry> {
 
 class TabItem extends TreeItem {
   constructor(e: Entry) {
-    const { picked, state, title } = e
+    const { picked, state } = e
+    let title = e.title
+    if (picked) title = `🎶 ${title}`
     super(title)
-    if (picked && state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'debug-pause' : 'debug-start')
-    else if (state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'primitive-square' : 'play')
+    if (state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'primitive-square' : 'play')
     this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }
   }
 }

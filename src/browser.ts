@@ -8,8 +8,8 @@ import { WhichChrome } from './whichChrome'
 import { Entry } from './interfaces'
 import { HTTPResponse } from 'puppeteer-core'
 
-const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos'
-
+const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos. 💡'
+const STATE_MSG = 'Please select the tab/page that either in playing or paused. 💡'
 export class Browser {
   public static activeBrowser: Browser | undefined
   public static cssPath: string
@@ -19,7 +19,7 @@ export class Browser {
   private currentBrowser: puppeteer.Browser
   private incognitoContext: puppeteer.BrowserContext
   private pagesStatus: Entry[]
-  private selectedMusicPageBrand: string | undefined
+  private selectedMusicBrand: string | undefined
   private selectedPage: puppeteer.Page | undefined
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
@@ -40,7 +40,7 @@ export class Browser {
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
 
       if (!cPath) {
-        vscode.window.showInformationMessage('Missing Browser! 🤔')
+        vscode.window.showInformationMessage('Missing Browser? 🤔')
         return
       }
 
@@ -54,7 +54,7 @@ export class Browser {
           }
         })
         if (invalid) {
-          vscode.window.showErrorMessage('You may have an invalid url on startPages setting! 🤔')
+          vscode.window.showErrorMessage('You may have an invalid url on startPages setting. 🤔')
           return
         }
       }
@@ -106,7 +106,7 @@ export class Browser {
 
   play() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'soundcloud': case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
         break
@@ -117,12 +117,12 @@ export class Browser {
       case 'youtube':
         this.selectedPage.keyboard.press('k')
     }
-    this.buttons.setPlayButton('pause')
+    this.buttons.setPlayButton('paused')
   }
 
   pause() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'soundcloud': case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
         break
@@ -133,12 +133,12 @@ export class Browser {
       case 'youtube':
         this.selectedPage.keyboard.press('k')
     }
-    this.buttons.setPlayButton('play')
+    this.buttons.setPlayButton('playing')
   }
 
   async skip() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'soundcloud':
         await this.selectedPage.keyboard.down('ShiftLeft')
         await this.selectedPage.keyboard.press('ArrowRight')
@@ -160,7 +160,7 @@ export class Browser {
 
   async back() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'soundcloud':
         await this.selectedPage.keyboard.down('ShiftLeft')
         await this.selectedPage.keyboard.press('ArrowLeft')
@@ -180,7 +180,7 @@ export class Browser {
 
   async forward() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowRight')
         break
@@ -190,7 +190,7 @@ export class Browser {
 
   async backward() {
     if (!this.selectedPage) return
-    switch (this.selectedMusicPageBrand) {
+    switch (this.selectedMusicBrand) {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowLeft')
         break
@@ -215,9 +215,14 @@ export class Browser {
 
   async pickTab(index: number) {
     if (!this.pagesStatus) return
-    const pickedTab = this.pagesStatus[index]
-    this.pause()
-    this.update('page_selected', pickedTab.page)
+    const { page, state } = this.pagesStatus[index]
+    console.debug(state)
+    if (state === 'none') {
+      vscode.window.showInformationMessage(STATE_MSG)
+      return
+    }
+    if (this.selectedPage === page && state === 'playing') this.pause()
+    this.update('page_selected', page)
   }
 
   // ↓↓↓↓ Private methods ↓↓↓↓
@@ -295,7 +300,7 @@ export class Browser {
 
     const title = await page.title()
 
-    if (this.selectedPage === page) this.selectedMusicPageBrand = brand
+    if (this.selectedPage === page) this.selectedMusicBrand = brand
 
     for (const [i, p] of this.pagesStatus.entries()) {
       if (p.page !== page) continue
@@ -308,11 +313,11 @@ export class Browser {
 
   private pageClosed(page: puppeteer.Page) {
     if (page === this.selectedPage) {
-      this.buttons.setPlayButton('play')
+      this.buttons.setPlayButton('playing')
       this.buttons.displayPlayback(false)
       this.buttons.setStatusButtonText('Running $(browser)')
       this.selectedPage = undefined
-      this.selectedMusicPageBrand = undefined
+      this.selectedMusicBrand = undefined
     }
     this.pagesStatus.forEach((e, i, arr) => {
       if (e.page !== page) return
@@ -343,6 +348,7 @@ export class Browser {
 
     page.removeAllListeners('close')
     page.on('close', async () => {
+      console.debug('page on CLOSE')
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
       if (Browser.activeBrowser) this.update('page_closed', page)
     })
@@ -366,6 +372,7 @@ export class Browser {
     this.pagesStatus.forEach(async e => {
       if (e.page !== page) return
       this.selectedPage = e.page
+      this.selectedMusicBrand = this.musicBrandCheck(page.url())
       this.buttons.setStatusButtonText(await this.selectedPage.title())
       e.picked = true
     })
