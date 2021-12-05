@@ -104,36 +104,18 @@ export class Browser {
     this.launchPages()
   }
 
-  play() {
+  // toggle
+  async playPause() {
     if (!this.selectedPage) return
+    const { state } = await this.getPlaybackState(this.selectedPage)
     switch (this.selectedMusicBrand) {
-      case 'soundcloud': case 'ytmusic':
+      case 'soundcloud': case 'spotify': case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
-        break
-      case 'spotify':
-        // @ts-ignore
-        this.selectedPage.evaluate(() => spotifyAction('play'))
         break
       case 'youtube':
         this.selectedPage.keyboard.press('k')
     }
-    this.buttons.setPlayButton('paused')
-  }
-
-  pause() {
-    if (!this.selectedPage) return
-    switch (this.selectedMusicBrand) {
-      case 'soundcloud': case 'ytmusic':
-        this.selectedPage.keyboard.press('Space')
-        break
-      case 'spotify':
-        // @ts-ignore
-        this.selectedPage.evaluate(() => spotifyAction('pause'))
-        break
-      case 'youtube':
-        this.selectedPage.keyboard.press('k')
-    }
-    this.buttons.setPlayButton('playing')
+    this.buttons.setPlayButtonLabel(state)
   }
 
   async skip() {
@@ -198,13 +180,6 @@ export class Browser {
     }
   }
 
-  async toggle() {
-    if (this.selectedPage) {
-      const pStt = await this.getPlaybackState(this.selectedPage)
-      pStt.state === 'playing' ? this.pause() : this.play()
-    }
-  }
-
   getTabTitle() {
     return this.selectedPage?.title()
   }
@@ -221,7 +196,7 @@ export class Browser {
       vscode.window.showInformationMessage(STATE_MSG)
       return
     }
-    if (this.selectedPage === page && state === 'playing') this.pause()
+    if (this.selectedPage === page && state === 'playing') this.playPause()
     this.update('page_selected', page)
   }
 
@@ -274,16 +249,16 @@ export class Browser {
     else return 'other'
   }
 
-  private async update(event: string, page: puppeteer.Page | null, state?: "playing" | "paused" | "none") {
+  private async update(event: string, page: puppeteer.Page | null, state?: MediaSessionPlaybackState) {
     if (!page) return
     switch (event) {
       case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
       case 'page_created': await this.pageCreated(page); break
-      case 'page_selected': this.pageSelected(page); break
+      case 'page_selected': await this.pageSelected(page); break
       case 'playback_changed':
         if (!state) break
-        this.playbackChanged(page, state); break
+        await this.playbackChanged(page, state); break
       default: vscode.window.showErrorMessage(`Unknown event - ${event}`)
     }
     TreeviewProvider.refresh()
@@ -302,18 +277,17 @@ export class Browser {
 
     if (this.selectedPage === page) this.selectedMusicBrand = brand
 
-    for (const [i, p] of this.pagesStatus.entries()) {
-      if (p.page !== page) continue
-      this.pagesStatus[i].title = title
+    for (const [i, e] of this.pagesStatus.entries()) {
+      if (e.page !== page) continue
       this.pagesStatus[i].brand = 'other'
-      this.pagesStatus[i].state = 'none'
       this.pagesStatus[i].picked = false
+      this.pagesStatus[i].state = 'none'
+      this.pagesStatus[i].title = title
     }
   }
 
   private pageClosed(page: puppeteer.Page) {
     if (page === this.selectedPage) {
-      this.buttons.setPlayButton('playing')
       this.buttons.displayPlayback(false)
       this.buttons.setStatusButtonText('Running $(browser)')
       this.selectedPage = undefined
@@ -334,6 +308,7 @@ export class Browser {
 
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
+    console.debug(title)
 
     const pages = await this.currentBrowser.pages()
     for (const [index, p] of pages.entries()) {
@@ -342,6 +317,7 @@ export class Browser {
     }
 
     page.on('load', async () => {
+      console.debug('###', title)
       page.addStyleTag({ path: Browser.cssPath })
       page.addScriptTag({ path: Browser.jsPath })
     })
@@ -359,31 +335,37 @@ export class Browser {
 
     // @ts-ignore
     if (!page._pageBindings.has('playbackChanged'))
-      page.exposeFunction('playbackChanged', (state: 'playing' | 'paused' | 'none') => this.update('playback_changed', page, state))
+      page.exposeFunction('playbackChanged', (state: MediaSessionPlaybackState) => this.update('playback_changed', page, state))
   }
 
-  private pageSelected(page: puppeteer.Page) {
+  private async pageSelected(page: puppeteer.Page) {
     this.buttons.displayPlayback(true)
-    if (this.selectedPage && this.selectedPage !== page) {
-      this.pause()
-      this.resetFloatButton()
+    if (this.selectedPage) {
+      const { state } = await this.getPlaybackState(this.selectedPage)
+      if (state === 'playing') this.playPause()
+      this.pagesStatus.forEach(e => e.page === this.selectedPage ? e.picked = false : null)
     }
-    this.pagesStatus.forEach(async e => e.page === this.selectedPage ? e.picked = false : null)
-    this.pagesStatus.forEach(async e => {
-      if (e.page !== page) return
+    for (const [i, e] of this.pagesStatus.entries()) {
+      if (e.page !== page) continue
       this.selectedPage = e.page
       this.selectedMusicBrand = this.musicBrandCheck(page.url())
-      this.buttons.setStatusButtonText(await this.selectedPage.title())
-      e.picked = true
-    })
+      const title = await this.selectedPage.title()
+      this.pagesStatus[i].picked = true
+      this.pagesStatus[i].title = title
+      this.buttons.setStatusButtonText(title)
+    }
   }
 
-  private playbackChanged(page: puppeteer.Page, state: 'playing' | 'paused' | 'none') {
-    this.pagesStatus.forEach(e => {
-      if (e.page !== page) return
-      if (this.selectedPage === page) this.buttons.setPlayButton(state)
-      e.state = state // change by ref
-    })
+  private async playbackChanged(page: puppeteer.Page, state: MediaSessionPlaybackState) {
+    for (const [i, e] of this.pagesStatus.entries()) {
+      if (e.page !== page) continue
+      if (this.selectedPage === page) {
+        this.buttons.setPlayButtonLabel(state)
+        this.buttons.setStatusButtonText(await this.selectedPage.title())
+      }
+      this.pagesStatus[i].state = state
+      this.pagesStatus[i].title = await page.title()
+    }
   }
 
   private async spotifyBypassCSP(page: puppeteer.Page) {

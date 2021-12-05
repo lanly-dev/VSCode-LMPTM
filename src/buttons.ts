@@ -18,7 +18,7 @@ export class Buttons {
     this.statusButton.text = 'Launch $(rocket)'
 
     this.statusButton.command = 'lmptm.browserLaunch'
-    this.playButton.command = 'lmptm.play'
+    this.playButton.command = 'lmptm.playPause'
     this.backButton.command = 'lmptm.back'
     this.skipButton.command = 'lmptm.skip'
 
@@ -41,14 +41,8 @@ export class Buttons {
     }
   }
 
-  setPlayButton(label: 'playing' | 'paused' | 'none') {
-    if (label === 'playing') {
-      this.playButton.text = '$(primitive-square)'
-      this.playButton.command = 'lmptm.pause'
-    } else {
-      this.playButton.text = '$(play)'
-      this.playButton.command = 'lmptm.play'
-    }
+  setPlayButtonLabel(label: MediaSessionPlaybackState) {
+    this.playButton.text = label === 'playing' ? '$(primitive-square)' : '$(play)'
   }
 
   displayPlayback(flag: boolean) {

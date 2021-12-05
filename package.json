@@ -103,7 +103,7 @@
       },
       {
         "key": "win+Alt+down",
-        "command": "lmptm.toggle",
+        "command": "lmptm.playPause",
         "description": "Toggle play/pause."
       },
       {

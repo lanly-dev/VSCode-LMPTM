@@ -4,6 +4,6 @@ export interface Entry {
   index: number
   page: Page
   picked: boolean
-  state: 'playing' | 'paused' | 'none'
+  state: MediaSessionPlaybackState
   title: string
 }

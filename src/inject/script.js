@@ -7,11 +7,9 @@ const PICK_MSG = '⛏️ Pick?'
 const playButtonAttrs = {
   soundcloud: { css: '.playControl' },
   spotify: {
-    css: '.control-button--circled',
-    svgPath: {
-      play: '',
-      pause: ''
-    }
+    css: 'button[data-testid="control-button-playpause"]',
+    cssAll: '.player-controls button',
+    play: 'M4.018 14L14.41 8 4.018 2z'
   },
   youtube: { css: '.ytp-play-button' },
   ytmusic: { css: '#play-pause-button' }
@@ -49,13 +47,13 @@ function click() {
   let brand
 
   if (href.includes('soundcloud.com')) {
-    if (!document.querySelectorAll('.m-visible')[0]) {
+    if (!navigator.mediaSession.metadata) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'soundcloud')
     }
     brand = 'soundcloud'
   } else if (href.includes('open.spotify.com')) {
-    if (!document.querySelectorAll('.now-playing .cover-art-image')[0]) {
+    if (!navigator.mediaSession.metadata.title) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'spotify')
     }
@@ -119,18 +117,20 @@ function setupObserver(brand) {
   const state = getPlaybackState(brand, css)
   window.playbackChanged(state)
   observer = new MutationObserver(() => {
-    const state = getPlaybackState(brand, css)
+    const state = getPlaybackState(brand)
     window.playbackChanged(state)
   })
   if (targetE) observer.observe(targetE, { attributes: true })
 }
 
-// NOTE: need this?
-function getPlaybackState(brand, attrs) {
-  console.log('getPlaybackState')
+function getPlaybackState(brand) {
+  // spotify doesn't update the mediaSession.playbackState
   if (brand === 'spotify') {
-    console.log(attrs)
-    return 'playing'
+    const { css, play } = playButtonAttrs.spotify
+    const d = document.querySelector(`${css} svg path:last-child`).getAttribute('d')
+    const state = d === play ? 'paused' : 'playing'
+    console.log(state)
+    return state
   } else return navigator.mediaSession.playbackState
 }
 
@@ -175,17 +175,13 @@ function showInfo(btnPick, brand) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function spotifyAction(action) {
+  const actionBtn = document.querySelectorAll(playButtonAttrs.spotify.cssAll)
   switch (action) {
-    case 'play':
-    case 'pause':
-      // prettier-ignore
-      (document.querySelector('.spoticon-play-16') || document.querySelector('.spoticon-pause-16')).click()
-      break
     case 'skip':
-      document.querySelector('.spoticon-skip-forward-16').click()
+      actionBtn[3].click()
       break
     case 'back':
-      document.querySelector('.spoticon-skip-back-16').click()
+      actionBtn[1].click()
       break
   }
 }
