@@ -5,10 +5,14 @@ log(`LMPTM's script injected successfully!`)
 
 const PICK_MSG = '⛏️ Pick?'
 const playButtonAttrs = {
-  soundcloud: { css: '.playControl' },
+  soundcloud: {
+    css: '.playControl',
+    cssCover: '.m-visible'
+  },
   spotify: {
     css: 'button[data-testid="control-button-playpause"]',
-    cssAll: '.player-controls button',
+    cssAll5Btns: '.player-controls button',
+    cssTitle: 'div[data-testid="now-playing-widget"]',
     play: 'M4.018 14L14.41 8 4.018 2z'
   },
   youtube: { css: '.ytp-play-button' },
@@ -47,7 +51,7 @@ function click() {
   let brand
 
   if (href.includes('soundcloud.com')) {
-    if (!navigator.mediaSession.metadata) {
+    if (!document.querySelector('.m-visible')) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'soundcloud')
     }
@@ -86,6 +90,7 @@ function click() {
   }
 }
 
+// For supporting other sites later?
 // function setupMediaSession() {
 //   const proxyHandler = {
 //     get(target, prop) {
@@ -114,13 +119,23 @@ function setupObserver(brand) {
   const { css } = playButtonAttrs[brand]
   if (observer) observer.disconnect()
   const targetE = document.querySelector(css)
-  const state = getPlaybackState(brand, css)
+  let state = getPlaybackState(brand, css)
+  if (brand === 'soundcloud' && state === 'none') state = 'paused'
   window.playbackChanged(state)
+
   observer = new MutationObserver(() => {
     const state = getPlaybackState(brand)
     window.playbackChanged(state)
   })
   if (targetE) observer.observe(targetE, { attributes: true })
+
+  // Spotify doesn't fire playbackChanged when skip/back a song
+  if (brand === 'spotify') {
+    const { cssTitle } = playButtonAttrs.spotify
+    const targetE2 = document.querySelector(cssTitle)
+    // Observer can watch multiple elements :)
+    if (targetE2) observer.observe(targetE2, { attributes: true })
+  }
 }
 
 function getPlaybackState(brand) {
@@ -129,7 +144,6 @@ function getPlaybackState(brand) {
     const { css, play } = playButtonAttrs.spotify
     const d = document.querySelector(`${css} svg path:last-child`).getAttribute('d')
     const state = d === play ? 'paused' : 'playing'
-    console.log(state)
     return state
   } else return navigator.mediaSession.playbackState
 }
@@ -175,7 +189,8 @@ function showInfo(btnPick, brand) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function spotifyAction(action) {
-  const actionBtn = document.querySelectorAll(playButtonAttrs.spotify.cssAll)
+  const { cssAll5Btns } = playButtonAttrs.spotify
+  const actionBtn = document.querySelectorAll(cssAll5Btns)
   switch (action) {
     case 'skip':
       actionBtn[3].click()

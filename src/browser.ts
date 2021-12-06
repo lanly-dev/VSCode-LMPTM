@@ -60,7 +60,7 @@ export class Browser {
       }
 
       Browser.launched = true
-      console.log('###########################################')
+      // console.log('###########################################')
       puppeteer.launch({
         args,
         defaultViewport: null,
@@ -104,7 +104,7 @@ export class Browser {
     this.launchPages()
   }
 
-  // toggle
+  // Toggle
   async playPause() {
     if (!this.selectedPage) return
     const { state } = await this.getPlaybackState(this.selectedPage)
@@ -190,13 +190,12 @@ export class Browser {
 
   async pickTab(index: number) {
     if (!this.pagesStatus) return
+    await this.tabOrderUpdate()
     const { page, state } = this.pagesStatus[index]
-    console.debug(state)
     if (state === 'none') {
       vscode.window.showInformationMessage(STATE_MSG)
       return
     }
-    if (this.selectedPage === page && state === 'playing') this.playPause()
     this.update('page_selected', page)
   }
 
@@ -227,6 +226,21 @@ export class Browser {
     this.selectedPage?.evaluate(() => reset())
   }
 
+  private async tabOrderUpdate() {
+    // Puppeteer doesn't keep track pages' order?
+    const pages = await this.currentBrowser.pages()
+    const newPagesStatus = []
+    for (const [i, p] of pages.entries()) {
+      for (const e of this.pagesStatus) {
+        if (p !== e.page) continue
+        e.index = i
+        newPagesStatus.push(e)
+      }
+    }
+    this.pagesStatus = newPagesStatus
+    TreeviewProvider.refresh()
+  }
+
   // Get from saved
   private getPlaybackState(page: puppeteer.Page) {
     for (const e of this.pagesStatus)
@@ -235,6 +249,7 @@ export class Browser {
     return this._getPlaybackState(page)
   }
 
+  // Need this?
   private async _getPlaybackState(page: puppeteer.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
     const state = await page.evaluate(() => navigator.mediaSession.playbackState)
@@ -251,6 +266,7 @@ export class Browser {
 
   private async update(event: string, page: puppeteer.Page | null, state?: MediaSessionPlaybackState) {
     if (!page) return
+    // console.debug('$$$$$$$$$', event)
     switch (event) {
       case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
@@ -258,7 +274,8 @@ export class Browser {
       case 'page_selected': await this.pageSelected(page); break
       case 'playback_changed':
         if (!state) break
-        await this.playbackChanged(page, state); break
+        await this.playbackChanged(page, state)
+        break
       default: vscode.window.showErrorMessage(`Unknown event - ${event}`)
     }
     TreeviewProvider.refresh()
@@ -275,28 +292,32 @@ export class Browser {
 
     const title = await page.title()
 
-    if (this.selectedPage === page) this.selectedMusicBrand = brand
-
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.page !== page) continue
-      this.pagesStatus[i].brand = 'other'
-      this.pagesStatus[i].picked = false
-      this.pagesStatus[i].state = 'none'
+      if (this.selectedPage === page) this.selectedMusicBrand = brand
+      if (brand === 'other') {
+        this.pagesStatus[i].picked = false
+        this.pagesStatus[i].state = 'none'
+        this.closingHelper()
+      }
+      this.pagesStatus[i].brand = brand
       this.pagesStatus[i].title = title
     }
   }
 
   private pageClosed(page: puppeteer.Page) {
-    if (page === this.selectedPage) {
-      this.buttons.displayPlayback(false)
-      this.buttons.setStatusButtonText('Running $(browser)')
-      this.selectedPage = undefined
-      this.selectedMusicBrand = undefined
-    }
+    if (page === this.selectedPage) this.closingHelper()
     this.pagesStatus.forEach((e, i, arr) => {
       if (e.page !== page) return
       arr.splice(i, 1)
     })
+  }
+
+  private closingHelper() {
+    this.buttons.displayPlayback(false)
+    this.buttons.setStatusButtonText('Running $(browser)')
+    this.selectedPage = undefined
+    this.selectedMusicBrand = undefined
   }
 
   private async pageCreated(page: puppeteer.Page) {
@@ -308,7 +329,6 @@ export class Browser {
 
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
-    console.debug(title)
 
     const pages = await this.currentBrowser.pages()
     for (const [index, p] of pages.entries()) {
@@ -317,14 +337,13 @@ export class Browser {
     }
 
     page.on('load', async () => {
-      console.debug('###', title)
       page.addStyleTag({ path: Browser.cssPath })
       page.addScriptTag({ path: Browser.jsPath })
     })
 
     page.removeAllListeners('close')
     page.on('close', async () => {
-      console.debug('page on CLOSE')
+      // console.debug('page on CLOSE')
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
       if (Browser.activeBrowser) this.update('page_closed', page)
     })
@@ -336,14 +355,22 @@ export class Browser {
     // @ts-ignore
     if (!page._pageBindings.has('playbackChanged'))
       page.exposeFunction('playbackChanged', (state: MediaSessionPlaybackState) => this.update('playback_changed', page, state))
+
   }
 
   private async pageSelected(page: puppeteer.Page) {
     this.buttons.displayPlayback(true)
+
+    // Not sure why it can't detect or wait - the error below
+    // rejected promise not handled within 1 second:
+    // Error: Execution context is not available in detached frame "about:blank"
+    // (are you trying to evaluate?)
+
     if (this.selectedPage) {
       const { state } = await this.getPlaybackState(this.selectedPage)
-      if (state === 'playing') this.playPause()
       this.pagesStatus.forEach(e => e.page === this.selectedPage ? e.picked = false : null)
+      if (this.selectedPage === page) await this.playPause()
+      else if (state === 'playing') await this.playPause()
     }
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.page !== page) continue
