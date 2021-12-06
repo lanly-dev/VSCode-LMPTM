@@ -4,26 +4,40 @@ All notable changes to the "LetMePlayTheMusic" extension will be documented in t
 
 Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how to structure this file.
 
-### Reference
+### References
 - https://github.com/microsoft/vscode-generator-code/tree/main/generators/app/templates/ext-command-ts
 - https://github.com/microsoft/vscode-extension-samples
+- https://www.conventionalcommits.org
 
 ### TODO
 - Brave setting removal
 - I18n
-- Look into mediaSession playbackState
 - Playwright vs Puppeteer option
+- Seek backward/forward setting option
 - Shelljs vs Execa
-- Site English version issue
 - Support for other sites
-- Treeview
 
 ## [2.0.0] - ??? 2021
-### Note:
+- Add new feature - treeview
+- Rewrite/refactor most of the code - 25+ commits
+- New float button style
+- Fix Spotify bug due to it's style class's changes
+- Fix site English version issue - observes another DOM element to update playback status
+- Move most of the minor inject action to inject script instead
+- Re-config project's configs like eslint, tsconfig, vscode setting, and webpack (.js -> .ts)
+- Rename directories: icon -> media, script -> inject
+- Playback icons is sync with the site's playback icons which was behaved contrarily before
+### Note
+### This release mostly has more significant impact on the dev side rather than like a product update.
 #### [MediaSession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
 - Soundcloud does update `playbackState` but only call `set` for from press play
 - Spotify does call `set` to update metadata but playbackState always *none*
-- Youtube and ytmusic update `playbackState` consistent with proxy `set` event
+- Youtube and YTmusic update `playbackState` consistent with proxy `set` event
+
+### Puppeteer
+- Seem Puppeteer doesn't keep track pages/tabs' order
+- If click too quick, this shows up: `Error: Execution context is not available in detached frame "about:blank" (are you trying to evaluate?)`
+  Waiting and try/catch was fruitless
 
 ## [1.4.0] - October 2020
 - Add key shortcuts [#7](https://github.com/lanly-dev/VSCode-LMPTM/issues/7)

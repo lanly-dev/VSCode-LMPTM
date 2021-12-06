@@ -55,7 +55,7 @@ class TabItem extends TreeItem {
   constructor(e: Entry) {
     const { picked, state } = e
     let title = e.title
-    if (picked) title = `🎶 ${title}`
+    if (picked) title = `⛏️ ${title}`
     super(title)
     if (state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'primitive-square' : 'play')
     this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }

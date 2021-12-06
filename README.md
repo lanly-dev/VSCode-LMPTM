@@ -29,11 +29,18 @@ Required Chromium-based browser
 * `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if **User Data** setting is unchecked.
 
 ## Known Issues
-- Work only with English version of the supported music sites
 - Does not work with Opera browser
 - Won't be able to login Youtube and SoundCloud(email method)
 
 ## Release Notes
+### 2.0.0
+- Add treeview - so now the the app can switch between tabs
+  1. The page has to be picked before being able to use in the treeview
+  2. You can select the treeview items that have  the play/pause icon
+  3. The emoji ⛏️ means the tab is currently picked
+  4. First click switches the picked icon to target tab, later clicks toggles playing/paused status of the target tab media's playback
+
+- Fix spotify bugs due to it's new UI changes
 
 ### 1.4.0
 - Add key shortcuts
