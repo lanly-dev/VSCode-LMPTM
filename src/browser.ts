@@ -69,8 +69,8 @@ export class Browser {
         ignoreDefaultArgs: iArgs
       }).then(async (browser: puppeteer.Browser) => {
         buttons.setStatusButtonText('Running $(browser)')
-        Browser.cssPath = path.join(context.extensionPath, 'out', 'inject', 'style.css')
-        Browser.jsPath = path.join(context.extensionPath, 'out', 'inject', 'script.js')
+        Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
+        Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
         const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())

@@ -45,6 +45,6 @@ export default {
   ],
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
+    minimizer: [new TerserPlugin({ extractComments: false }), new CssMinimizerPlugin()]
   }
 }

@@ -8,7 +8,6 @@
 media/res
 media/vscodeignore
 node_modules
-out
 src
 vsc-extension-quickstart.md
 webpack.config.js

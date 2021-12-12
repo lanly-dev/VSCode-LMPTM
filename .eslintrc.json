@@ -4,7 +4,7 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"],
-  "ignorePatterns": ["dist", "out"],
+  "ignorePatterns": ["dist"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
