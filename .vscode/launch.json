@@ -6,22 +6,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Extension:webpack",
+      "name": "Launch Extension webpack",
       "type": "extensionHost",
       "request": "launch",
-      "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "npm: webpack"
+      "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Extension:watch",
+      "name": "Launch Extension ts-watch",
       "type": "extensionHost",
       "request": "launch",
-      "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "npm: watch"
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "preLaunchTask": "ts-watch"
     }
   ]
 }

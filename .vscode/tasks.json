@@ -5,30 +5,43 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "watch",
-      "problemMatcher": "$tsc-watch",
+      "script": "wp-watch",
+      "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
       "isBackground": true,
       "presentation": {
-        "reveal": "never"
+        "reveal": "never",
+        "group": "watcher"
       },
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "dependsOn": ["npm: task-clean-output"]
+    },
+    {
+      "label": "ts-watch",
+      "type": "npm",
+      "script": "ts-watch",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": { "reveal": "never" },
+      "dependsOrder": "sequence",
+      "dependsOn": ["npm: task-clean-output", "npm: task-copy-static-assets"]
+    },
+    // ↓↓↓↓ For vscode command palette ↓↓↓↓
+    {
+      "type": "npm",
+      "script": "test-compile",
+      "dependsOn": ["npm: task-clean-output"]
     },
     {
       "type": "npm",
-      "script": "compile",
-      "dependsOn": ["npm: copy-static-assets"]
-    },
-    {
-      "type": "npm",
-      "script": "copy-static-assets",
+      "script": "task-copy-static-assets",
       "isBackground": false
     },
     {
       "type": "npm",
-      "script": "clean-output",
+      "script": "task-clean-output",
       "isBackground": false
     }
   ]

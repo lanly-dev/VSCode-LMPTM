@@ -1,12 +1,12 @@
 {
   "name": "letmeplaythemusic",
   "displayName": "Let Me Play The Music",
-  "description": "Control playback from the popular music sites",
+  "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.63.0"
   },
   "extensionKind": [
     "ui"
@@ -15,24 +15,40 @@
     "Other"
   ],
   "keywords": [
+    "Browser",
     "Music",
     "Playback",
-    "Browser",
-    "Souncloud",
+    "SoundCloud",
     "Spotify",
-    "Youtube",
-    "Youtube Music"
+    "Youtube Music",
+    "Youtube"
   ],
-  "icon": "icon/lmptm.png",
+  "icon": "media/lmptm.png",
   "galleryBanner": {
     "color": "#000f33",
     "theme": "dark"
   },
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./dist/extension",
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "LMPTM",
+        "contents": "[Launch $(rocket)](command:lmptm.browserLaunch)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "LMPTM",
+          "name": "LMPTM",
+          "icon": "media/icon.svg",
+          "contextualTitle": "LMPTM"
+        }
+      ]
+    },
     "configuration": [
       {
         "title": "LMPTM",
@@ -40,7 +56,7 @@
           "lmptm.browserPath": {
             "type": "string",
             "default": null,
-            "markdownDescription": "Specify custom browser executable file path."
+            "description": "Specify custom browser executable file path."
           },
           "lmptm.ignoreDisableSync": {
             "type": "boolean",
@@ -50,7 +66,7 @@
           "lmptm.incognitoMode": {
             "type": "boolean",
             "default": true,
-            "markdownDescription": "Specify whether to launch browser in incognito/private mode."
+            "description": "Specify whether to launch browser in incognito/private mode."
           },
           "lmptm.startPages": {
             "type": "array",
@@ -65,7 +81,7 @@
           "lmptm.userData": {
             "type": "boolean",
             "default": false,
-            "markdownDescription": "Specify if the extension could store browser's user data, if enabled, user data directory setting is required."
+            "description": "Specify if the extension could store browser's user data, if enabled, user data directory setting is required."
           },
           "lmptm.userDataDirectory": {
             "type": "string",
@@ -85,7 +101,7 @@
       },
       {
         "key": "win+Alt+down",
-        "command": "lmptm.toggle"
+        "command": "lmptm.playPause"
       },
       {
         "key": "win+Alt+x",
@@ -98,36 +114,42 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production",
+    "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
+    "vsce-package": "vsce package",
     "test-compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "webpack": "webpack --mode development",
-    "webpack-dev": "webpack --mode development --watch",
+    "test-webpack": "webpack",
+    "ts-watch": "tsc -watch -p ./",
+    "wp-watch": "webpack --watch",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
-    "copy-static-assets": "ts-node tasks.ts copy",
-    "clean-output": "ts-node tasks.ts clean"
+    "task-copy-static-assets": "ts-node tasks.ts copy",
+    "task-clean-output": "ts-node tasks.ts clean",
+    "copy": "npm run task-copy-static-assets",
+    "clean": "npm run task-clean-output"
   },
   "devDependencies": {
-    "@types/node": "^14.11.8",
-    "@types/puppeteer-core": "^2.0.0",
-    "@types/shelljs": "^0.8.8",
-    "@types/vscode": "^1.50.0",
-    "@typescript-eslint/eslint-plugin": "^4.4.0",
-    "@typescript-eslint/parser": "^4.4.0",
-    "copy-webpack-plugin": "^6.2.1",
-    "eslint": "^7.11.0",
+    "@types/copy-webpack-plugin": "^8.0.1",
+    "@types/karma-chrome-launcher": "^3.1.1",
+    "@types/node": "^16.11.13",
+    "@types/puppeteer-core": "^5.4.0",
+    "@types/shelljs": "^0.8.9",
+    "@types/vscode": "^1.63.0",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "copy-webpack-plugin": "^10.1.0",
+    "css-minimizer-webpack-plugin": "^3.2.0",
+    "eslint": "^8.4.1",
     "shelljs": "^0.8.4",
-    "terser": "^5.3.4",
-    "ts-loader": "^8.0.4",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4",
+    "vsce": "^2.5.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
     "karma-chrome-launcher": "^3.1.0",
-    "puppeteer-core": "^5.3.1"
+    "puppeteer-core": "^13.0.0"
   },
   "repository": {
     "type": "git",
