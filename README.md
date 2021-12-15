@@ -10,9 +10,11 @@ Wanted to stay focus on your programing instead of those shortcomings above?
 If yes, you are in luck!\
 This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
 
-Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment-661796089) - you could use this extension to follow programming tutorials on Youtube with the handy seek forward/backward key shortcuts.
+>Extra [use case](https://github.com/lanly-dev/VSCode-LMPTM/issues/8#issuecomment-661796089) - you could use this extension to follow programming tutorials on Youtube with the handy seek forward/backward key shortcuts.
 
-[How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
+>[How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
+
+<img src='./media/capture2.0.png' width='700'/>
 
 ## Features
 Supports SoundCloud, Spotify, Youtube and Youtube Music

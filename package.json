@@ -1,7 +1,7 @@
 {
   "name": "letmeplaythemusic",
   "displayName": "Let Me Play The Music",
-  "description": "Control playback from the popular music sites",
+  "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
   "version": "2.0.0",
   "publisher": "lanly-dev",
@@ -93,28 +93,23 @@
     "keybindings": [
       {
         "key": "win+Alt+right",
-        "command": "lmptm.skip",
-        "description": "Play the next track."
+        "command": "lmptm.skip"
       },
       {
         "key": "win+Alt+left",
-        "command": "lmptm.back",
-        "description": "Play the previous track."
+        "command": "lmptm.back"
       },
       {
         "key": "win+Alt+down",
-        "command": "lmptm.playPause",
-        "description": "Toggle play/pause."
+        "command": "lmptm.playPause"
       },
       {
         "key": "win+Alt+x",
-        "command": "lmptm.forward",
-        "description": "Seek forward s5 for Youtube videos."
+        "command": "lmptm.forward"
       },
       {
         "key": "win+Alt+z",
-        "command": "lmptm.backward",
-        "description": "Seek backward s5 for Youtube videos"
+        "command": "lmptm.backward"
       }
     ]
   },
@@ -135,19 +130,19 @@
   "devDependencies": {
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/karma-chrome-launcher": "^3.1.1",
-    "@types/node": "^16.11.12",
+    "@types/node": "^16.11.13",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.9",
     "@types/vscode": "^1.63.0",
-    "@typescript-eslint/eslint-plugin": "^5.6.0",
-    "@typescript-eslint/parser": "^5.6.0",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
     "copy-webpack-plugin": "^10.1.0",
     "css-minimizer-webpack-plugin": "^3.2.0",
     "eslint": "^8.4.1",
     "shelljs": "^0.8.4",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.3",
+    "typescript": "^4.5.4",
     "vsce": "^2.5.1",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"

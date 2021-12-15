@@ -17,10 +17,11 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Shelljs vs Execa
 - Support for other sites
 
-## [2.0.0] - ??? 2021
+## [2.0.0] - December 2021
 - Add new feature - treeview
 - Rewrite/refactor most of the code - 25+ commits
-- New float button style
+- New float button style - old vs new
+  <br><img src='./media/btn1.4.png' width='100'/> <img src='./media/btn2.0.png' width='100'/>
 - Fix Spotify bug due to it's style class's changes
 - Fix site English version issue - observes another DOM element to update playback status
 - Merge play and pause commands into one toggle function
