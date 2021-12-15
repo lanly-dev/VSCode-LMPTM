@@ -19,18 +19,25 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 
 ## [2.0.0] - December 2021
 - Add new feature - treeview
-- Rewrite/refactor most of the code - 25+ commits
-- New float button style - old vs new
+- Rewrite/refactor most of the code - 30+ commits
+- New float button style - old vs new in Windows
   <br><img src='./media/btn1.4.png' width='100'/> <img src='./media/btn2.0.png' width='100'/>
 - Fix Spotify bug due to it's style class's changes
 - Fix site English version issue - observes another DOM element to update playback status
 - Merge play and pause commands into one toggle function
 - Move most of the minor inject action to inject script instead
 - Re-config project's configs like eslint, tsconfig, vscode setting, and webpack (.js -> .ts)
-- Rename directories: icon -> media, script -> inject
+- Rename directories: icon -> media, scripts -> inject
 - Playback icons is sync with the site's playback icons which was behaved contrarily before
+- Webpack 5.65.0 compiled successfully in 9980 ms
+- 15 files, 1.39MB, 1.63.0
+
 ### Note
+
 #### This release mostly has more significant impact on the dev side rather than like a product update.
+
+#### One funny thing is that the picture in README.md accounts for a large part of this extension's size.
+
 #### [MediaSession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
 - Soundcloud does update `playbackState` but only call `set` for from press play
 - Spotify does call `set` to update metadata but playbackState always *none*

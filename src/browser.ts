@@ -40,7 +40,7 @@ export class Browser {
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
 
       if (!cPath) {
-        vscode.window.showInformationMessage('Missing Browser? 🤔')
+        vscode.window.showInformationMessage('No Chromium or Chrome browser found. 🤔')
         return
       }
 
@@ -78,7 +78,7 @@ export class Browser {
         TreeviewProvider.refresh()
       }, (error: { message: string }) => {
         vscode.window.showErrorMessage(error.message)
-        vscode.window.showInformationMessage('Missing Chrome? 🤔')
+        vscode.window.showInformationMessage('Browser launch failed. 😲')
         Browser.launched = false
       })
     }
