@@ -36,13 +36,12 @@ Required Chromium-based browser
 
 ## Release Notes
 ### 2.0.0
+- Fix spotify bugs due to it's new UI changes
 - Add treeview - so now the the app can switch between tabs
   1. The page has to be picked before being able to use in the treeview
   2. You can select the treeview items that have  the play/pause icon
   3. The emoji ⛏️ means the tab is currently picked
   4. First click switches the picked icon to target tab, later clicks toggles playing/paused status of the target tab media's playback
-
-- Fix spotify bugs due to it's new UI changes
 
 ### 1.4.0
 - Add key shortcuts

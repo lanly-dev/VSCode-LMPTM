@@ -1,6 +1,6 @@
 import { window, StatusBarItem, StatusBarAlignment } from 'vscode'
 
-export class Buttons {
+export default class Buttons {
   private playButton: StatusBarItem
   private skipButton: StatusBarItem
   private backButton: StatusBarItem

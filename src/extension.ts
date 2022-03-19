@@ -1,12 +1,12 @@
 import { commands, window, ExtensionContext } from 'vscode'
-import { Browser } from './browser'
-import { Buttons } from './buttons'
 import { Entry } from './interfaces'
-import { TreeviewProvider } from './treeview'
+import Browser from './browser'
+import Buttons from './buttons'
+import TreeviewProvider from './treeview'
 
 export function activate(context: ExtensionContext) {
   const buttons = new Buttons()
-  const fn = ['playPause', 'skip', 'back', 'forward', 'backward'] as const
+  const fn = <const>['playPause', 'skip', 'back', 'forward', 'backward']
   const rc = commands.registerCommand
   TreeviewProvider.create()
   const disposables = fn.map(n => rc(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))

@@ -1,14 +1,9 @@
 'use strict'
-
-interface Paths {
-  [key: string]: string
-}
-
 import * as karmaChromeLauncher from 'karma-chrome-launcher'
 
-export class WhichChrome {
+export default class WhichChrome {
   public static getPaths() {
-    const chromePaths: Paths = {}
+    const chromePaths: { [key: string]: string } = {}
     Object.keys(karmaChromeLauncher).forEach(key => {
       if (key.indexOf('launcher:') !== 0) return
       // @ts-ignore

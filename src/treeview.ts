@@ -1,8 +1,8 @@
-import { Browser } from './browser'
 import { Event, EventEmitter, ThemeIcon, TreeDataProvider, TreeItem, window } from 'vscode'
 import { Entry } from './interfaces'
+import Browser from './browser'
 
-export class TreeviewProvider implements TreeDataProvider<Entry> {
+export default class TreeviewProvider implements TreeDataProvider<Entry> {
   public static tvProvider: TreeviewProvider
 
   private _onDidChangeTreeData: EventEmitter<null> = new EventEmitter<null>()
