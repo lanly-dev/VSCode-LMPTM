@@ -37,7 +37,7 @@ export default class Browser {
       if (vscode.workspace.getConfiguration().get('lmptm.ignoreDisableSync')) iArgs.push('--disable-sync')
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
-      if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+      if (!cPath) cPath = WhichChrome.getPaths().Chrome ?? WhichChrome.getPaths().Chromium
 
       if (!cPath) {
         vscode.window.showInformationMessage('No Chromium or Chrome browser found. 🤔')
@@ -58,9 +58,8 @@ export default class Browser {
           return
         }
       }
-
       Browser.launched = true
-      // console.log('###########################################')
+
       puppeteer.launch({
         args,
         defaultViewport: null,
@@ -71,15 +70,15 @@ export default class Browser {
         buttons.setStatusButtonText('Running $(browser)')
         Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
         Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
-        const defaultPages = await browser.pages()
-        defaultPages[0].close() // evaluateOnNewDocument won't on this page
-        const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
-        Browser.activeBrowser = b
+        Browser.activeBrowser = new Browser(browser, buttons, await browser.createBrowserContext())
         TreeviewProvider.refresh()
-      }, (error: { message: string }) => {
+      }, error => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Browser launch failed. 😲')
         Browser.launched = false
+      }).catch(error => {
+        vscode.window.showErrorMessage(error.message)
+        vscode.window.showInformationMessage('Browser launch failed. 😲')
       })
     }
   }
@@ -206,13 +205,27 @@ export default class Browser {
     if (links && links.length) {
       const p: Promise<HTTPResponse>[] = []
       links.forEach(async (e: string) => {
-        const pg = await this.newPage()
+        let pg
+        try {
+          pg = await this.newPage()
+        } catch (e) {
+          console.log('$$$', e)
+        }
+        if (!pg) return
         await pg.setDefaultNavigationTimeout(0)
         await pg.goto(e)
       })
-      await Promise.all(p) // need to wait?
+      await Promise.all(p)
+      this.removeBlankPageAtStartup()
     }
     TreeviewProvider.refresh()
+  }
+
+  // Browser will close if the only tab close so remove blank page after other pages created
+  // Doesn't want to deal with the default blank page
+  private async removeBlankPageAtStartup() {
+    const pages = await this.currentBrowser.pages()
+    pages[0].close()
   }
 
   private async newPage() {
@@ -350,6 +363,7 @@ export default class Browser {
     }
 
     page.on('load', async () => {
+      if (await this.isDevTools(page)) return
       page.addStyleTag({ path: Browser.cssPath })
       page.addScriptTag({ path: Browser.jsPath })
     })
@@ -361,14 +375,8 @@ export default class Browser {
       if (Browser.activeBrowser) this.update('page_closed', page)
     })
 
-    // @ts-ignore
-    if (!page._pageBindings.has('pageSelected'))
-      page.exposeFunction('pageSelected', () => this.update('page_selected:button', page))
-
-    // @ts-ignore
-    if (!page._pageBindings.has('playbackChanged'))
-      page.exposeFunction('playbackChanged', (state: string) => this.update(`playback_changed:${state}`, page))
-
+    page.exposeFunction('pageSelected', () => this.update('page_selected:button', page))
+    page.exposeFunction('playbackChanged', (state: string) => this.update(`playback_changed:${state}`, page))
   }
 
   private async pageSelected(page: puppeteer.Page, source: string) {
@@ -419,12 +427,26 @@ export default class Browser {
     }
   }
 
+  // private async requestStoragePermission(page: puppeteer.Page) {
+  //   if (await this.isDevTools(page)) return
+  //   // @ts-ignore
+  //   await page.evaluate(() => navigator.permissions.query({ name: 'storage-access' }))
+  //   // @ts-ignore
+  //   await page.evaluate(async () => console.log(await navigator.permissions.query({ name: 'storage-access' })))
+  // }
+
   private async spotifyBypassCSP(page: puppeteer.Page) {
+    if (await this.isDevTools(page)) return
     page.setBypassCSP(true)
     // for debugging
     await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'true'))
     // this doesn't trigger page_changed again -> no infinity loop
     page.goto(page.url())
+  }
+
+  private async isDevTools(page: puppeteer.Page) {
+    const title = await page.title()
+    return title === 'DevTools'
   }
 
   // private async sleep(ms: number = 1000) {
