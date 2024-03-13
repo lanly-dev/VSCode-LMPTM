@@ -10,6 +10,7 @@ import WhichChrome from './whichChrome'
 
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos. 💡'
 const STATE_MSG = 'Please select the tab/page that either in playing or paused. 💡'
+
 export default class Browser {
   public static activeBrowser: Browser | undefined
   public static cssPath: string
@@ -205,12 +206,7 @@ export default class Browser {
     if (links && links.length) {
       const p: Promise<HTTPResponse>[] = []
       links.forEach(async (e: string) => {
-        let pg
-        try {
-          pg = await this.newPage()
-        } catch (e) {
-          console.log('$$$', e)
-        }
+        const pg = await this.newPage()
         if (!pg) return
         await pg.setDefaultNavigationTimeout(0)
         await pg.goto(e)
@@ -222,7 +218,7 @@ export default class Browser {
   }
 
   // Browser will close if the only tab close so remove blank page after other pages created
-  // Doesn't want to deal with the default blank page
+  // Don't want to deal with the default blank page
   private async removeBlankPageAtStartup() {
     const pages = await this.currentBrowser.pages()
     pages[0].close()
@@ -426,14 +422,6 @@ export default class Browser {
       this.pagesStatus[i].title = await page.title()
     }
   }
-
-  // private async requestStoragePermission(page: puppeteer.Page) {
-  //   if (await this.isDevTools(page)) return
-  //   // @ts-ignore
-  //   await page.evaluate(() => navigator.permissions.query({ name: 'storage-access' }))
-  //   // @ts-ignore
-  //   await page.evaluate(async () => console.log(await navigator.permissions.query({ name: 'storage-access' })))
-  // }
 
   private async spotifyBypassCSP(page: puppeteer.Page) {
     if (await this.isDevTools(page)) return
