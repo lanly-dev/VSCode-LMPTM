@@ -1,9 +1,12 @@
 import * as path from 'path'
-import * as puppeteer from 'puppeteer-core'
+import * as pptCore from 'puppeteer-core'
 import * as vscode from 'vscode'
 
+import { default as pptExtra } from 'puppeteer-extra'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker'
+
 import { Entry } from './interfaces'
-import { HTTPResponse } from 'puppeteer-core'
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
 import WhichChrome from './whichChrome'
@@ -17,11 +20,11 @@ export default class Browser {
   public static jsPath: string
   public static launched = false
   private buttons: Buttons
-  private currentBrowser: puppeteer.Browser
-  private incognitoContext: puppeteer.BrowserContext
+  private currentBrowser: pptCore.Browser
+  private incognitoContext: pptCore.BrowserContext
   private pagesStatus: Entry[]
   private selectedMusicBrand: string | undefined
-  private selectedPage: puppeteer.Page | undefined
+  private selectedPage: pptCore.Page | undefined
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
     if (!Browser.activeBrowser && !Browser.launched) {
@@ -60,37 +63,48 @@ export default class Browser {
         }
       }
       Browser.launched = true
-
-      puppeteer.launch({
-        args,
-        defaultViewport: null,
-        executablePath: String(cPath),
-        headless: false,
-        ignoreDefaultArgs: iArgs
-      }).then(async (browser: puppeteer.Browser) => {
-        buttons.setStatusButtonText('Running $(browser)')
-        Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
-        Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
-        Browser.activeBrowser = new Browser(browser, buttons, await browser.createBrowserContext())
-        TreeviewProvider.refresh()
-      }, error => {
-        vscode.window.showErrorMessage(error.message)
-        vscode.window.showInformationMessage('Browser launch failed. 😲')
-        Browser.launched = false
-      }).catch(error => {
-        vscode.window.showErrorMessage(error.message)
-        vscode.window.showInformationMessage('Browser launch failed. 😲')
-      })
+      pptExtra.use(StealthPlugin())
+      pptExtra.use(AdblockerPlugin({ blockTrackers: true }))
+      args.push('--incognito')
+      pptExtra
+        .launch({
+          args,
+          executablePath: String(cPath),
+          headless: false,
+        })
+        .then(
+          async browser => {
+            buttons.setStatusButtonText('Running $(browser)')
+            Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
+            Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
+            //@ts-ignore asdf
+            Browser.activeBrowser = new Browser(browser, buttons, await browser.createBrowserContext())
+            TreeviewProvider.refresh()
+          },
+          error => {
+            vscode.window.showErrorMessage(error.message)
+            vscode.window.showInformationMessage('Browser launch failed. 😲')
+            Browser.launched = false
+          }
+        )
+        .catch(error => {
+          vscode.window.showErrorMessage(error.message)
+          vscode.window.showInformationMessage('Browser launch failed. 😲')
+        })
     }
   }
 
-  constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext) {
+  constructor(browser: pptCore.Browser, buttons: Buttons, context: pptCore.BrowserContext) {
     this.buttons = buttons
-    this.currentBrowser = browser
+    this.currentBrowser = browser as pptCore.Browser
     this.pagesStatus = []
-    this.incognitoContext = incognitoContext
-    this.currentBrowser.on('targetcreated', async (target: puppeteer.Target) => this.update('page_created', await target.page()))
-    this.currentBrowser.on('targetchanged', async (target: puppeteer.Target) => this.update('page_changed', await target.page()))
+    this.incognitoContext = context
+    this.currentBrowser.on('targetcreated', async (target: pptCore.Target) =>
+      this.update('page_created', await target.page())
+    )
+    this.currentBrowser.on('targetchanged', async (target: pptCore.Target) =>
+      this.update('page_changed', await target.page())
+    )
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed', target))
     this.currentBrowser.on('disconnected', () => {
       this.buttons.setStatusButtonText('Launch $(rocket)')
@@ -109,7 +123,9 @@ export default class Browser {
     if (!this.selectedPage) return
     const { state } = await this.getPlaybackState(this.selectedPage)
     switch (this.selectedMusicBrand) {
-      case 'soundcloud': case 'spotify': case 'ytmusic':
+      case 'soundcloud':
+      case 'spotify':
+      case 'ytmusic':
         this.selectedPage.keyboard.press('Space')
         break
       case 'youtube':
@@ -166,7 +182,8 @@ export default class Browser {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowRight')
         break
-      default: vscode.window.showInformationMessage(SEEK_MSG)
+      default:
+        vscode.window.showInformationMessage(SEEK_MSG)
     }
   }
 
@@ -176,7 +193,8 @@ export default class Browser {
       case 'youtube':
         await this.selectedPage.keyboard.press('ArrowLeft')
         break
-      default: vscode.window.showInformationMessage(SEEK_MSG)
+      default:
+        vscode.window.showInformationMessage(SEEK_MSG)
     }
   }
 
@@ -204,7 +222,7 @@ export default class Browser {
   private async launchPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (links && links.length) {
-      const p: Promise<HTTPResponse>[] = []
+      const p: Promise<pptCore.HTTPResponse>[] = []
       links.forEach(async (e: string) => {
         const pg = await this.newPage()
         if (!pg) return
@@ -212,7 +230,7 @@ export default class Browser {
         await pg.goto(e)
       })
       await Promise.all(p)
-      this.removeBlankPageAtStartup()
+      // this.removeBlankPageAtStartup()
     }
     TreeviewProvider.refresh()
   }
@@ -235,7 +253,7 @@ export default class Browser {
     this.selectedPage?.evaluate(() => reset())
   }
 
-  private clickFloatButton(thePage: puppeteer.Page) {
+  private clickFloatButton(thePage: pptCore.Page) {
     // @ts-ignore
     thePage.evaluate(() => click())
   }
@@ -256,15 +274,14 @@ export default class Browser {
   }
 
   // Get from saved
-  private getPlaybackState(page: puppeteer.Page) {
-    for (const e of this.pagesStatus)
-      if (e.page === page) return e
+  private getPlaybackState(page: pptCore.Page) {
+    for (const e of this.pagesStatus) if (e.page === page) return e
     // when not found
     return this._getPlaybackState(page)
   }
 
   // Need this?
-  private async _getPlaybackState(page: puppeteer.Page) {
+  private async _getPlaybackState(page: pptCore.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
     const state = await page.evaluate(() => navigator.mediaSession.playbackState)
     return { brand: pageBrand, state }
@@ -278,7 +295,7 @@ export default class Browser {
     else return 'other'
   }
 
-  private async update(event: string, page: puppeteer.Page | null) {
+  private async update(event: string, page: pptCore.Page | null) {
     // console.debug('$$$$$$$$$', event)
     if (!page) return
 
@@ -286,24 +303,34 @@ export default class Browser {
     if (event.includes('page_selected')) {
       [event, extra] = event.split(':')
       if (!extra) throw new Error('page_selected event needs source - tab|button')
-    }
-    else if (event.includes('playback_change')) {
+    } else if (event.includes('playback_change')) {
       [event, extra] = event.split(':')
       if (!extra) throw new Error('playback_change event needs state - playing|paused|none')
     }
 
     switch (event) {
-      case 'page_changed': await this.pageChanged(page); break
-      case 'page_closed': this.pageClosed(page); break
-      case 'page_created': await this.pageCreated(page); break
-      case 'page_selected': await this.pageSelected(page, <string>extra); break
-      case 'playback_changed': await this.playbackChanged(page, <string>extra); break
-      default: vscode.window.showErrorMessage(`Unknown event - ${event}`)
+      case 'page_changed':
+        await this.pageChanged(page)
+        break
+      case 'page_closed':
+        this.pageClosed(page)
+        break
+      case 'page_created':
+        await this.pageCreated(page)
+        break
+      case 'page_selected':
+        await this.pageSelected(page, <string>extra)
+        break
+      case 'playback_changed':
+        await this.playbackChanged(page, <string>extra)
+        break
+      default:
+        vscode.window.showErrorMessage(`Unknown event - ${event}`)
     }
     TreeviewProvider.refresh()
   }
 
-  private async pageChanged(page: puppeteer.Page) {
+  private async pageChanged(page: pptCore.Page) {
     await page.waitForNetworkIdle() // this somehow prevents navigation error
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)
@@ -327,7 +354,7 @@ export default class Browser {
     }
   }
 
-  private pageClosed(page: puppeteer.Page) {
+  private pageClosed(page: pptCore.Page) {
     if (page === this.selectedPage) this.closingHelper()
     this.pagesStatus.forEach((e, i, arr) => {
       if (e.page !== page) return
@@ -342,7 +369,7 @@ export default class Browser {
     this.selectedMusicBrand = undefined
   }
 
-  private async pageCreated(page: puppeteer.Page) {
+  private async pageCreated(page: pptCore.Page) {
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
 
@@ -375,7 +402,7 @@ export default class Browser {
     page.exposeFunction('playbackChanged', (state: string) => this.update(`playback_changed:${state}`, page))
   }
 
-  private async pageSelected(page: puppeteer.Page, source: string) {
+  private async pageSelected(page: pptCore.Page, source: string) {
     this.buttons.displayPlayback(true)
 
     // Not sure why it can't detect or wait - the error below
@@ -389,7 +416,7 @@ export default class Browser {
         await this.playPause()
         return
       } else {
-        this.pagesStatus.forEach(e => e.page === this.selectedPage ? e.picked = false : null)
+        this.pagesStatus.forEach(e => (e.page === this.selectedPage ? (e.picked = false) : null))
         if (source === 'button' && state === 'playing') await this.playPause()
         this.resetFloatButton()
       }
@@ -411,7 +438,7 @@ export default class Browser {
     }
   }
 
-  private async playbackChanged(page: puppeteer.Page, state: string) {
+  private async playbackChanged(page: pptCore.Page, state: string) {
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.page !== page) continue
       if (this.selectedPage === page) {
@@ -423,7 +450,7 @@ export default class Browser {
     }
   }
 
-  private async spotifyBypassCSP(page: puppeteer.Page) {
+  private async spotifyBypassCSP(page: pptCore.Page) {
     if (await this.isDevTools(page)) return
     page.setBypassCSP(true)
     // for debugging
@@ -432,7 +459,7 @@ export default class Browser {
     page.goto(page.url())
   }
 
-  private async isDevTools(page: puppeteer.Page) {
+  private async isDevTools(page: pptCore.Page) {
     const title = await page.title()
     return title === 'DevTools'
   }

@@ -1,7 +1,7 @@
-
 import puppeteer from 'puppeteer-extra'
 import { setTimeout } from 'node:timers/promises'
 import WhichChrome from './whichChrome'
+import { Browser } from 'puppeteer-core'
 
 // Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
@@ -12,16 +12,19 @@ import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker'
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
 
 // That's it, the rest is puppeteer usage as normal 😊
-puppeteer.launch({
-  executablePath: WhichChrome.getPaths().Chrome ?? WhichChrome.getPaths().Chromium,
-  headless: false,
-  ignoreHTTPSErrors: false,
-  args: ['--incognito', '--no-sandbox']
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-}).then(async browser => {
-  // method1(browser)
-  // method2(browser)
-})
+puppeteer
+  .launch({
+    executablePath: WhichChrome.getPaths().Chrome ?? WhichChrome.getPaths().Chromium,
+    headless: false,
+    ignoreHTTPSErrors: false,
+    args: ['--incognito', '--no-sandbox']
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  })
+  .then(async browser => {
+    // method1(browser)
+    //@ts-ignore
+    method2(browser)
+  })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function method1(browser) {
@@ -42,3 +45,13 @@ async function method1(browser) {
   await browser.close()
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function method2(browser: Browser) {
+  const dContext = await browser.defaultBrowserContext()
+  const page = await dContext.newPage()
+  page.goto('https://www.google.com')
+
+  const context = await browser.createBrowserContext()
+  const page1 = await context.newPage()
+  await page1.goto('https://example.com')
+}
