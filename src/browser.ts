@@ -77,8 +77,9 @@ export default class Browser {
             buttons.setStatusButtonText('Running $(browser)')
             Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
             Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
+            console.log('*****', browser.browserContexts())
             //@ts-ignore asdf
-            Browser.activeBrowser = new Browser(browser, buttons, await browser.createBrowserContext())
+            Browser.activeBrowser = new Browser(browser, buttons, await browser.defaultBrowserContext())
             TreeviewProvider.refresh()
           },
           error => {

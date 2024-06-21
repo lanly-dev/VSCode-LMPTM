@@ -47,9 +47,16 @@ async function method1(browser) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function method2(browser: Browser) {
-  const dContext = await browser.defaultBrowserContext()
-  const page = await dContext.newPage()
-  page.goto('https://www.google.com')
+  const defaultNewPage = await browser.newPage()
+  defaultNewPage.goto('https://www.messenger.com')
+
+  const curContext = await browser.browserContexts()[0]
+  const curPage = await curContext.newPage()
+  curPage.goto('https://www.yahoo.com')
+
+  // const dContext = await browser.defaultBrowserContext()
+  // const page = await dContext.newPage()
+  // page.goto('https://www.google.com')
 
   const context = await browser.createBrowserContext()
   const page1 = await context.newPage()
