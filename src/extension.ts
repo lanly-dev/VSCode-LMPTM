@@ -16,7 +16,10 @@ export function activate(context: ExtensionContext) {
       try {
         Browser.launch(buttons, context)
       } catch (error) {
-        console.debug(error)
+        const err = error as Error
+        window.showErrorMessage(err.message)
+        console.error(err)
+        window.showInformationMessage('Failed to launch LMPTM 😲')
       }
     }),
     rc('lmptm.tvRefresh', () => TreeviewProvider.refresh()),
