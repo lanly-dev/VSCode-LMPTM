@@ -4,35 +4,61 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "wp-watch",
-      "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
-      "isBackground": true,
+      "label": "watch",
+      "dependsOn": [
+        "npm: watch:tsc",
+        "npm: watch:esbuild"
+      ],
       "presentation": {
-        "reveal": "never",
-        "group": "watcher"
+        "reveal": "never"
       },
       "group": {
         "kind": "build",
         "isDefault": true
-      },
-      "dependsOn": ["npm: task-clean-output"]
+      }
     },
     {
-      "label": "ts-watch",
       "type": "npm",
-      "script": "ts-watch",
+      "script": "watch:esbuild",
+      "group": "build",
+      "problemMatcher": "$esbuild-watch",
+      "isBackground": true,
+      "label": "npm: watch:esbuild",
+      "presentation": {
+        "group": "watch",
+        "reveal": "never"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "watch:tsc",
+      "group": "build",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
-      "presentation": { "reveal": "never" },
-      "dependsOrder": "sequence",
-      "dependsOn": ["npm: task-clean-output", "npm: task-copy-static-assets"]
+      "label": "npm: watch:tsc",
+      "presentation": {
+        "group": "watch",
+        "reveal": "never"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "watch-tests",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never",
+        "group": "watchers"
+      },
+      "group": "build"
     },
     // ↓↓↓↓ For vscode command palette ↓↓↓↓
     {
       "type": "npm",
-      "script": "test-compile",
-      "dependsOn": ["npm: task-clean-output"]
+      "script": "compile-tests",
+      "dependsOn": [
+        "npm: task-clean-output"
+      ]
     },
     {
       "type": "npm",

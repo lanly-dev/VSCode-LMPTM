@@ -5,7 +5,7 @@
 Tired or get annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\
 Or perhaps your keyboard doesn't have the handy media hotkeys?\
-Wanted to stay focus on your programing instead of those shortcomings above?
+Wanted to stay focus on your programming instead of those shortcomings above?
 
 If yes, you are in luck!\
 This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.

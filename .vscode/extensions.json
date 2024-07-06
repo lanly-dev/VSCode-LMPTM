@@ -2,10 +2,12 @@
   // See http://go.microsoft.com/fwlink/?LinkId=827846
   // for the documentation about the extensions.json format
   "recommendations": [
+    "connor4312.esbuild-problem-matchers",
     "dbaeumer.vscode-eslint",
-    "amodio.tsl-problem-matcher",
-    "ue.alphabetical-sorter",
+
+    "eamodio.gitlens",
     "shardulm94.trailing-spaces",
-    "streetsidesoftware.code-spell-checker"
+    "streetsidesoftware.code-spell-checker",
+    "ue.alphabetical-sorter"
   ]
 }

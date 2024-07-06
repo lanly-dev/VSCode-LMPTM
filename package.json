@@ -114,14 +114,16 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
+    "vscode:prepublish": "npm run package",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
     "vsce-package": "vsce package",
-    "test-compile": "tsc -p ./",
-    "test-webpack": "webpack",
-    "ts-watch": "tsc -watch -p ./",
-    "wp-watch": "webpack --watch",
-    "lint": "eslint .",
-    "lint-fix": "eslint . --fix",
     "task-copy-static-assets": "ts-node tasks.ts copy",
     "task-clean-output": "ts-node tasks.ts clean",
     "copy": "npm run task-copy-static-assets",
@@ -130,29 +132,38 @@
   "devDependencies": {
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/karma-chrome-launcher": "^3.1.4",
-    "@types/node": "^20.14.7",
+    "@types/node": "^20.14.10",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.15",
-    "@types/vscode": "^1.90.0",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
-    "@typescript-eslint/parser": "^7.13.1",
+    "@types/vscode": "^1.91.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vscode/vsce": "^2.29.0",
     "copy-webpack-plugin": "^12.0.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
-    "eslint": "^9.5.0",
+    "esbuild": "^0.23.0",
+    "eslint": "^8.57.0",
     "shelljs": "^0.8.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.2",
-    "vsce": "^2.6.3",
+    "typescript": "^5.5.3",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "karma-chrome-launcher": "^3.2.0",
-    "puppeteer-core": "^22.7.1",
+    "puppeteer-core": "^22.12.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-adblocker": "^2.13.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "resolutions": {
+    "clone-deep": "^4.0.1"
+  },
+  "overrides": {
+    "merge-deep": {
+    "clone-deep": "^4.0.1"
+    }
   },
   "repository": {
     "type": "git",

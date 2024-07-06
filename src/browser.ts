@@ -27,6 +27,7 @@ export default class Browser {
   private selectedPage: pptCore.Page | undefined
 
   public static launch(buttons: Buttons, context: vscode.ExtensionContext) {
+    console.debug('helldo1233')
     if (!Browser.activeBrowser && !Browser.launched) {
       const args = ['--window-size=500,500']
       const iArgs = ['--disable-extensions'] // enable extension
@@ -38,6 +39,7 @@ export default class Browser {
           return
         }
       }
+      console.debug('helldo12333')
       if (vscode.workspace.getConfiguration().get('lmptm.ignoreDisableSync')) iArgs.push('--disable-sync')
 
       let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
@@ -66,32 +68,40 @@ export default class Browser {
       pptExtra.use(StealthPlugin())
       pptExtra.use(AdblockerPlugin({ blockTrackers: true }))
       args.push('--incognito')
-      pptExtra
-        .launch({
-          args,
-          executablePath: String(cPath),
-          headless: false,
-        })
-        .then(
-          async browser => {
-            buttons.setStatusButtonText('Running $(browser)')
-            Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
-            Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
-            console.log('*****', browser.browserContexts())
-            //@ts-ignore asdf
-            Browser.activeBrowser = new Browser(browser, buttons, await browser.defaultBrowserContext())
-            TreeviewProvider.refresh()
-          },
-          error => {
+      try {
+        console.debug('helldo12333')
+        pptExtra
+          .launch({
+            args,
+            executablePath: String(cPath),
+            headless: false,
+          })
+          .then(
+            async browser => {
+              console.debug('helldo123')
+              buttons.setStatusButtonText('Running $(browser)')
+              Browser.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
+              Browser.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
+              console.log('*****', browser.browserContexts())
+              //@ts-ignore asdf
+              Browser.activeBrowser = new Browser(browser, buttons, await browser.defaultBrowserContext())
+              TreeviewProvider.refresh()
+            },
+            error => {
+              console.debug('helldo')
+              vscode.window.showErrorMessage(error.message)
+              vscode.window.showInformationMessage('Browser launch failed. 😲')
+              Browser.launched = false
+            }
+          )
+          .catch(error => {
+            console.debug('helldo')
             vscode.window.showErrorMessage(error.message)
             vscode.window.showInformationMessage('Browser launch failed. 😲')
-            Browser.launched = false
-          }
-        )
-        .catch(error => {
-          vscode.window.showErrorMessage(error.message)
-          vscode.window.showInformationMessage('Browser launch failed. 😲')
-        })
+          })
+      } catch (error) {
+        console.debug(error)
+      }
     }
   }
 

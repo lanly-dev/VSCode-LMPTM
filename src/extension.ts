@@ -12,7 +12,13 @@ export function activate(context: ExtensionContext) {
   const disposables = fn.map(n => rc(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))
   context.subscriptions.concat(disposables)
   context.subscriptions.concat([
-    rc('lmptm.browserLaunch', () => Browser.launch(buttons, context)),
+    rc('lmptm.browserLaunch', () => {
+      try {
+        Browser.launch(buttons, context)
+      } catch (error) {
+        console.debug(error)
+      }
+    }),
     rc('lmptm.tvRefresh', () => TreeviewProvider.refresh()),
     rc('lmptm.showTitle', showTitle),
     rc('lmptm.click', selection => click(selection))
