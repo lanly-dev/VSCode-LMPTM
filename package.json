@@ -3,10 +3,10 @@
   "displayName": "Let Me Play The Music",
   "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.91.0"
   },
   "extensionKind": [
     "ui"
