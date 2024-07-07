@@ -65,7 +65,8 @@ export default class Browser {
       Browser.launched = true
       pptExtra.use(StealthPlugin())
       pptExtra.use(AdblockerPlugin({ blockTrackers: true }))
-      pptExtra
+      // pptExtra is buggy
+      pptCore
         .launch({
           args,
           executablePath: String(cPath),
@@ -229,7 +230,7 @@ export default class Browser {
         await pg.goto(e)
       })
       await Promise.all(p)
-      // this.removeBlankPageAtStartup()
+      this.removeBlankPageAtStartup()
     }
     TreeviewProvider.refresh()
   }

@@ -1,4 +1,6 @@
-import * as shell from 'shelljs'
+// import * as shell from 'shelljs'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const shell = require('shelljs')
 
 console.log(`Run task ${process.argv[2]}`)
 if (process.argv[2] === 'clean') {

@@ -57,7 +57,8 @@ function click() {
     }
     brand = 'soundcloud'
   } else if (href.includes('open.spotify.com')) {
-    if (!navigator.mediaSession.metadata.title) {
+    console.log(navigator.mediaSession)
+    if (!navigator.mediaSession.metadata?.title) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'spotify')
     }
