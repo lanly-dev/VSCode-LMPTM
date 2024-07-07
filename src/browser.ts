@@ -2,15 +2,16 @@ import * as path from 'path'
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 
-import { Buttons } from './buttons'
-import { TreeviewProvider } from './treeview'
-import { WhichChrome } from './whichChrome'
 import { Entry } from './interfaces'
 import { Response } from 'puppeteer-core'
 
+import Buttons from './buttons'
+import TreeviewProvider from './treeview'
+import WhichChrome from './whichChrome'
+
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos. 💡'
 const STATE_MSG = 'Please select the tab/page that either in playing or paused. 💡'
-export class Browser {
+export default class Browser {
   public static activeBrowser: Browser | undefined
   public static cssPath: string
   public static jsPath: string

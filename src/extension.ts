@@ -1,8 +1,9 @@
 import { commands, window, ExtensionContext } from 'vscode'
-import { Browser } from './browser'
-import { Buttons } from './buttons'
 import { Entry } from './interfaces'
-import { TreeviewProvider } from './treeview'
+
+import Browser from './browser'
+import Buttons from './buttons'
+import TreeviewProvider from './treeview'
 
 export function activate(context: ExtensionContext) {
   const buttons = new Buttons()

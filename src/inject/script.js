@@ -187,7 +187,7 @@ function showInfo(btnPick, brand) {
 
 function btnTimeoutReset(btnPick) {
   setTimeout(() => {
-    btnPick.innerHTML = '⛏️ Pick?'
+    btnPick.innerHTML = PICK_MSG
     btnPick.className = 'btn-pick-float'
     btnPick.disabled = false
   }, 3000)
@@ -195,7 +195,7 @@ function btnTimeoutReset(btnPick) {
 
 function reset() {
   const btnPick = document.querySelector('.btn-pick-float')
-  btnPick.innerHTML = '⛏️ Pick?'
+  btnPick.innerHTML = PICK_MSG
   btnPick.className = 'btn-pick-float'
   sessionStorage.removeItem('lmptm')
 }
