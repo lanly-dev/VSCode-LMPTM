@@ -18,8 +18,8 @@ export function activate(context: ExtensionContext) {
       } catch (error) {
         const err = error as Error
         window.showErrorMessage(err.message)
-        console.error(err)
         window.showInformationMessage('Failed to launch LMPTM 😲')
+        // console.debug(err)
       }
     }),
     rc('lmptm.tvRefresh', () => TreeviewProvider.refresh()),
