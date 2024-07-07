@@ -11,9 +11,8 @@ const playButtonAttrs = {
   },
   spotify: {
     css: 'button[data-testid="control-button-playpause"]',
-    cssAll5Btns: '.player-controls button',
     cssTitle: 'div[data-testid="now-playing-widget"]',
-    play: 'M4.018 14L14.41 8 4.018 2z'
+    play: 'M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z'
   },
   youtube: { css: '.ytp-play-button' },
   ytmusic: { css: '#play-pause-button' }
@@ -69,8 +68,7 @@ function click() {
     }
     brand = 'youtube'
   } else if (href.includes('music.youtube.com')) {
-    const e = 'ytmusic-app-layout[player-visible_] > [slot=player-bar]'
-    if (!document.querySelectorAll(e)[0]) {
+    if (!href.includes('/watch')) {
       btnPick.disabled = true
       return void showInfo(btnPick, 'ytmusic')
     }
@@ -187,23 +185,9 @@ function showInfo(btnPick, brand) {
   btnTimeoutReset(btnPick)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function spotifyAction(action) {
-  const { cssAll5Btns } = playButtonAttrs.spotify
-  const actionBtn = document.querySelectorAll(cssAll5Btns)
-  switch (action) {
-    case 'skip':
-      actionBtn[3].click()
-      break
-    case 'back':
-      actionBtn[1].click()
-      break
-  }
-}
-
 function btnTimeoutReset(btnPick) {
   setTimeout(() => {
-    btnPick.innerHTML = '⛏️ Pick?'
+    btnPick.innerHTML = PICK_MSG
     btnPick.className = 'btn-pick-float'
     btnPick.disabled = false
   }, 3000)
@@ -211,7 +195,7 @@ function btnTimeoutReset(btnPick) {
 
 function reset() {
   const btnPick = document.querySelector('.btn-pick-float')
-  btnPick.innerHTML = '⛏️ Pick?'
+  btnPick.innerHTML = PICK_MSG
   btnPick.className = 'btn-pick-float'
   sessionStorage.removeItem('lmptm')
 }

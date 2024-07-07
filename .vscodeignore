@@ -5,6 +5,7 @@
 **/*.map
 **/*.ts
 **/tsconfig.json
+lab
 media/res
 media/vscodeignore
 node_modules
