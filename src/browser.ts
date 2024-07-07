@@ -3,7 +3,6 @@ import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 
 import { Entry } from './interfaces'
-import { Response } from 'puppeteer-core'
 
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
@@ -207,7 +206,7 @@ export default class Browser {
   private async launchPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (links && links.length) {
-      const p: Promise<Response>[] = []
+      const p: Promise<unknown>[] = []
       links.forEach(async (e: string) => {
         const pg = await this.newPage()
         await pg.setDefaultNavigationTimeout(0)
