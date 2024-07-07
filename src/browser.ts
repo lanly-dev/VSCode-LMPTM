@@ -6,7 +6,7 @@ import { Buttons } from './buttons'
 import { TreeviewProvider } from './treeview'
 import { WhichChrome } from './whichChrome'
 import { Entry } from './interfaces'
-import { HTTPResponse } from 'puppeteer-core'
+import { Response } from 'puppeteer-core'
 
 const SEEK_MSG = 'Seeking backward/forward function is only work for Youtube videos. 💡'
 const STATE_MSG = 'Please select the tab/page that either in playing or paused. 💡'
@@ -127,8 +127,9 @@ export class Browser {
         await this.selectedPage.keyboard.up('ShiftLeft')
         break
       case 'spotify':
-        // @ts-ignore
-        this.selectedPage.evaluate(() => spotifyAction('skip'))
+        await this.selectedPage.keyboard.down('ControlLeft')
+        await this.selectedPage.keyboard.press('ArrowRight')
+        await this.selectedPage.keyboard.up('ControlLeft')
         break
       case 'youtube':
         await this.selectedPage.keyboard.down('ShiftLeft')
@@ -149,8 +150,9 @@ export class Browser {
         await this.selectedPage.keyboard.up('ShiftLeft')
         break
       case 'spotify':
-        // @ts-ignore
-        this.selectedPage.evaluate(() => spotifyAction('back'))
+        await this.selectedPage.keyboard.down('ControlLeft')
+        await this.selectedPage.keyboard.press('ArrowLeft')
+        await this.selectedPage.keyboard.up('ControlLeft')
         break
       case 'youtube':
         this.selectedPage.goBack()
@@ -204,7 +206,7 @@ export class Browser {
   private async launchPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (links && links.length) {
-      const p: Promise<HTTPResponse>[] = []
+      const p: Promise<Response>[] = []
       links.forEach(async (e: string) => {
         const pg = await this.newPage()
         await pg.setDefaultNavigationTimeout(0)
@@ -295,6 +297,7 @@ export class Browser {
   }
 
   private async pageChanged(page: puppeteer.Page) {
+    // @ts-ignore
     await page.waitForNetworkIdle() // this somehow prevents navigation error
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)

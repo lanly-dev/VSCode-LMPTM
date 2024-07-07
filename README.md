@@ -5,7 +5,7 @@
 Tired or get annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\
 Or perhaps your keyboard doesn't have the handy media hotkeys?\
-Wanted to stay focus on your programing instead of those shortcomings above?
+Wanted to stay focus on your programming instead of those shortcomings above?
 
 If yes, you are in luck!\
 This extension launches a Chrome/Chromium browser to the 4 popular music sites and you can control the playback from within your favorite Visual Studio Code editor.
@@ -36,13 +36,12 @@ Required Chromium-based browser
 
 ## Release Notes
 ### 2.0.0
+- Fix spotify bugs due to it's new UI changes
 - Add treeview - so now the the app can switch between tabs
   1. The page has to be picked before being able to use in the treeview
   2. You can select the treeview items that have  the play/pause icon
   3. The emoji ⛏️ means the tab is currently picked
   4. First click switches the picked icon to target tab, later clicks toggles playing/paused status of the target tab media's playback
-
-- Fix spotify bugs due to it's new UI changes
 
 ### 1.4.0
 - Add key shortcuts

@@ -34,9 +34,8 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 
 ### Note
 
-#### This release mostly has more significant impact on the dev side rather than like a product update.
-
-#### One funny thing is that the picture in README.md accounts for a large part of this extension's size.
+- This release mostly has more significant impact on the dev side rather than like a product update.
+- One funny thing is that the picture in README.md accounts for a large part of this extension's size.
 
 #### [MediaSession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
 - Soundcloud does update `playbackState` but only call `set` for from press play
