@@ -19,8 +19,8 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 
 ## [2.2.0] - September 2024
 - Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
-- webpack 5.94.0 compiled successfully in 4120 ms
-- 17 files, 1.4MB, 1.93.0
+- webpack 5.94.0 compiled successfully in 3000 ms
+- 15 files, 1.4MB, 1.93.0
 
 ### Note
 - Chrome team added the [Trusted Types to YouTube](https://developer.chrome.com/blog/trusted-types-on-youtube) - thanks [Matthew](https://github.com/mattzgg) for the info
