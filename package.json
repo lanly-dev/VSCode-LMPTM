@@ -72,7 +72,7 @@
             "type": "array",
             "default": [
               "https://soundcloud.com",
-              "https://www.youtube.com",
+              "https://www.youtube.com/trending",
               "https://open.spotify.com",
               "https://music.youtube.com"
             ],
