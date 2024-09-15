@@ -60,7 +60,7 @@ export default class Browser {
       }
 
       Browser.launched = true
-      // console.log('###########################################')
+      // console.log('#### Browser Launched ####')
       puppeteer.launch({
         args,
         defaultViewport: null,
@@ -301,10 +301,7 @@ export default class Browser {
     await page.waitForNetworkIdle() // this somehow prevents navigation error
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)
-
-    // Spotify needs bypass CSP
-    // won't stick to another site (if go to another URL) after set
-    if (brand === 'spotify') this.spotifyBypassCSP(page)
+    this.bypassCSP(brand, page)
 
     const title = await page.title()
 
@@ -339,9 +336,7 @@ export default class Browser {
   private async pageCreated(page: puppeteer.Page) {
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
-
-    // Spotify needs bypass CSP
-    if (brand === 'spotify') this.spotifyBypassCSP(page)
+    this.bypassCSP(brand, page)
 
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
@@ -422,7 +417,9 @@ export default class Browser {
     }
   }
 
-  private async spotifyBypassCSP(page: puppeteer.Page) {
+  // Won't stick if go to another site (if go to another URL)
+  private async bypassCSP(brand: string, page: puppeteer.Page) {
+    if (['spotify', 'youtube', 'ytmusic'].includes(brand)) await page.setBypassCSP(true)
     page.setBypassCSP(true)
     // for debugging
     await page.evaluate(() => sessionStorage.setItem('bypassCSP', 'true'))

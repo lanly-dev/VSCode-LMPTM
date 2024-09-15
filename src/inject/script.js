@@ -52,25 +52,25 @@ function click() {
   if (href.includes('soundcloud.com')) {
     if (!document.querySelector('.m-visible')) {
       btnPick.disabled = true
-      return void showInfo(btnPick, 'soundcloud')
+      return void showRejectInfo(btnPick, 'soundcloud')
     }
     brand = 'soundcloud'
   } else if (href.includes('open.spotify.com')) {
     if (!navigator.mediaSession.metadata.title) {
       btnPick.disabled = true
-      return void showInfo(btnPick, 'spotify')
+      return void showRejectInfo(btnPick, 'spotify')
     }
     brand = 'spotify'
   } else if (href.includes('www.youtube.com')) {
     if (!href.includes('/watch')) {
       btnPick.disabled = true
-      return void showInfo(btnPick, 'youtube')
+      return void showRejectInfo(btnPick, 'youtube')
     }
     brand = 'youtube'
   } else if (href.includes('music.youtube.com')) {
     if (!href.includes('/watch')) {
       btnPick.disabled = true
-      return void showInfo(btnPick, 'ytmusic')
+      return void showRejectInfo(btnPick, 'ytmusic')
     }
     brand = 'ytmusic'
   } else {
@@ -164,7 +164,7 @@ function changeBtnAttr(brand) {
   btnPick.innerHTML = null
 }
 
-function showInfo(btnPick, brand) {
+function showRejectInfo(btnPick, brand) {
   btnPick.className = `btn-pick-float border-gray ${brand}-info`
   let msg = 'Something is not right...'
   switch (brand) {

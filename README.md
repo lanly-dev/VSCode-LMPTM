@@ -18,7 +18,8 @@ This extension launches a Chrome/Chromium browser to the 4 popular music sites, 
 Supports SoundCloud, Spotify, YouTube, and YouTube Music
 
 ## Requirements
-Required Chromium-based browser
+- Required Chromium-based browser
+- [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) is disabled for Spotify, Youtube, and Youtube Music
 
 ## Extension Settings
 * `lmptm.browserPath`: Specify custom browser executable file path.
@@ -33,6 +34,9 @@ Required Chromium-based browser
 - Won't be able to log into YouTube and SoundCloud(email method)
 
 ## Release Notes
+### 2.2.0
+- CSP bypass for Youtube and Youtube Music
+
 ### 2.1.0
 - Fix Spotify and YouTube Music for its UI changes
 
