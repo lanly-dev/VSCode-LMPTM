@@ -17,6 +17,15 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Shelljs vs Execa
 - Support for other sites
 
+## [2.2.0] - September 2024
+- Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
+- webpack 5.94.0 compiled successfully in 4120 ms
+- 17 files, 1.4MB, 1.93.0
+
+### Note
+- Chrome team added the [Trusted Types to YouTube](https://developer.chrome.com/blog/trusted-types-on-youtube) - thanks [Matthew](https://github.com/mattzgg) for the info
+- There is probably a proper way to comply with the new security requirement but yeah, one shortcut is just to bypass it by disabling the [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+
 ## [2.1.0] - July 2024
 - Fix Spotify and YouTube Music due to its UI change
 - webpack 5.92.1 compiled successfully in 10241 ms
