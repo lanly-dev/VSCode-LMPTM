@@ -34,7 +34,6 @@ export default class Browser {
           return
         }
       }
-      if (vscode.workspace.getConfiguration().get(`lmptm.ignoreDisableSync`)) iArgs.push(`--disable-sync`)
 
       let cPath = vscode.workspace.getConfiguration().get(`lmptm.browserPath`)
       if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium

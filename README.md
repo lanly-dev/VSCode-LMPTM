@@ -23,7 +23,6 @@ Supports SoundCloud, Spotify, YouTube, and YouTube Music
 
 ## Extension Settings
 * `lmptm.browserPath`: Specify custom browser executable file path.
-* `lmptm.ignoreDisableSync`: Ignore --disable-sync, this option is specifically for [Brave](https://brave.com) browser.
 * `lmptm.incognitoMode`: Specify whether to launch the browser in incognito/private mode.
 * `lmptm.startPages`: Starting tabs.
 * `lmptm.userData`: Specify if the extension could store the browser's user data; if enabled, a user-data directory setting is required.

@@ -58,11 +58,6 @@
             "default": null,
             "description": "Specify custom browser executable file path."
           },
-          "lmptm.ignoreDisableSync": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "Ignore `-disable-sync`, this option is specifically for [Brave](https://brave.com) browser."
-          },
           "lmptm.incognitoMode": {
             "type": "boolean",
             "default": true,
