@@ -4,21 +4,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "wp-watch",
-      "problemMatcher": ["$ts-webpack-watch", "$tslint-webpack-watch"],
-      "isBackground": true,
-      "presentation": {
-        "reveal": "never",
-        "group": "watcher"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "dependsOn": ["npm: task-clean-output"]
-    },
-    {
       "label": "ts-watch",
       "type": "npm",
       "script": "ts-watch",
@@ -31,7 +16,7 @@
     // ↓↓↓↓ For vscode command palette ↓↓↓↓
     {
       "type": "npm",
-      "script": "test-compile",
+      "script": "ts-compile",
       "dependsOn": ["npm: task-clean-output"]
     },
     {

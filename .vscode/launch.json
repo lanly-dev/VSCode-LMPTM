@@ -6,14 +6,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Extension webpack",
-      "type": "extensionHost",
-      "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
-    },
-    {
       "name": "Launch Extension ts-watch",
       "type": "extensionHost",
       "request": "launch",

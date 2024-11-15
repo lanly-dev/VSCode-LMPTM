@@ -114,12 +114,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
+    "vscode:prepublish": "npm run compile",
     "vsce-package": "vsce package",
-    "test-compile": "tsc -p ./",
-    "test-webpack": "webpack",
+    "ts-compile": "tsc -p ./",
     "ts-watch": "tsc -watch -p ./",
-    "wp-watch": "webpack --watch",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "task-copy-static-assets": "ts-node tasks.ts copy",
@@ -128,24 +126,19 @@
     "clean": "npm run task-clean-output"
   },
   "devDependencies": {
-    "@types/copy-webpack-plugin": "^8.0.1",
     "@types/karma-chrome-launcher": "^3.1.4",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.9.0",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.15",
-    "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^7.15.0",
-    "@typescript-eslint/parser": "^7.15.0",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-minimizer-webpack-plugin": "^7.0.0",
-    "eslint": "^8.4.1",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.14.0",
+    "@typescript-eslint/parser": "^8.14.0",
+    "eslint": "^9.14.0",
     "shelljs": "^0.8.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.2",
-    "vsce": "^2.15.0",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
+    "typescript": "^5.6.3",
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "karma-chrome-launcher": "^3.2.0",
