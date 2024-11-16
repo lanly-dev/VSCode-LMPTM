@@ -1,4 +1,4 @@
-# [LetMePlayTheMusic](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
+# LetMePlayTheMusic [🔗](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
 
 Are you tired or annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\

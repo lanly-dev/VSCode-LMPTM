@@ -10,7 +10,6 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - https://www.conventionalcommits.org
 
 ### TODO
-- Brave setting removal
 - I18n
 - Playwright vs Puppeteer option
 - Seek backward/forward setting option
