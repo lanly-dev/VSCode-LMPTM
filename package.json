@@ -3,10 +3,10 @@
   "displayName": "Let Me Play The Music",
   "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.95.0"
   },
   "extensionKind": [
     "ui"
@@ -23,7 +23,7 @@
     "Youtube Music",
     "Youtube"
   ],
-  "icon": "media/lmptm.png",
+  "icon": "media/lmptm2.png",
   "galleryBanner": {
     "color": "#000f33",
     "theme": "dark"
@@ -36,7 +36,13 @@
     "viewsWelcome": [
       {
         "view": "LMPTM",
-        "contents": "[Launch $(rocket)](command:lmptm.browserLaunch)"
+        "contents": "%lmptm.launch.isDefault%",
+        "when": "!lmptm.private"
+      },
+      {
+        "view": "LMPTM",
+        "contents": "%lmptm.launch.isPrivate%",
+        "when": "lmptm.private"
       }
     ],
     "views": {
@@ -109,7 +115,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run ts-compile",
     "vsce-package": "vsce package",
     "ts-compile": "tsc -p ./",
     "ts-watch": "tsc -watch -p ./",
@@ -122,13 +128,13 @@
   },
   "devDependencies": {
     "@types/karma-chrome-launcher": "^3.1.4",
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.9.1",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.15",
     "@types/vscode": "^1.95.0",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
-    "eslint": "^9.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^9.15.0",
     "shelljs": "^0.8.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",

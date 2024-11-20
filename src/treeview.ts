@@ -31,23 +31,18 @@ export default class TreeviewProvider implements TreeDataProvider<Entry> {
   }
 
   async getChildren(): Promise<Entry[] | undefined> {
-    if (!this.browser) return
-    const details = this.browser.getPagesStatus()
-    // console.debug('@@@@@@@@', details)
-    if (!details) return
-    return details
+    return this?.browser?.getPagesStatus()
   }
 
   private getItem(element: Entry) {
     // console.debug(element)
-
     return new TabItem(element)
   }
 
   refresh(): void {
     this.browser = Browser.activeBrowser
     this._onDidChangeTreeData.fire(null)
-    // console.debug('refresh')
+    // console.debug(`refresh`)
   }
 }
 

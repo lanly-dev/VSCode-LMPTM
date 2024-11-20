@@ -1,4 +1,4 @@
-import { commands, window, ExtensionContext } from 'vscode'
+import { commands, ConfigurationTarget,ExtensionContext, workspace, window } from 'vscode'
 import { Entry } from './interfaces'
 
 import Browser from './browser'
@@ -14,10 +14,21 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.concat(disposables)
   context.subscriptions.concat([
     rc(`lmptm.browserLaunch`, () => Browser.launch(buttons, context)),
-    rc(`lmptm.tvRefresh`, () => TreeviewProvider.refresh()),
+    rc(`lmptm.click`, selection => click(selection)),
+    rc(`lmptm.openSettings`, openSettings),
     rc(`lmptm.showTitle`, showTitle),
-    rc(`lmptm.click`, selection => click(selection))
+    rc(`lmptm.toggleMode`, toggleMode),
+    rc(`lmptm.tvRefresh`, () => TreeviewProvider.refresh())
   ])
+}
+
+function click(selection: Entry) {
+  Browser.activeBrowser?.pickTab(selection.index)
+}
+
+function openSettings() {
+  // doesn't seem to work
+  commands.executeCommand(`workbench.action.openSettings`, `@ext:lanly-dev.letmeplaythemusic`)
 }
 
 async function showTitle() {
@@ -26,8 +37,11 @@ async function showTitle() {
   else window.showErrorMessage(`Failed to retrieve title`)
 }
 
-function click(selection: Entry) {
-  Browser.activeBrowser?.pickTab(selection.index)
+function toggleMode() {
+  const mode = workspace.getConfiguration().get(`lmptm.incognitoMode`)
+  workspace.getConfiguration().update(`lmptm.incognitoMode`, !mode, ConfigurationTarget.Global)
+  commands.executeCommand(`setContext`, `lmptm.private`, !mode)
+  TreeviewProvider.refresh()
 }
 
 // export function deactivate() { }
