@@ -1,0 +1,4 @@
+{
+  "lmptm.launch.isDefault": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[Toggle to PRIVATE mode](command:lmptm.toggleMode)\n[Open settings](command:workbench.action.openSettings)",
+  "lmptm.launch.isPrivate": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[Toggle to DEFAULT mode](command:lmptm.toggleMode)\n[Open settings](command:workbench.action.openSettings)"
+}

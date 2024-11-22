@@ -3,10 +3,11 @@
   "displayName": "Let Me Play The Music",
   "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
-  "version": "2.2.0",
+  "version": "3.0.0",
+  "author": "lanly",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.95.0"
   },
   "extensionKind": [
     "ui"
@@ -23,7 +24,7 @@
     "Youtube Music",
     "Youtube"
   ],
-  "icon": "media/lmptm.png",
+  "icon": "media/lmptm2.png",
   "galleryBanner": {
     "color": "#000f33",
     "theme": "dark"
@@ -33,10 +34,44 @@
   ],
   "main": "./dist/extension",
   "contributes": {
+    "commands": [
+      {
+        "command": "lmptm.closeBrowser",
+        "title": "Close browser",
+        "icon": "$(breakpoints-remove-all)"
+      },
+      {
+        "command": "lmptm.closeTab",
+        "title": "Close tab",
+        "icon": "$(remove-close)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "lmptm.closeBrowser",
+          "group": "navigation",
+          "when": "view == LMPTM && lmptm.launched"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "lmptm.closeTab",
+          "when": "view == LMPTM",
+          "group": "inline"
+        }
+      ]
+    },
     "viewsWelcome": [
       {
         "view": "LMPTM",
-        "contents": "[Launch $(rocket)](command:lmptm.browserLaunch)"
+        "contents": "%lmptm.launch.isDefault%",
+        "when": "!lmptm.private"
+      },
+      {
+        "view": "LMPTM",
+        "contents": "%lmptm.launch.isPrivate%",
+        "when": "lmptm.private"
       }
     ],
     "views": {
@@ -57,11 +92,6 @@
             "type": "string",
             "default": null,
             "description": "Specify custom browser executable file path."
-          },
-          "lmptm.ignoreDisableSync": {
-            "type": "boolean",
-            "default": false,
-            "markdownDescription": "Ignore `-disable-sync`, this option is specifically for [Brave](https://brave.com) browser."
           },
           "lmptm.incognitoMode": {
             "type": "boolean",
@@ -114,37 +144,35 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
+    "vscode:prepublish": "npm run ts-compile && npm run clean && npm run wp",
     "vsce-package": "vsce package",
-    "test-compile": "tsc -p ./",
-    "test-webpack": "webpack",
+    "ts-compile": "tsc -p ./",
     "ts-watch": "tsc -watch -p ./",
-    "wp-watch": "webpack --watch",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
+    "wp": "webpack",
     "task-copy-static-assets": "ts-node tasks.ts copy",
     "task-clean-output": "ts-node tasks.ts clean",
     "copy": "npm run task-copy-static-assets",
     "clean": "npm run task-clean-output"
   },
   "devDependencies": {
-    "@types/copy-webpack-plugin": "^8.0.1",
     "@types/karma-chrome-launcher": "^3.1.4",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.9.1",
     "@types/puppeteer-core": "^5.4.0",
     "@types/shelljs": "^0.8.15",
-    "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^7.15.0",
-    "@typescript-eslint/parser": "^7.15.0",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "@vscode/vsce": "^3.2.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
-    "eslint": "^8.4.1",
+    "eslint": "^9.15.0",
     "shelljs": "^0.8.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.2",
-    "vsce": "^2.15.0",
-    "webpack": "^5.94.0",
+    "typescript": "^5.7.2",
+    "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
@@ -153,7 +181,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lanly-dev/VSCode-LMPTM.git"
+    "url": "git+https://github.com/lanly-dev/VSCode-LMPTM.git"
   },
   "bugs": {
     "url": "https://github.com/lanly-dev/VSCode-LMPTM/issues"

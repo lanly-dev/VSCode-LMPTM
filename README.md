@@ -1,4 +1,4 @@
-# [LetMePlayTheMusic](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
+# LetMePlayTheMusic [🔗](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
 
 Are you tired or annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\
@@ -12,7 +12,7 @@ This extension launches a Chrome/Chromium browser to the 4 popular music sites, 
 
 >[How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
 
-<img src='./media/capture2.0.png' width='700'/>
+<img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/3.0/media/vscodeignore/capture3.0.0.png?raw=true' width='700'/>
 
 ## Features
 Supports SoundCloud, Spotify, YouTube, and YouTube Music
@@ -23,7 +23,6 @@ Supports SoundCloud, Spotify, YouTube, and YouTube Music
 
 ## Extension Settings
 * `lmptm.browserPath`: Specify custom browser executable file path.
-* `lmptm.ignoreDisableSync`: Ignore --disable-sync, this option is specifically for [Brave](https://brave.com) browser.
 * `lmptm.incognitoMode`: Specify whether to launch the browser in incognito/private mode.
 * `lmptm.startPages`: Starting tabs.
 * `lmptm.userData`: Specify if the extension could store the browser's user data; if enabled, a user-data directory setting is required.
@@ -34,6 +33,13 @@ Supports SoundCloud, Spotify, YouTube, and YouTube Music
 - Won't be able to log into YouTube and SoundCloud(email method)
 
 ## Release Notes
+
+### 3.0.0
+- Fix CSP, apply only for Youtube/YTmusic and Spotify
+- Improve treeview
+- Partial Chinese support
+- New logo
+
 ### 2.2.0
 - CSP bypass for Youtube and Youtube Music
 

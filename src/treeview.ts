@@ -12,7 +12,7 @@ export default class TreeviewProvider implements TreeDataProvider<Entry> {
 
   public static create() {
     const treeDataProvider = new TreeviewProvider()
-    window.createTreeView('LMPTM', { treeDataProvider })
+    window.createTreeView(`LMPTM`, { treeDataProvider })
     // const tv = window.createTreeView('LMPTM', { treeDataProvider })
     // tv.onDidChangeSelection(({ selection }) => {})
     this.tvProvider = treeDataProvider
@@ -31,23 +31,18 @@ export default class TreeviewProvider implements TreeDataProvider<Entry> {
   }
 
   async getChildren(): Promise<Entry[] | undefined> {
-    if (!this.browser) return
-    const details = this.browser.getPagesStatus()
-    // console.debug('@@@@@@@@', details)
-    if (!details) return
-    return details
+    return this?.browser?.getPagesStatus()
   }
 
   private getItem(element: Entry) {
     // console.debug(element)
-
     return new TabItem(element)
   }
 
   refresh(): void {
     this.browser = Browser.activeBrowser
     this._onDidChangeTreeData.fire(null)
-    // console.debug('refresh')
+    // console.debug(`refresh`)
   }
 }
 
@@ -57,7 +52,7 @@ class TabItem extends TreeItem {
     let title = e.title
     if (picked) title = `⛏️ ${title}`
     super(title)
-    if (state !== 'none') this.iconPath = new ThemeIcon(state === 'playing' ? 'primitive-square' : 'play')
-    this.command = { title: 'click', command: 'lmptm.click', arguments: [e] }
+    if (state !== `none`) this.iconPath = new ThemeIcon(state === `playing` ? `primitive-square` : `play`)
+    this.command = { title: `click`, command: `lmptm.click`, arguments: [e] }
   }
 }

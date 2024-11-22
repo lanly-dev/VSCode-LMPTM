@@ -12,37 +12,37 @@ export default class Buttons {
     this.backButton = window.createStatusBarItem(StatusBarAlignment.Right, 3)
     this.statusButton = window.createStatusBarItem(StatusBarAlignment.Right, 4)
 
-    this.playButton.text = '$(play)'
-    this.skipButton.text = '$(chevron-right)'
-    this.backButton.text = '$(chevron-left)'
-    this.statusButton.text = 'Launch $(rocket)'
+    this.playButton.text = `$(play)`
+    this.skipButton.text = `$(chevron-right)`
+    this.backButton.text = `$(chevron-left)`
+    this.statusButton.text = `Launch $(rocket)`
 
-    this.statusButton.command = 'lmptm.browserLaunch'
-    this.playButton.command = 'lmptm.playPause'
-    this.backButton.command = 'lmptm.back'
-    this.skipButton.command = 'lmptm.skip'
+    this.statusButton.command = `lmptm.browserLaunch`
+    this.playButton.command = `lmptm.playPause`
+    this.backButton.command = `lmptm.back`
+    this.skipButton.command = `lmptm.skip`
 
     this.statusButton.show()
   }
 
   setStatusButtonText(text: string) {
-    if (text === 'Launch $(rocket)') {
+    if (text === `Launch $(rocket)`) {
       this.statusButton.text = text
-      this.statusButton.command = 'lmptm.browserLaunch'
-    } else if (text === 'Running $(browser)') {
+      this.statusButton.command = `lmptm.browserLaunch`
+    } else if (text === `Running $(browser)`) {
       this.statusButton.text = text
       this.statusButton.command = undefined
     } else if (text.length > 30) {
       this.statusButton.text = `${text.substring(0, 15)}...`
-      this.statusButton.command = 'lmptm.showTitle'
+      this.statusButton.command = `lmptm.showTitle`
     } else {
       this.statusButton.text = text
-      this.statusButton.command = 'lmptm.showTitle'
+      this.statusButton.command = `lmptm.showTitle`
     }
   }
 
   setPlayButtonLabel(label: MediaSessionPlaybackState) {
-    this.playButton.text = label === 'playing' ? '$(primitive-square)' : '$(play)'
+    this.playButton.text = label === `playing` ? `$(primitive-square)` : `$(play)`
   }
 
   displayPlayback(flag: boolean) {

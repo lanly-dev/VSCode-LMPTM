@@ -1,88 +1,88 @@
 'use strict'
-const style = 'background:deepskyblue;padding:1px 2px;border-radius:2px'
+const style = `background:deepskyblue;padding:1px 2px;border-radius:2px`
 const log = (text, ...rest) => console.log(`%c${text}`, style, ...rest)
 log(`LMPTM's script injected successfully!`)
 
-const PICK_MSG = '⛏️ Pick?'
+const PICK_MSG = `⛏️ Pick?`
 const playButtonAttrs = {
   soundcloud: {
-    css: '.playControl',
-    cssCover: '.m-visible'
+    css: `.playControl`,
+    cssCover: `.m-visible`
   },
   spotify: {
-    css: 'button[data-testid="control-button-playpause"]',
-    cssTitle: 'div[data-testid="now-playing-widget"]',
-    play: 'M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z'
+    css: `button[data-testid="control-button-playpause"]`,
+    cssTitle: `div[data-testid="now-playing-widget"]`,
+    play: `M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z`
   },
-  youtube: { css: '.ytp-play-button' },
-  ytmusic: { css: '#play-pause-button' }
+  youtube: { css: `.ytp-play-button` },
+  ytmusic: { css: `#play-pause-button` }
 }
 
 let observer
-const btnPick = document.createElement('button')
+const btnPick = document.createElement(`button`)
 btnPick.innerHTML = PICK_MSG
-btnPick.className = 'btn-pick-float'
+btnPick.className = `btn-pick-float`
 document.body.appendChild(btnPick)
-btnPick.addEventListener('click', click)
+btnPick.addEventListener(`click`, click)
 
 // Duplicate tabs solution
 // TODO: need note
 let clear = false
-let loadCount = sessionStorage.getItem('load')
+let loadCount = sessionStorage.getItem(`load`)
 loadCount === null ? (loadCount = 0) : loadCount++
-sessionStorage.setItem('load', loadCount)
-let unloadCount = sessionStorage.getItem('unload')
+sessionStorage.setItem(`load`, loadCount)
+let unloadCount = sessionStorage.getItem(`unload`)
 unloadCount = unloadCount === null ? 0 : parseInt(unloadCount)
 if (loadCount === unloadCount) verifyPage()
 
-window.addEventListener('beforeunload', () => {
+window.addEventListener(`beforeunload`, () => {
   if (clear) {
-    sessionStorage.removeItem('load')
-    sessionStorage.removeItem('unload')
+    sessionStorage.removeItem(`load`)
+    sessionStorage.removeItem(`unload`)
     return
   }
-  sessionStorage.setItem('unload', unloadCount + 1)
+  sessionStorage.setItem(`unload`, unloadCount + 1)
 })
 
 function click() {
-  const btnPick = document.querySelector('.btn-pick-float')
+  const btnPick = document.querySelector(`.btn-pick-float`)
   const href = window.location.href
   let brand
 
-  if (href.includes('soundcloud.com')) {
-    if (!document.querySelector('.m-visible')) {
+  if (href.includes(`soundcloud.com`)) {
+    if (!document.querySelector(`.m-visible`)) {
       btnPick.disabled = true
-      return void showRejectInfo(btnPick, 'soundcloud')
+      return void showRejectInfo(btnPick, `soundcloud`)
     }
-    brand = 'soundcloud'
-  } else if (href.includes('open.spotify.com')) {
+    brand = `soundcloud`
+  } else if (href.includes(`open.spotify.com`)) {
     if (!navigator.mediaSession.metadata.title) {
       btnPick.disabled = true
-      return void showRejectInfo(btnPick, 'spotify')
+      return void showRejectInfo(btnPick, `spotify`)
     }
-    brand = 'spotify'
-  } else if (href.includes('www.youtube.com')) {
-    if (!href.includes('/watch')) {
+    brand = `spotify`
+  } else if (href.includes(`www.youtube.com`)) {
+    if (!href.includes(`/watch`)) {
       btnPick.disabled = true
-      return void showRejectInfo(btnPick, 'youtube')
+      return void showRejectInfo(btnPick, `youtube`)
     }
-    brand = 'youtube'
-  } else if (href.includes('music.youtube.com')) {
-    if (!href.includes('/watch')) {
+    brand = `youtube`
+  } else if (href.includes(`music.youtube.com`)) {
+    if (!href.includes(`/watch`)) {
       btnPick.disabled = true
-      return void showRejectInfo(btnPick, 'ytmusic')
+      return void showRejectInfo(btnPick, `ytmusic`)
     }
-    brand = 'ytmusic'
+    brand = `ytmusic`
   } else {
-    btnPick.className = 'btn-pick-float error'
-    btnPick.innerHTML = 'Never mind! 😓'
+    btnPick.className = `btn-pick-float error`
+    btnPick.innerHTML = `Never mind! 😓`
     btnPick.disabled = true
     btnTimeoutReset(btnPick)
   }
 
   if (brand) {
     window.pageSelected()
-    sessionStorage.setItem('lmptm', brand)
+    sessionStorage.setItem(`lmptm`, brand)
     changeBtnAttr(brand)
     clear = true
   }
@@ -118,7 +118,7 @@ function setupObserver(brand) {
   if (observer) observer.disconnect()
   const targetE = document.querySelector(css)
   let state = getPlaybackState(brand, css)
-  if (brand === 'soundcloud' && state === 'none') state = 'paused'
+  if (brand === `soundcloud` && state === `none`) state = `paused`
   window.playbackChanged(state)
 
   observer = new MutationObserver(() => {
@@ -128,7 +128,7 @@ function setupObserver(brand) {
   if (targetE) observer.observe(targetE, { attributes: true })
 
   // Spotify doesn't fire playbackChanged when skip/back a song
-  if (brand === 'spotify') {
+  if (brand === `spotify`) {
     const { cssTitle } = playButtonAttrs.spotify
     const targetE2 = document.querySelector(cssTitle)
     // Observer can watch multiple elements :)
@@ -138,47 +138,47 @@ function setupObserver(brand) {
 
 function getPlaybackState(brand) {
   // spotify doesn't update the mediaSession.playbackState
-  if (brand === 'spotify') {
+  if (brand === `spotify`) {
     const { css, play } = playButtonAttrs.spotify
-    const d = document.querySelector(`${css} svg path:last-child`).getAttribute('d')
-    const state = d === play ? 'paused' : 'playing'
+    const d = document.querySelector(`${css} svg path:last-child`).getAttribute(`d`)
+    const state = d === play ? `paused` : `playing`
     return state
   } else return navigator.mediaSession.playbackState
 }
 
 function verifyPage() {
-  const brand = sessionStorage.getItem('lmptm')
+  const brand = sessionStorage.getItem(`lmptm`)
   const href = window.location.href
   if (!brand) return
-  if (brand === 'spotify' && href.includes('open.spotify.com')) changeBtnAttr(brand)
-  else if (brand === 'soundcloud' && href.includes('soundcloud.com')) changeBtnAttr(brand)
-  else if (brand === 'youtube' && href.includes('www.youtube.com/watch')) changeBtnAttr(brand)
-  else if (brand === 'ytmusic' && href.includes('music.youtube.com/watch')) changeBtnAttr(brand)
+  if (brand === `spotify` && href.includes(`open.spotify.com`)) changeBtnAttr(brand)
+  else if (brand === `soundcloud` && href.includes(`soundcloud.com`)) changeBtnAttr(brand)
+  else if (brand === `youtube` && href.includes(`www.youtube.com/watch`)) changeBtnAttr(brand)
+  else if (brand === `ytmusic` && href.includes(`music.youtube.com/watch`)) changeBtnAttr(brand)
   else reset()
 }
 
 function changeBtnAttr(brand) {
   setupObserver(brand)
-  if (brand === 'ytmusic') brand = 'youtube'
+  if (brand === `ytmusic`) brand = `youtube`
   btnPick.className = `btn-pick-float border-gray ${brand}`
   btnPick.innerHTML = null
 }
 
 function showRejectInfo(btnPick, brand) {
   btnPick.className = `btn-pick-float border-gray ${brand}-info`
-  let msg = 'Something is not right...'
+  let msg = `Something is not right...`
   switch (brand) {
-    case 'soundcloud':
-      msg = 'Please pick a song 😉'
+    case `soundcloud`:
+      msg = `Please pick a song 😉`
       break
-    case 'spotify':
-      msg = 'Please log in and make sure the playing queue is not empty 😉'
+    case `spotify`:
+      msg = `Please log in and make sure the playing queue is not empty 😉`
       break
-    case 'youtube':
-      msg = 'Please pick a video 😉'
+    case `youtube`:
+      msg = `Please pick a video 😉`
       break
-    case 'ytmusic':
-      msg = 'Please make sure the playing queue is not empty 😉'
+    case `ytmusic`:
+      msg = `Please make sure the playing queue is not empty 😉`
       break
   }
   btnPick.innerHTML = msg
@@ -188,14 +188,14 @@ function showRejectInfo(btnPick, brand) {
 function btnTimeoutReset(btnPick) {
   setTimeout(() => {
     btnPick.innerHTML = PICK_MSG
-    btnPick.className = 'btn-pick-float'
+    btnPick.className = `btn-pick-float`
     btnPick.disabled = false
   }, 3000)
 }
 
 function reset() {
-  const btnPick = document.querySelector('.btn-pick-float')
+  const btnPick = document.querySelector(`.btn-pick-float`)
   btnPick.innerHTML = PICK_MSG
-  btnPick.className = 'btn-pick-float'
-  sessionStorage.removeItem('lmptm')
+  btnPick.className = `btn-pick-float`
+  sessionStorage.removeItem(`lmptm`)
 }
