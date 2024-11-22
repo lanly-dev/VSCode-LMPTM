@@ -12,7 +12,7 @@ This extension launches a Chrome/Chromium browser to the 4 popular music sites, 
 
 >[How to use it?](https://github.com/lanly-dev/VSCode-LMPTM/issues/1)
 
-<img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/refs/heads/3.0/media/vscodeignore/capture2.0.png' width='700'/>
+<img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/ec3e09a684b8a23bd59fc7e9aece29c5dbe42f30/media/vscodeignore/capture3.0.0.png?raw=true' width='700'/>
 
 ## Features
 Supports SoundCloud, Spotify, YouTube, and YouTube Music
