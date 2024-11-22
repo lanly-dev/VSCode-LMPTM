@@ -72,12 +72,13 @@ export default class Browser {
         Browser.jsPath = path.join(context.extensionPath, `dist`, `inject`, `script.js`)
         const defaultPages = await browser.pages()
         defaultPages[0].close() // evaluateOnNewDocument won't on this page
-        const b = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
-        Browser.activeBrowser = b
+        Browser.activeBrowser = new Browser(browser, buttons, await browser.createIncognitoBrowserContext())
+        vscode.commands.executeCommand(`setContext`, `lmptm.launched`, true)
         TreeviewProvider.refresh()
       }, (error: { message: string }) => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage(`Browser launch failed. 😲`)
+        vscode.commands.executeCommand(`setContext`, `lmptm.launched`, false)
         Browser.launched = false
       })
     }
@@ -88,14 +89,17 @@ export default class Browser {
     this.currentBrowser = browser
     this.pagesStatus = []
     this.incognitoContext = incognitoContext
-    this.currentBrowser.on(`targetcreated`, async (target: puppeteer.Target) => this.update(`page_created`, await target.page()))
-    this.currentBrowser.on(`targetchanged`, async (target: puppeteer.Target) => this.update(`page_changed`, await target.page()))
+    this.currentBrowser.on(`targetcreated`, async (target: puppeteer.Target) =>
+      this.update(`page_created`, await target.page()))
+    this.currentBrowser.on(`targetchanged`, async (target: puppeteer.Target) =>
+      this.update(`page_changed`, await target.page()))
     // this.currentBrowser.on('targetdestroyed', target => this.update('page_destroyed', target))
     this.currentBrowser.on(`disconnected`, () => {
       this.buttons.setStatusButtonText(`Launch $(rocket)`)
       Browser.activeBrowser = undefined
       this.buttons.displayPlayback(false)
       TreeviewProvider.refresh()
+      vscode.commands.executeCommand(`setContext`, `lmptm.launched`, false)
       Browser.launched = false
       // console.debug('CLOSE')
     })
@@ -179,6 +183,14 @@ export default class Browser {
         break
       default: vscode.window.showInformationMessage(SEEK_MSG)
     }
+  }
+
+  closeBrowser() {
+    this.currentBrowser.close()
+  }
+
+  closeTab(tab: Entry) {
+    tab.page.close()
   }
 
   getTabTitle() {

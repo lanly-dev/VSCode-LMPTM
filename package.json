@@ -4,6 +4,7 @@
   "description": "Playback control buttons for the popular music sites",
   "homepage": "https://github.com/lanly-dev/VSCode-LMPTM",
   "version": "3.0.0",
+  "author": "lanly",
   "publisher": "lanly-dev",
   "engines": {
     "vscode": "^1.95.0"
@@ -33,6 +34,34 @@
   ],
   "main": "./dist/extension",
   "contributes": {
+    "commands": [
+      {
+        "command": "lmptm.closeBrowser",
+        "title": "Close browser",
+        "icon": "$(breakpoints-remove-all)"
+      },
+      {
+        "command": "lmptm.closeTab",
+        "title": "Close tab",
+        "icon": "$(remove-close)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "lmptm.closeBrowser",
+          "group": "navigation",
+          "when": "view == LMPTM && lmptm.launched"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "lmptm.closeTab",
+          "when": "view == LMPTM",
+          "group": "inline"
+        }
+      ]
+    },
     "viewsWelcome": [
       {
         "view": "LMPTM",
@@ -147,7 +176,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lanly-dev/VSCode-LMPTM.git"
+    "url": "git+https://github.com/lanly-dev/VSCode-LMPTM.git"
   },
   "bugs": {
     "url": "https://github.com/lanly-dev/VSCode-LMPTM/issues"

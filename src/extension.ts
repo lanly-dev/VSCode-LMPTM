@@ -15,6 +15,8 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.concat([
     rc(`lmptm.browserLaunch`, () => Browser.launch(buttons, context)),
     rc(`lmptm.click`, selection => click(selection)),
+    rc(`lmptm.closeBrowser`, () => Browser.activeBrowser?.closeBrowser()),
+    rc(`lmptm.closeTab`, tab => Browser.activeBrowser?.closeTab(tab)),
     rc(`lmptm.openSettings`, openSettings),
     rc(`lmptm.showTitle`, showTitle),
     rc(`lmptm.toggleMode`, toggleMode),
