@@ -17,23 +17,23 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Support for other sites
 
 ## [3.0.0] - September 2024
-- Fix [silly bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP
+- Fix the [bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP
 - Add Chinese for treeview buttons
 - Improve treeview with more buttons
 - Migrate to ESlint v9
-- Stop using bundler
+- ~~Stop using bundler~~
 - Optimize SVGs again using [svgo](https://svgo.dev)
 - Refer image from documentation to GitHub link to reduce extension size
 - Remove Prettier config
 - Remove setting for Brave browser
 - Update logo<br>
-  <img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/lmptm.png' width='100' title='btn1.4.png'/>
-  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/btn2.0.png?raw=true' width='100' title='btn2.0.png'/>
+  <img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/05f573b4091fb82334ec1d6e93152631717c8a5c/media/vscodeignore/lmptm.svg.png' width='100' title='lmptm'/>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/05f573b4091fb82334ec1d6e93152631717c8a5c/media/lmptm2.svg.png' width='100' title='lmptm2'/>
 
 ### Notes
 - I18n isn't necessary
 - It seems like the VSCode extension sample code has moved to use esbuild instead of webpack, but now it seems like you can pick either one
-- esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore
+- ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since node_modules is huge
 - The logo has been changed for consistency with its menu vector
 - Not sure if the Brave setting is still necessary
 

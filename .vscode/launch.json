@@ -6,12 +6,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Extension ts-watch",
+      "name": "Run extension",
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "ts-watch"
+      "preLaunchTask": "ts-watch-task"
     }
   ]
 }

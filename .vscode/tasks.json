@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "ts-watch",
+      "label": "ts-watch-task",
       "type": "npm",
       "script": "ts-watch",
       "problemMatcher": "$tsc-watch",

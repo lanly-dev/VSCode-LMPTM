@@ -18,9 +18,10 @@ export default [{
     "@typescript-eslint/naming-convention": [`warn`, { selector: `import`, format: [`camelCase`, `PascalCase`] }],
     "comma-dangle": [`error`, `never`],
     "no-throw-literal": `warn`,
+    "quote-props": [`error`, `as-needed`],
     curly: [`error`, `multi-or-nest`],
     eqeqeq: `error`,
     quotes: [`error`, `backtick`],
-    semi: `off`
+    semi: [`error`, `never`]
   }
 }]
