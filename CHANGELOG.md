@@ -16,7 +16,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Shelljs vs Execa
 - Support for other sites
 
-## [3.0.0] - September 2024
+## [3.0.0] - November 2024
 - Fix the [bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP
 - Add Chinese for treeview buttons
 - Improve treeview with more buttons
@@ -35,6 +35,8 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since *node_modules* is huge
 - The logo has been changed for consistency with its menu vector
 - Not sure if the Brave setting is still relevant
+- webpack 5.96.1 compiled successfully in 17898 ms
+- 14 files, 243.83 KB, 1.95.0
 
 ## [2.2.0] - September 2024
 - Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
