@@ -26,8 +26,8 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Refer image from documentation to GitHub link to reduce extension size
 - Remove setting for Brave browser
 - Update logo<br>
-  <img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/05f573b4091fb82334ec1d6e93152631717c8a5c/media/vscodeignore/lmptm.svg.png' width='100' title='lmptm'/>
-  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/05f573b4091fb82334ec1d6e93152631717c8a5c/media/lmptm2.svg.png' width='100' title='lmptm2'/>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/3.0/media/vscodeignore/lmptm.png?raw=true' width='50' title='lmptm'/>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/3.0/media/lmptm2.png?raw=true' width='55' title='lmptm2'/>
 
 ### Notes
 - I18n isn't necessary
