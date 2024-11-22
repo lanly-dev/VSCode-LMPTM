@@ -308,14 +308,13 @@ export default class Browser {
   }
 
   private async pageChanged(page: puppeteer.Page) {
-    // @ts-ignore
     await page.waitForNetworkIdle() // this somehow prevents navigation error
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)
     this.bypassCSP(brand, page)
 
     const title = await page.title()
-
+    // console.debug(`page_changed:`, brand, title)
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.page !== page) continue
       if (this.selectedPage === page) this.selectedMusicBrand = brand
@@ -347,6 +346,7 @@ export default class Browser {
   private async pageCreated(page: puppeteer.Page) {
     const pageURL = page.url()
     const brand = pageURL === `about:blank` ? `other` : this.musicBrandCheck(pageURL)
+    // console.debug(`pageCreated: ${pageURL} - ${brand}`)
     this.bypassCSP(brand, page)
 
     let title = pageURL === `about:blank` ? pageURL : await page.title()
@@ -359,8 +359,12 @@ export default class Browser {
     }
 
     page.on(`load`, async () => {
-      page.addStyleTag({ path: Browser.cssPath })
-      page.addScriptTag({ path: Browser.jsPath })
+      try {
+        page.addStyleTag({ path: Browser.cssPath })
+        page.addScriptTag({ path: Browser.jsPath })
+      } catch (error) {
+        console.error(error)
+      }
     })
 
     page.removeAllListeners(`close`)
@@ -430,7 +434,13 @@ export default class Browser {
 
   // Won't stick if go to another site (if go to another URL)
   private async bypassCSP(brand: string, page: puppeteer.Page) {
-    if ([`spotify`, `youtube`, `ytmusic`].includes(brand)) await page.setBypassCSP(true)
+    if ([`spotify`, `ytmusic`].includes(brand)) await page.setBypassCSP(true)
+    else {
+      const url = await page.url()
+      // console.debug(`bypassCSP:`, url)
+      // Because !youtube.com/watch === "other" as its brand so we skipped, need to do this again here
+      if (url.includes(`youtube`)) await page.setBypassCSP(true)
+    }
 
     // for debugging
     await page.evaluate(() => sessionStorage.setItem(`bypassCSP`, `true`))

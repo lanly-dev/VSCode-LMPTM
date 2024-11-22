@@ -20,7 +20,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Fix the [bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP
 - Add Chinese for treeview buttons
 - Improve treeview with more buttons
-- Migrate to ESlint v9
+- Migrate to ESlint@9
 - ~~Stop using bundler~~
 - Optimize SVGs again using [svgo](https://svgo.dev)
 - Refer image from documentation to GitHub link to reduce extension size
@@ -32,9 +32,9 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 ### Notes
 - I18n isn't necessary
 - It seems like the VSCode extension sample code has moved to use esbuild instead of webpack, but now it seems like you can pick either one
-- ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since node_modules is huge
+- ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since *node_modules* is huge
 - The logo has been changed for consistency with its menu vector
-- Not sure if the Brave setting is still necessary
+- Not sure if the Brave setting is still relevant
 
 ## [2.2.0] - September 2024
 - Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
