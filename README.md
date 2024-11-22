@@ -33,6 +33,13 @@ Supports SoundCloud, Spotify, YouTube, and YouTube Music
 - Won't be able to log into YouTube and SoundCloud(email method)
 
 ## Release Notes
+
+### 3.0.0
+- Fix CSP, apply only for Youtube/YTmusic and Spotify
+- Improve treeview
+- Partial Chinese support
+- New logo
+
 ### 2.2.0
 - CSP bypass for Youtube and Youtube Music
 

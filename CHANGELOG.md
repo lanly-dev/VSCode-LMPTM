@@ -10,18 +10,39 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - https://www.conventionalcommits.org
 
 ### TODO
-- I18n
 - Playwright vs Puppeteer option
+- Proxy feature?
 - Seek backward/forward setting option
 - Shelljs vs Execa
 - Support for other sites
+
+## [3.0.0] - September 2024
+- Fix [silly bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP
+- Add Chinese for treeview buttons
+- Improve treeview with more buttons
+- Migrate to ESlint v9
+- Stop using bundler
+- Optimize SVGs again using [svgo](https://svgo.dev)
+- Refer image from documentation to GitHub link to reduce extension size
+- Remove Prettier config
+- Remove setting for Brave browser
+- Update logo<br>
+  <img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/lmptm.png' width='100' title='btn1.4.png'/>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/btn2.0.png?raw=true' width='100' title='btn2.0.png'/>
+
+### Notes
+- I18n isn't necessary
+- It seems like the VSCode extension sample code has moved to use esbuild instead of webpack, but now it seems like you can pick either one
+- esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore
+- The logo has been changed for consistency with its menu vector
+- Not sure if the Brave setting is still necessary
 
 ## [2.2.0] - September 2024
 - Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
 - webpack 5.94.0 compiled successfully in 8730 ms
 - 20 files, 1.4MB, 1.93.0
 
-### Note
+### Notes
 - Chrome team added the [Trusted Types to YouTube](https://developer.chrome.com/blog/trusted-types-on-youtube) - thanks [Matthew](https://github.com/mattzgg) for the info
 - There is probably a proper way to comply with the new security requirement but yeah, one shortcut is just to bypass it by disabling the [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 - It seems like the webpack (in old project/machine) that used to publish this extension doesn't combine files, another package stats:
@@ -33,7 +54,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - webpack 5.92.1 compiled successfully in 10241 ms
 - 20 files, 1.4MB, 1.91.0
 
-### Note
+### Notes
 - Updating this project to 3.0 was rough, so here is the minor release
 - The Puppeteer@22 was having undesired bugs and behaviors
 - Adding puppeteer-extra on top of it = more strange behaviors
@@ -42,8 +63,9 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 ## [2.0.0] - December 2021
 - Add new feature - treeview
 - Rewrite/refactor most of the code - 30+ commits
-- New float button style - old vs new in Windows
-  <br><img src='./media/btn1.4.png' width='100'/> <img src='./media/btn2.0.png' width='100'/>
+- New float button style - old vs new in Windows<br>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/btn1.4.png?raw=true' width='100' title='btn1.4.png'/>
+  <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/6e3c7ffb704a8752bbef8c5c203213340182d012/media/vscodeignore/btn2.0.png?raw=true' width='100' title='btn2.0.png'/>
 - Fix Spotify bug due to its style class's changes
 - Fix site English version issue - observes another DOM element to update playback status
 - Merge play and pause commands into one toggle function
