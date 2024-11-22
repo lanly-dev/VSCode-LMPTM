@@ -24,7 +24,6 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - ~~Stop using bundler~~
 - Optimize SVGs again using [svgo](https://svgo.dev)
 - Refer image from documentation to GitHub link to reduce extension size
-- Remove Prettier config
 - Remove setting for Brave browser
 - Update logo<br>
   <img src='https://raw.githubusercontent.com/lanly-dev/VSCode-LMPTM/05f573b4091fb82334ec1d6e93152631717c8a5c/media/vscodeignore/lmptm.svg.png' width='100' title='lmptm'/>
