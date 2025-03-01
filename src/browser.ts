@@ -380,7 +380,7 @@ export default class Browser {
 
     // @ts-ignore
     if (!page._pageBindings.has('playbackChanged'))
-      page.exposeFunction('playbackChanged', (state: string) => this.update('playback_changed:${state}', page))
+      page.exposeFunction('playbackChanged', (state: string) => this.update(`playback_changed:${state}`, page))
 
   }
 
