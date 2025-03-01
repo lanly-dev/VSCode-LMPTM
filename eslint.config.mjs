@@ -1,5 +1,5 @@
-import typescriptEslint from "@typescript-eslint/eslint-plugin"
-import tsParser from "@typescript-eslint/parser"
+import typescriptEslint from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
 
 export default [{
   files: [`**/*.ts`]
@@ -7,7 +7,7 @@ export default [{
   ignores: [`**/dist`]
 }, {
   plugins: {
-    "@typescript-eslint": typescriptEslint
+    '@typescript-eslint': typescriptEslint
   },
   languageOptions: {
     parser: tsParser,
@@ -15,13 +15,13 @@ export default [{
     sourceType: `module`
   },
   rules: {
-    "@typescript-eslint/naming-convention": [`warn`, { selector: `import`, format: [`camelCase`, `PascalCase`] }],
-    "comma-dangle": [`error`, `never`],
-    "no-throw-literal": `warn`,
-    "quote-props": [`error`, `as-needed`],
+    '@typescript-eslint/naming-convention': [`warn`, { selector: `import`, format: [`camelCase`, `PascalCase`] }],
+    'comma-dangle': [`error`, `never`],
+    'no-throw-literal': `warn`,
+    'quote-props': [`error`, `as-needed`],
     curly: [`error`, `multi-or-nest`],
     eqeqeq: `error`,
-    quotes: [`error`, `backtick`],
+    quotes: ['error', 'single', { allowTemplateLiterals: true }],
     semi: [`error`, `never`]
   }
 }]
