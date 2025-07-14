@@ -1,6 +1,7 @@
 import { Entry } from './interfaces'
 import { Event, EventEmitter, ThemeIcon, TreeDataProvider, TreeItem, window } from 'vscode'
-import Browser from './browser'
+import Lmptm from './lmptm'
+import Browser from './browser/browser'
 
 export default class TreeviewProvider implements TreeDataProvider<Entry> {
   public static tvProvider: TreeviewProvider
@@ -23,7 +24,7 @@ export default class TreeviewProvider implements TreeDataProvider<Entry> {
   }
 
   constructor() {
-    this.browser = Browser.activeBrowser
+    this.browser = Lmptm.activeBrowser
   }
 
   getTreeItem(element: Entry): TreeItem {
@@ -40,7 +41,7 @@ export default class TreeviewProvider implements TreeDataProvider<Entry> {
   }
 
   refresh(): void {
-    this.browser = Browser.activeBrowser
+    this.browser = Lmptm.activeBrowser
     this._onDidChangeTreeData.fire(null)
     // console.debug(`refresh`)
   }

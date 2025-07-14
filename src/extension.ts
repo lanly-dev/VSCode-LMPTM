@@ -1,7 +1,7 @@
 import { commands, ConfigurationTarget,ExtensionContext, workspace, window } from 'vscode'
 import { Entry } from './interfaces'
 
-import Browser from './browser'
+import Browser from './lmptm'
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
 
@@ -34,8 +34,8 @@ function openSettings() {
 }
 
 async function showTitle() {
-  const title = Browser.activeBrowser?.getTabTitle()
-  if (title) window.showInformationMessage(await title)
+  const title = await Browser.activeBrowser?.getTabTitle()
+  if (title) window.showInformationMessage(title)
   else window.showErrorMessage(`Failed to retrieve title`)
 }
 
