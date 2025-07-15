@@ -23,6 +23,8 @@ export default class PwrBrowser extends Browser {
     this.context = context
     this.context.on('page', (page: playwright.Page) => this.update('page_created', page))
     this.context.addInitScript({ path: Lmptm.jsPath })
+    this.context.exposeFunction('pageSelected', (page: playwright.Page) => this.update('page_selected:button', page))
+    this.context.exposeFunction('playbackChanged', (page: playwright.Page, state: string) => this.update(`playback_changed:${state}`, page))
     this.currentBrowser.on('disconnected', () => {
       // Either closed by script or crash, not manually
       this.buttons.setStatusButtonText('Launch $(rocket)')
@@ -277,7 +279,6 @@ export default class PwrBrowser extends Browser {
     }
 
     page.once('load', async () => {
-      console.log('PAGE LOADED')
       await page.mainFrame().addStyleTag({ path: Lmptm.cssPath })
       await page.mainFrame().addScriptTag({ path: Lmptm.jsPath })
     })
