@@ -8,10 +8,6 @@ import Buttons from '../buttons'
 import TreeviewProvider from '../treeview'
 
 export default class PwrBrowser extends Browser {
-  public static activeBrowser: Browser | undefined
-  public static cssPath: string
-  public static jsPath: string
-  public static launched = false
   private buttons: Buttons
   private currentBrowser: playwright.Browser
   private context: playwright.BrowserContext
@@ -25,7 +21,10 @@ export default class PwrBrowser extends Browser {
     this.currentBrowser = browser
     this.pagesStatus = []
     this.context = context
+    this.context.on('page', (page: playwright.Page) => this.update('page_created', page))
+    this.context.addInitScript({ path: Lmptm.jsPath })
     this.currentBrowser.on('disconnected', () => {
+      // Either closed by script or crash, not manually
       this.buttons.setStatusButtonText('Launch $(rocket)')
       Lmptm.activeBrowser = undefined
       this.buttons.displayPlayback(false)
@@ -201,6 +200,7 @@ export default class PwrBrowser extends Browser {
   }
 
   private async update(event: string, page: playwright.Page | null) {
+    console.debug('$$$$$$$$$', event)
     if (!page) return
 
     let extra
@@ -249,6 +249,9 @@ export default class PwrBrowser extends Browser {
       if (e.pwrPage !== page) return
       arr.splice(i, 1)
     })
+    console.log(this.currentBrowser.isConnected())
+    console.log(this.currentBrowser.contexts().length)
+    console.log(this.context.pages().length)
   }
 
   private closingHelper() {
@@ -259,6 +262,7 @@ export default class PwrBrowser extends Browser {
   }
 
   private async pageCreated(page: playwright.Page) {
+    console.log('PAGE CREATED')
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
     // await this.bypassCSP(brand, page)
@@ -272,10 +276,17 @@ export default class PwrBrowser extends Browser {
       this.pagesStatus.splice(index, 0, { pwrPage: p, brand, index, state: 'none', picked: false, title })
     }
 
+    page.once('load', async () => {
+      console.log('PAGE LOADED')
+      await page.mainFrame().addStyleTag({ path: Lmptm.cssPath })
+      await page.mainFrame().addScriptTag({ path: Lmptm.jsPath })
+    })
+
     page.on('close', async () => {
-          await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
-          if (Lmptm.activeBrowser) this.update('page_closed', page)
-        })
+      // Not manually closed, but by script or crash
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
+      if (Lmptm.activeBrowser) this.update('page_closed', page)
+    })
   }
 
   private async pageSelected(page: playwright.Page, source: string) {

@@ -2,8 +2,6 @@ import * as path from 'path'
 import * as puppeteer from 'puppeteer-core'
 import * as vscode from 'vscode'
 
-import { Entry } from './interfaces'
-
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
 import WhichChrome from './whichChrome'
@@ -68,6 +66,7 @@ export default class Lmptm {
         Lmptm.activeBrowser = new PwrBrowser(theB, buttons, contextPW)
         vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
         TreeviewProvider.refresh()
+        // Lmptm.activeBrowser.closeBrowser()
       }, (error: { message: string }) => {
         vscode.window.showErrorMessage(error.message)
         vscode.window.showInformationMessage('Playwright browser launch failed. 😲')
@@ -75,7 +74,6 @@ export default class Lmptm {
         Lmptm.launched = false
       })
     }).catch(err => {
-      vscode.window.showErrorMessage('Playwright is not installed. Please run "npm install playwright-core".')
       vscode.window.showErrorMessage(String(err))
     })
   }

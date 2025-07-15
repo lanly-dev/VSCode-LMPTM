@@ -20,10 +20,19 @@ const playButtonAttrs = {
 
 let observer
 const btnPick = document.createElement(`button`)
-btnPick.innerHTML = PICK_MSG
+btnPick.textContent = PICK_MSG
 btnPick.className = `btn-pick-float`
-document.body.appendChild(btnPick)
-btnPick.addEventListener(`click`, click)
+
+// Check if the page is already loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.appendChild(btnPick)
+    btnPick.addEventListener(`click`, click)
+  })
+} else {
+  document.body.appendChild(btnPick)
+  btnPick.addEventListener(`click`, click)
+}
 
 // Duplicate tabs solution
 // TODO: need note
@@ -181,13 +190,13 @@ function showRejectInfo(btnPick, brand) {
       msg = `Please make sure the playing queue is not empty 😉`
       break
   }
-  btnPick.innerHTML = msg
+  btnPick.textContent = msg
   btnTimeoutReset(btnPick)
 }
 
 function btnTimeoutReset(btnPick) {
   setTimeout(() => {
-    btnPick.innerHTML = PICK_MSG
+    btnPick.textContent = PICK_MSG
     btnPick.className = `btn-pick-float`
     btnPick.disabled = false
   }, 3000)
@@ -195,7 +204,7 @@ function btnTimeoutReset(btnPick) {
 
 function reset() {
   const btnPick = document.querySelector(`.btn-pick-float`)
-  btnPick.innerHTML = PICK_MSG
+  btnPick.textContent = PICK_MSG
   btnPick.className = `btn-pick-float`
   sessionStorage.removeItem(`lmptm`)
 }
