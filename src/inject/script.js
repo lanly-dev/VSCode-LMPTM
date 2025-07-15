@@ -84,7 +84,7 @@ function click() {
     brand = `ytmusic`
   } else {
     btnPick.className = `btn-pick-float error`
-    btnPick.innerHTML = `Never mind! 😓`
+    btnPick.textContent = `Never mind! 😓`
     btnPick.disabled = true
     btnTimeoutReset(btnPick)
   }
@@ -152,7 +152,11 @@ function getPlaybackState(brand) {
     const d = document.querySelector(`${css} svg path:last-child`).getAttribute(`d`)
     const state = d === play ? `paused` : `playing`
     return state
-  } else return navigator.mediaSession.playbackState
+  } else {
+    const state = navigator.mediaSession.playbackState
+    if (!state) console.error('lmptm: no playback state', navigator.mediaSession)
+    return navigator.mediaSession.playbackState
+  }
 }
 
 function verifyPage() {
@@ -170,7 +174,7 @@ function changeBtnAttr(brand) {
   setupObserver(brand)
   if (brand === `ytmusic`) brand = `youtube`
   btnPick.className = `btn-pick-float border-gray ${brand}`
-  btnPick.innerHTML = null
+  btnPick.textContent = null
 }
 
 function showRejectInfo(btnPick, brand) {

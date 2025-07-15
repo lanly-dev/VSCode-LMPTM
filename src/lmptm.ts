@@ -27,6 +27,7 @@ export default class Lmptm {
   }
 
   private static launchPlaywright(buttons: Buttons, context: vscode.ExtensionContext) {
+    // TODO
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     import('playwright-core').then(async playwright => {
       const args = ['--window-size=500,500', '--disable-web-security']

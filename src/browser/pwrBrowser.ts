@@ -292,6 +292,7 @@ export default class PwrBrowser extends Browser {
 
   private async pageSelected(page: playwright.Page, source: string) {
     this.buttons.displayPlayback(true)
+    console.log('PAGE SELECTED')
 
     if (this.selectedPage) {
       const { state } = await this.getPlaybackState(this.selectedPage)

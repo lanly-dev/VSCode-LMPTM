@@ -220,22 +220,22 @@ export default class PptBrowser extends Browser {
     // console.debug('$$$$$$$$$', event)
     if (!page) return
 
-    let extra
+    let eventTail
     if (event.includes('page_selected')) {
-      [event, extra] = event.split(':')
-      if (!extra) throw new Error('page_selected event needs source - tab|button')
+      [event, eventTail] = event.split(':')
+      if (!eventTail) throw new Error('page_selected event needs source - tab|button')
     }
     else if (event.includes('playback_change')) {
-      [event, extra] = event.split(':')
-      if (!extra) throw new Error('playback_change event needs state - playing|paused|none')
+      [event, eventTail] = event.split(':')
+      if (!eventTail) throw new Error('playback_change event needs state - playing|paused|none')
     }
 
     switch (event) {
       case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
       case 'page_created': await this.pageCreated(page); break
-      case 'page_selected': await this.pageSelected(page, <string>extra); break
-      case 'playback_changed': await this.playbackChanged(page, <string>extra); break
+      case 'page_selected': await this.pageSelected(page, <string>eventTail); break
+      case 'playback_changed': await this.playbackChanged(page, <string>eventTail); break
       default: vscode.window.showErrorMessage('Unknown event - ${event}')
     }
     TreeviewProvider.refresh()
