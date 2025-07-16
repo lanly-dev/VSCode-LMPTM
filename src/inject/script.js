@@ -128,11 +128,11 @@ function setupObserver(brand) {
   const targetE = document.querySelector(css)
   let state = getPlaybackState(brand, css)
   if (brand === `soundcloud` && state === `none`) state = `paused`
-  window.playbackChanged(state)
+  sendPlaybackState(state)
 
   observer = new MutationObserver(() => {
     const state = getPlaybackState(brand)
-    window.playbackChanged(state)
+    sendPlaybackState(state)
   })
   if (targetE) observer.observe(targetE, { attributes: true })
 
@@ -142,6 +142,14 @@ function setupObserver(brand) {
     const targetE2 = document.querySelector(cssTitle)
     // Observer can watch multiple elements :)
     if (targetE2) observer.observe(targetE2, { attributes: true })
+  }
+
+  function sendPlaybackState(state) {
+    if (window.__LMPTM_FRAMEWORK === 'playwright') {
+      const id = window.__LMPTM_PAGE_ID
+      window.playbackChanged(id, state)
+    } else if (window.__LMPTM_FRAMEWORK === 'puppeteer') window.playbackChanged(state)
+    else console.error(`lmptm: invalid framework`, window.__LMPTM_FRAMEWORK)
   }
 }
 

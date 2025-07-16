@@ -294,6 +294,10 @@ export default class PptBrowser extends Browser {
 
     page.on('load', async () => {
       try {
+        // Not really needed
+        // page.evaluate(() => {
+        //   (window as any).__LMPTM_FRAMEWORK = 'puppeteer'
+        // })
         page.addStyleTag({ path: Lmptm.cssPath })
         page.addScriptTag({ path: Lmptm.jsPath })
       } catch (error) {

@@ -23,8 +23,8 @@ export default class PwrBrowser extends Browser {
     this.context = context
     this.context.on('page', (page: playwright.Page) => this.update('page_created', page))
     this.context.addInitScript({ path: Lmptm.jsPath })
-    this.context.exposeFunction('pageSelected', (page: playwright.Page) => this.update('page_selected:button', page))
-    this.context.exposeFunction('playbackChanged', (page: playwright.Page, state: string) => this.update(`playback_changed:${state}`, page))
+    this.context.exposeFunction('pageSelected', (pageId: string) => this.update('page_selected:button', null, pageId))
+    this.context.exposeFunction('playbackChanged', (pageId: string, state: string) => this.update(`playback_changed:${state}`, null, pageId))
     this.currentBrowser.on('disconnected', () => {
       // Either closed by script or crash, not manually
       this.buttons.setStatusButtonText('Launch $(rocket)')
@@ -201,26 +201,28 @@ export default class PwrBrowser extends Browser {
     else return 'other'
   }
 
-  private async update(event: string, page: playwright.Page | null) {
-    console.debug('$$$$$$$$$', event)
+  private async update(event: string, page: playwright.Page | null, pageId?: string) {
+    console.debug('$$$$$$$$$', event, page, pageId)
     if (!page) return
 
-    let extra
+    let eventTail
     if (event.includes('page_selected')) {
-      [event, extra] = event.split(':')
-      if (!extra) throw new Error('page_selected event needs source - tab|button')
+      [event, eventTail] = event.split(':')
+      if (!eventTail) throw new Error('page_selected event needs source - tab|button')
+      if (!pageId) throw new Error('page_selected event needs pageId')
     }
     else if (event.includes('playback_change')) {
-      [event, extra] = event.split(':')
-      if (!extra) throw new Error('playback_change event needs state - playing|paused|none')
+      [event, eventTail] = event.split(':')
+      if (!eventTail) throw new Error('playback_change event needs state - playing|paused|none')
+      if (!pageId) throw new Error('playback_change event needs pageId')
     }
 
     switch (event) {
       case 'page_changed': await this.pageChanged(page); break
       case 'page_closed': this.pageClosed(page); break
       case 'page_created': await this.pageCreated(page); break
-      case 'page_selected': await this.pageSelected(page, <string>extra); break
-      case 'playback_changed': await this.playbackChanged(page, <string>extra); break
+      case 'page_selected': await this.pageSelected(pageId!, <string>eventTail); break
+      case 'playback_changed': await this.playbackChanged(pageId!, <string>eventTail); break
       default: vscode.window.showErrorMessage(`Unknown event - ${event}`)
     }
     TreeviewProvider.refresh()
@@ -254,6 +256,11 @@ export default class PwrBrowser extends Browser {
     console.log(this.currentBrowser.isConnected())
     console.log(this.currentBrowser.contexts().length)
     console.log(this.context.pages().length)
+    // If no pages left, close the browser - playwright doesn't close the browser when user manually closes all tabs
+    if (this.context.pages().length === 0) {
+      this.buttons.setStatusButtonText('Closing $(Chrome)')
+      this.currentBrowser.close()
+    }
   }
 
   private closingHelper() {
@@ -273,24 +280,30 @@ export default class PwrBrowser extends Browser {
     if (title === '') title = 'New Tab'
 
     const pages = await this.context.pages()
+    const generatedId = `page-${Math.random().toString(36).slice(2, 11)}`
     for (const [index, p] of pages.entries()) {
       if (p !== page) continue
-      this.pagesStatus.splice(index, 0, { pwrPage: p, brand, index, state: 'none', picked: false, title })
+      this.pagesStatus.splice(index, 0, { id: generatedId, pwrPage: p, brand, index, state: 'none', picked: false, title })
     }
 
     page.once('load', async () => {
+      await page.evaluate(id => {
+        (window as any).__LMPTM_PAGE_ID = id;
+        (window as any).__LMPTM_FRAMEWORK = 'playwright'
+      }, generatedId)
       await page.mainFrame().addStyleTag({ path: Lmptm.cssPath })
       await page.mainFrame().addScriptTag({ path: Lmptm.jsPath })
     })
 
     page.on('close', async () => {
-      // Not manually closed, but by script or crash
+      // Won't fire when closed manually, but by script or crash
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
       if (Lmptm.activeBrowser) this.update('page_closed', page)
     })
   }
 
-  private async pageSelected(page: playwright.Page, source: string) {
+  private async pageSelected(pageId: string, source: string) {
+    // TODO: find page from id
     this.buttons.displayPlayback(true)
     console.log('PAGE SELECTED')
 
@@ -322,15 +335,15 @@ export default class PwrBrowser extends Browser {
     }
   }
 
-  private async playbackChanged(page: playwright.Page, state: string) {
+  private async playbackChanged(pageId: string, state: string) {
     for (const [i, e] of this.pagesStatus.entries()) {
-      if (e.pwrPage !== page) continue
-      if (this.selectedPage === page) {
-        this.buttons.setPlayButtonLabel(state as MediaSessionPlaybackState)
+      if (e.id !== pageId) continue
+      if (this.selectedPage === e.pwrPage!) {
+        this.buttons.setPlayButtonLabel(<MediaSessionPlaybackState>state)
         this.buttons.setStatusButtonText(await this.selectedPage.title())
       }
-      this.pagesStatus[i].state = state as MediaSessionPlaybackState
-      this.pagesStatus[i].title = await page.title()
+      this.pagesStatus[i].state = <MediaSessionPlaybackState>state
+      this.pagesStatus[i].title = await e.pwrPage!.title()
     }
   }
 

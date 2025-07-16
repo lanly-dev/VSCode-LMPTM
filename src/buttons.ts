@@ -29,7 +29,7 @@ export default class Buttons {
     if (text === `Launch $(rocket)`) {
       this.statusButton.text = text
       this.statusButton.command = `lmptm.browserLaunch`
-    } else if (text === `Running $(browser)`) {
+    } else if (text === `Running $(browser)` || text === `Closing $(browser)`) {
       this.statusButton.text = text
       this.statusButton.command = undefined
     } else if (text.length > 30) {
