@@ -161,11 +161,11 @@ export default class PwrBrowser extends Browser {
   }
 
   private resetFloatButton() {
-    this.selectedPage?.evaluate(() => (window as any).reset && (window as any).reset())
+    this.selectedPage?.evaluate(() => (window as any).reset())
   }
 
   private clickFloatButton(thePage: playwright.Page) {
-    thePage.evaluate(() => (window as any).click && (window as any).click())
+    thePage.evaluate(() => (window as any).click())
   }
 
   private async tabOrderUpdate() {
@@ -233,7 +233,8 @@ export default class PwrBrowser extends Browser {
   private async pageChanged(page: playwright.Page) {
     const pageURL = page.url()
     const brand = this.musicBrandCheck(pageURL)
-    // await this.bypassCSP(brand, page)
+
+    if (page.isClosed()) return
 
     const title = await page.title()
     for (const [i, e] of this.pagesStatus.entries()) {

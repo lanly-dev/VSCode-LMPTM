@@ -228,3 +228,8 @@ function reset() {
   btnPick.className = `btn-pick-float`
   sessionStorage.removeItem(`lmptm`)
 }
+
+// Find a way to inject __LMPTM_FRAMEWORK in the page earlier?
+// if (window.__LMPTM_FRAMEWORK === 'playwright') {}
+window.reset = reset
+window.click = click
