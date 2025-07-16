@@ -135,6 +135,7 @@ export default class PptBrowser extends Browser {
     return this.pagesStatus
   }
 
+  // Click from treeview
   async pickTab(index: number) {
     if (!this.pagesStatus) return
     await this.tabOrderUpdate()

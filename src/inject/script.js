@@ -90,11 +90,19 @@ function click() {
   }
 
   if (brand) {
-    window.pageSelected()
+    sendPageSelected()
     sessionStorage.setItem(`lmptm`, brand)
     changeBtnAttr(brand)
     clear = true
   }
+}
+
+function sendPageSelected() {
+  if (window.__LMPTM_FRAMEWORK === 'playwright') {
+    const id = window.__LMPTM_PAGE_ID
+    window.pageSelected(id)
+  } else if (window.__LMPTM_FRAMEWORK === 'puppeteer') window.pageSelected()
+  else console.error(`lmptm: invalid framework`, window.__LMPTM_FRAMEWORK)
 }
 
 // For supporting other sites later?

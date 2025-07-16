@@ -131,15 +131,16 @@ export default class PwrBrowser extends Browser {
     return this.pagesStatus
   }
 
+  // Click from treeview
   async pickTab(index: number) {
     if (!this.pagesStatus) return
     await this.tabOrderUpdate()
-    const { pwrPage: page, state } = this.pagesStatus[index]
+    const { id, state } = this.pagesStatus[index]
     if (state === 'none') {
       vscode.window.showInformationMessage(Lmptm.STATE_MSG)
       return
     }
-    this.update('page_selected:tab', page!)
+    this.update('page_selected:tab', null, id)
   }
 
   // ↓↓↓↓ Private methods ↓↓↓↓
