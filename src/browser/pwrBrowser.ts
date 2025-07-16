@@ -201,9 +201,10 @@ export default class PwrBrowser extends Browser {
     else return 'other'
   }
 
+  // Maybe separate one for page and one for pageId
   private async update(event: string, page: playwright.Page | null, pageId?: string) {
     console.debug('$$$$$$$$$', event, page, pageId)
-    if (!page) return
+    if (!page && !pageId) return
 
     let eventTail
     if (event.includes('page_selected')) {
@@ -218,9 +219,9 @@ export default class PwrBrowser extends Browser {
     }
 
     switch (event) {
-      case 'page_changed': await this.pageChanged(page); break
-      case 'page_closed': this.pageClosed(page); break
-      case 'page_created': await this.pageCreated(page); break
+      case 'page_changed': await this.pageChanged(page!); break
+      case 'page_closed': this.pageClosed(page!); break
+      case 'page_created': await this.pageCreated(page!); break
       case 'page_selected': await this.pageSelected(pageId!, <string>eventTail); break
       case 'playback_changed': await this.playbackChanged(pageId!, <string>eventTail); break
       default: vscode.window.showErrorMessage(`Unknown event - ${event}`)
@@ -295,6 +296,8 @@ export default class PwrBrowser extends Browser {
       await page.mainFrame().addScriptTag({ path: Lmptm.jsPath })
     })
 
+    page.on('framenavigated', async () => this.update('page_changed', page))
+
     page.on('close', async () => {
       // Won't fire when closed manually, but by script or crash
       await new Promise<void>(resolve => setTimeout(() => resolve(), 1000))
@@ -303,9 +306,8 @@ export default class PwrBrowser extends Browser {
   }
 
   private async pageSelected(pageId: string, source: string) {
-    // TODO: find page from id
     this.buttons.displayPlayback(true)
-    console.log('PAGE SELECTED')
+    const page = this.pagesStatus.find(e => e.id === pageId)?.pwrPage
 
     if (this.selectedPage) {
       const { state } = await this.getPlaybackState(this.selectedPage)
@@ -322,13 +324,13 @@ export default class PwrBrowser extends Browser {
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.pwrPage !== page) continue
       if (source === 'tab') {
-        this.clickFloatButton(e.pwrPage)
+        this.clickFloatButton(e.pwrPage!)
         break
       } else {
         this.selectedPage = e.pwrPage
         this.pagesStatus[i].picked = true
-        this.selectedMusicBrand = this.musicBrandCheck(page.url())
-        const title = await this.selectedPage.title()
+        this.selectedMusicBrand = this.musicBrandCheck(page!.url())
+        const title = await this.selectedPage!.title()
         this.pagesStatus[i].title = title
         this.buttons.setStatusButtonText(title)
       }
