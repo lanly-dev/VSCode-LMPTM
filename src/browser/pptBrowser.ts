@@ -138,6 +138,7 @@ export default class PptBrowser extends Browser {
   // Click from treeview
   async pickTab(index: number) {
     if (!this.pagesStatus) return
+    // Why need to update tab order here? Would it mess up based on the selected index?
     await this.tabOrderUpdate()
     const { pptPage: page, state } = this.pagesStatus[index]
     if (state === 'none') {

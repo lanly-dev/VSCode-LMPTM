@@ -14,6 +14,7 @@ export default class PwrBrowser extends Browser {
   private pagesStatus: Entry[]
   private selectedMusicBrand: string | undefined
   private selectedPage: playwright.Page | undefined
+  private playbackChanging: Promise<void> | undefined
 
   constructor(browser: playwright.Browser, buttons: Buttons, context: playwright.BrowserContext) {
     super()
@@ -39,7 +40,6 @@ export default class PwrBrowser extends Browser {
 
   async playPause() {
     if (!this.selectedPage) return
-    const { state } = await this.getPlaybackState(this.selectedPage)
     switch (this.selectedMusicBrand) {
       case 'soundcloud': case 'spotify': case 'ytmusic':
         await this.selectedPage.keyboard.press('Space')
@@ -47,6 +47,9 @@ export default class PwrBrowser extends Browser {
       case 'youtube':
         await this.selectedPage.keyboard.press('k')
     }
+    // Need to wait playback change from exposed function
+    if (this.playbackChanging) await this.playbackChanging
+    const { state } = await this.getPlaybackState(this.selectedPage)
     this.buttons.setPlayButtonLabel(state)
   }
 
@@ -134,6 +137,7 @@ export default class PwrBrowser extends Browser {
   // Click from treeview
   async pickTab(index: number) {
     if (!this.pagesStatus) return
+    // Why need to update tab order here? Would it mess up based on the selected index?
     await this.tabOrderUpdate()
     const { id, state } = this.pagesStatus[index]
     if (state === 'none') {
@@ -190,7 +194,7 @@ export default class PwrBrowser extends Browser {
 
   private async _getPlaybackState(page: playwright.Page) {
     const pageBrand = this.musicBrandCheck(page.url())
-    const state = await page.evaluate(() => (navigator as any).mediaSession.playbackState)
+    const state = await page.evaluate(() => navigator.mediaSession.playbackState)
     return { brand: pageBrand, state }
   }
 
@@ -340,14 +344,19 @@ export default class PwrBrowser extends Browser {
   }
 
   private async playbackChanged(pageId: string, state: string) {
+    let pcResolve
+    this.playbackChanging = new Promise<void>(resolve => pcResolve = resolve)
     for (const [i, e] of this.pagesStatus.entries()) {
       if (e.id !== pageId) continue
+
       if (this.selectedPage === e.pwrPage!) {
         this.buttons.setPlayButtonLabel(<MediaSessionPlaybackState>state)
         this.buttons.setStatusButtonText(await this.selectedPage.title())
       }
       this.pagesStatus[i].state = <MediaSessionPlaybackState>state
       this.pagesStatus[i].title = await e.pwrPage!.title()
+      pcResolve
+      this.playbackChanging = undefined
     }
   }
 

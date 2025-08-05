@@ -42,7 +42,7 @@ export default class Buttons {
   }
 
   setPlayButtonLabel(label: MediaSessionPlaybackState) {
-    this.playButton.text = label === `playing` ? `$(primitive-square)` : `$(play)`
+    this.playButton.text = label === `playing` ? `$(debug-pause)` : `$(play)`
   }
 
   displayPlayback(flag: boolean) {

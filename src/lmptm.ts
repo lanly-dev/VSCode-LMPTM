@@ -115,7 +115,6 @@ export default class Lmptm {
     }
 
     Lmptm.launched = true
-    // console.log('#### Browser Launched ####')
     puppeteer.launch({
       args,
       defaultViewport: null,
@@ -127,7 +126,7 @@ export default class Lmptm {
       Lmptm.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
       Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
       const defaultPages = await theB.pages()
-      defaultPages[0].close() // evaluateOnNewDocument won't on this page
+      defaultPages[0].close() // evaluateOnNewDocument won't be on this page
       Lmptm.activeBrowser = new PptBrowser(theB, buttons, await theB.createIncognitoBrowserContext())
       vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
       TreeviewProvider.refresh()
