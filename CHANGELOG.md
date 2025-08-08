@@ -31,7 +31,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 
 ### Notes
 - I18n isn't necessary
-- It seems like the VSCode extension sample code has moved to use esbuild instead of webpack, but now it seems like you can pick either one
+- It seems like the VSCode extension sample code has moved to use esbuild instead of webpack, but you can pick either one
 - ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since *node_modules* is huge
 - The logo has been changed for consistency with its menu vector
 - Not sure if the Brave setting is still relevant
