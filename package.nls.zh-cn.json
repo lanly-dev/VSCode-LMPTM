@@ -1,4 +1,4 @@
 {
-  "lmptm.launch.isDefault": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[切换到 PRIVATE 模式](command:lmptm.toggleMode)\n[Open settings](command:workbench.action.openSettings)",
-  "lmptm.launch.isPrivate": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[切换到 DEFAULT 模式](command:lmptm.toggleMode)\n[Open settings](command:workbench.action.openSettings)"
+  "lmptm.launch.isDefault": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[切换到 PRIVATE 模式](command:lmptm.toggleMode)\n[Open settings](command:lmptm.openSettings)",
+  "lmptm.launch.isPrivate": "[Launch $(rocket)](command:lmptm.browserLaunch)\n[切换到 DEFAULT 模式](command:lmptm.toggleMode)\n[Open settings](command:lmptm.openSettings)"
 }

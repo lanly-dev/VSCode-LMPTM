@@ -11,17 +11,15 @@ import TreeviewProvider from '../treeview'
 export default class PptBrowser extends Browser {
   private buttons: Buttons
   private currentBrowser: puppeteer.Browser
-  private incognitoContext: puppeteer.BrowserContext
   private pagesStatus: Entry[]
   private selectedMusicBrand: string | undefined
   private selectedPage: puppeteer.Page | undefined
 
-  constructor(browser: puppeteer.Browser, buttons: Buttons, incognitoContext: puppeteer.BrowserContext) {
+  constructor(browser: puppeteer.Browser, buttons: Buttons) {
     super()
     this.buttons = buttons
     this.currentBrowser = browser
     this.pagesStatus = []
-    this.incognitoContext = incognitoContext
     this.currentBrowser.on('targetcreated', async (target: puppeteer.Target) =>
       this.update('page_created', await target.page()))
     this.currentBrowser.on('targetchanged', async (target: puppeteer.Target) =>
@@ -155,19 +153,13 @@ export default class PptBrowser extends Browser {
     if (links && links.length) {
       const p: Promise<unknown>[] = []
       links.forEach(async (e: string) => {
-        const pg = await this.newPage()
+        const pg = await this.currentBrowser.newPage()
         await pg.setDefaultNavigationTimeout(0)
         await pg.goto(e)
       })
       await Promise.all(p) // need to wait?
     }
     TreeviewProvider.refresh()
-  }
-
-  private async newPage() {
-    const needIncognito = vscode.workspace.getConfiguration().get('lmptm.incognitoMode')
-    if (needIncognito) return this.incognitoContext.newPage()
-    else return this.currentBrowser.newPage()
   }
 
   private resetFloatButton() {

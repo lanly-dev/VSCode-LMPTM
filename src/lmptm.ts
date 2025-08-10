@@ -112,7 +112,7 @@ export default class Lmptm {
       Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
       const defaultPages = await theB.pages()
       defaultPages[0].close() // evaluateOnNewDocument won't be on this page
-      Lmptm.activeBrowser = new PptBrowser(theB, buttons, await theB.createIncognitoBrowserContext())
+      Lmptm.activeBrowser = new PptBrowser(theB, buttons)
       vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
       TreeviewProvider.refresh()
     }, (error: { message: string }) => {

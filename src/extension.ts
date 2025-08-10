@@ -1,4 +1,4 @@
-import { commands, ConfigurationTarget,ExtensionContext, workspace, window } from 'vscode'
+import { commands, ConfigurationTarget, ExtensionContext, workspace, window } from 'vscode'
 import { Entry } from './interfaces'
 
 import Browser from './lmptm'
@@ -10,6 +10,7 @@ export function activate(context: ExtensionContext) {
   const fn = [`playPause`, `skip`, `back`, `forward`, `backward`] as const
   const rc = commands.registerCommand
   TreeviewProvider.create()
+  checkCustomContext()
   const disposables = fn.map(n => rc(`lmptm.${n}`, () => Browser.activeBrowser?.[n]()))
   context.subscriptions.concat(disposables)
   context.subscriptions.concat([
@@ -29,8 +30,12 @@ function click(selection: Entry) {
 }
 
 function openSettings() {
-  // doesn't seem to work
   commands.executeCommand(`workbench.action.openSettings`, `@ext:lanly-dev.letmeplaythemusic`)
+}
+
+async function checkCustomContext() {
+  const mode = workspace.getConfiguration().get(`lmptm.incognitoMode`)
+  await commands.executeCommand(`setContext`, `lmptm.private`, mode)
 }
 
 async function showTitle() {
