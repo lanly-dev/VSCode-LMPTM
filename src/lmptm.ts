@@ -38,12 +38,14 @@ export default class Lmptm {
         return
       }
     }
+    Lmptm.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
+    Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
 
-    if (fw === 'puppeteer') Lmptm.launchPuppeteer(buttons, context)
-    else Lmptm.launchPlaywright(buttons, context)
+    if (fw === 'puppeteer') Lmptm.launchPuppeteer(buttons)
+    else Lmptm.launchPlaywright(buttons)
   }
 
-  private static async launchPlaywright(buttons: Buttons, context: vscode.ExtensionContext) {
+  private static async launchPlaywright(buttons: Buttons) {
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     const playwright = await import('playwright-core')
     const args = ['--window-size=500,500', '--disable-web-security']
@@ -60,8 +62,6 @@ export default class Lmptm {
       executablePath: String(cPath)
     }).then(async (theB: PlaywrightBrowser) => {
       buttons.setStatusButtonText('Running $(browser)')
-      Lmptm.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
-      Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
       const contextPW = await theB.newContext()
       const defaultPages = await contextPW.pages()
       if (defaultPages.length > 0) await defaultPages[0].close()
@@ -78,7 +78,7 @@ export default class Lmptm {
     })
   }
 
-  private static async launchPuppeteer(buttons: Buttons, context: vscode.ExtensionContext) {
+  private static async launchPuppeteer(buttons: Buttons) {
     const puppeteer = await import('puppeteer-core')
     const args = ['--window-size=500,500']
     const iArgs = ['--disable-extensions'] // enable extension
@@ -102,7 +102,7 @@ export default class Lmptm {
 
     const incognitoMode = vscode.workspace.getConfiguration().get('lmptm.incognitoMode') as boolean
     if (incognitoMode) args.push('--incognito')
-
+    // args.push('--disable-blink-features=AutomationControlled', '--disable-web-security')
     Lmptm.launched = true
     puppeteer.launch({
       args,
@@ -112,8 +112,6 @@ export default class Lmptm {
       ignoreDefaultArgs: iArgs
     }).then(async (theB: PuppeteerBrowser) => {
       buttons.setStatusButtonText('Running $(browser)')
-      Lmptm.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
-      Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
       Lmptm.activeBrowser = new PptBrowser(theB, buttons, incognitoMode)
       vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
       TreeviewProvider.refresh()

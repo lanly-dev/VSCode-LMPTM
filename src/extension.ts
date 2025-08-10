@@ -30,7 +30,7 @@ function click(selection: Entry) {
 }
 
 function openSettings() {
-  commands.executeCommand(`workbench.action.openSettings`, `@ext:lanly-dev.letmeplaythemusic`)
+  commands.executeCommand(`workbench.action.openSettings`, `lmptm`)
 }
 
 async function checkCustomContext() {
