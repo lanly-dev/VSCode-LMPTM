@@ -49,33 +49,55 @@ export default class Lmptm {
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     const playwright = await import('playwright-core')
     const args = ['--window-size=500,500', '--disable-web-security']
+
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
     if (!cPath) {
       vscode.window.showInformationMessage('No browser path specified for Playwright.')
       return
     }
 
-    Lmptm.launched = true
-    playwright.chromium.launch({
+    let uddir
+    if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
+      uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
+      if (!uddir) {
+        vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
+        return
+      }
+    }
+
+    const opts = {
       args,
       headless: false,
       executablePath: String(cPath)
-    }).then(async (theB: PlaywrightBrowser) => {
+    }
+
+    let contextPW
+    let theB
+    let isPersistent = false
+
+    try {
+      if (uddir) {
+        // Launch persistent context with user data directory, can't make multiple tabs
+        contextPW = await playwright.chromium.launchPersistentContext(String(uddir), opts)
+        theB = contextPW.browser()
+        isPersistent = true
+      } else {
+        theB = await playwright.chromium.launch(opts)
+        contextPW = await theB.newContext()
+      }
+      Lmptm.launched = true
       buttons.setStatusButtonText('Running $(browser)')
-      const contextPW = await theB.newContext()
-      const defaultPages = await contextPW.pages()
-      if (defaultPages.length > 0) await defaultPages[0].close()
       const PwrBrowser = (await import('./browser/pwrBrowser')).default
-      Lmptm.activeBrowser = new PwrBrowser(theB, buttons, contextPW)
+      Lmptm.activeBrowser = new PwrBrowser(theB!, buttons, contextPW, isPersistent)
       vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
       TreeviewProvider.refresh()
       // Lmptm.activeBrowser.closeBrowser()
-    }, (error: { message: string }) => {
+    } catch (error: any) {
       vscode.window.showErrorMessage(error.message)
       vscode.window.showInformationMessage('Playwright browser launch failed. 😲')
       vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
       Lmptm.launched = false
-    })
+    }
   }
 
   private static async launchPuppeteer(buttons: Buttons) {
@@ -85,11 +107,11 @@ export default class Lmptm {
 
     if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
       const uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
-      if (uddir) args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')}`)
-      else {
+      if (!uddir) {
         vscode.window.showInformationMessage('Please specify the user data directory or disable user data setting!')
         return
       }
+      args.push(`--user-data-dir=${uddir}`)
     }
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')

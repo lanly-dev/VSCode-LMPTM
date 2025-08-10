@@ -16,7 +16,7 @@ export default class PwrBrowser extends Browser {
   private selectedPage: playwright.Page | undefined
   private playbackChanging: Promise<void> | undefined
 
-  constructor(browser: playwright.Browser, buttons: Buttons, context: playwright.BrowserContext) {
+  constructor(browser: playwright.Browser, buttons: Buttons, context: playwright.BrowserContext, isPersistent: boolean) {
     super()
     this.buttons = buttons
     this.currentBrowser = browser
@@ -35,7 +35,7 @@ export default class PwrBrowser extends Browser {
       vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
       Lmptm.launched = false
     })
-    this.launchPages()
+    this.launchPages(isPersistent)
   }
 
   async playPause() {
@@ -149,19 +149,19 @@ export default class PwrBrowser extends Browser {
 
   // ↓↓↓↓ Private methods ↓↓↓↓
 
-  private async launchPages() {
+  private async launchPages(isPersistent: boolean) {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
-    if (links && links.length) {
+    if (!links || !links.length) return
+    if (isPersistent) {
+      const pages = this.context.pages()
+      pages[0].goto(links[0])
+    } else {
       for (const e of links) {
-        const pg = await this.newPage()
+        const pg = await this.context.newPage()
         await pg.goto(e)
       }
     }
     TreeviewProvider.refresh()
-  }
-
-  private async newPage() {
-    return this.context.newPage()
   }
 
   private resetFloatButton() {
