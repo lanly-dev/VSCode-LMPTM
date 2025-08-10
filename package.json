@@ -101,9 +101,9 @@
           "lmptm.startPages": {
             "type": "array",
             "default": [
-              "https://soundcloud.com",
               "https://www.youtube.com/trending",
               "https://open.spotify.com",
+              "https://soundcloud.com",
               "https://music.youtube.com"
             ],
             "description": "Starting tabs."

@@ -82,6 +82,7 @@ export default class Lmptm {
     const puppeteer = await import('puppeteer-core')
     const args = ['--window-size=500,500']
     const iArgs = ['--disable-extensions'] // enable extension
+
     if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
       const uddir = vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')
       if (uddir) args.push(`--user-data-dir=${vscode.workspace.getConfiguration().get('lmptm.userDataDirectory')}`)
@@ -99,6 +100,9 @@ export default class Lmptm {
       return
     }
 
+    const incognitoMode = vscode.workspace.getConfiguration().get('lmptm.incognitoMode') as boolean
+    if (incognitoMode) args.push('--incognito')
+
     Lmptm.launched = true
     puppeteer.launch({
       args,
@@ -110,9 +114,7 @@ export default class Lmptm {
       buttons.setStatusButtonText('Running $(browser)')
       Lmptm.cssPath = path.join(context.extensionPath, 'dist', 'inject', 'style.css')
       Lmptm.jsPath = path.join(context.extensionPath, 'dist', 'inject', 'script.js')
-      const defaultPages = await theB.pages()
-      defaultPages[0].close() // evaluateOnNewDocument won't be on this page
-      Lmptm.activeBrowser = new PptBrowser(theB, buttons)
+      Lmptm.activeBrowser = new PptBrowser(theB, buttons, incognitoMode)
       vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
       TreeviewProvider.refresh()
     }, (error: { message: string }) => {

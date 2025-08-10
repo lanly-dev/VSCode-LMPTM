@@ -12,14 +12,16 @@ export default class PptBrowser extends Browser {
   private buttons: Buttons
   private currentBrowser: puppeteer.Browser
   private pagesStatus: Entry[]
+  private isIncognitoMode: boolean
   private selectedMusicBrand: string | undefined
   private selectedPage: puppeteer.Page | undefined
 
-  constructor(browser: puppeteer.Browser, buttons: Buttons) {
+  constructor(browser: puppeteer.Browser, buttons: Buttons, isIncognitoMode: boolean) {
     super()
     this.buttons = buttons
     this.currentBrowser = browser
     this.pagesStatus = []
+    this.isIncognitoMode = isIncognitoMode
     this.currentBrowser.on('targetcreated', async (target: puppeteer.Target) =>
       this.update('page_created', await target.page()))
     this.currentBrowser.on('targetchanged', async (target: puppeteer.Target) =>
@@ -35,7 +37,7 @@ export default class PptBrowser extends Browser {
       // console.debug('CLOSE')
     })
     // this.currentBrowser.process().once('close', () => console.debug('CLOSE!!!!!!!!'))
-    this.launchPages()
+    this.setupInitPages()
   }
 
   // Toggle
@@ -148,8 +150,22 @@ export default class PptBrowser extends Browser {
 
   // ↓↓↓↓ Private methods ↓↓↓↓
 
-  private async launchPages() {
+  private async setupInitPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
+    const pages = await this.currentBrowser.pages()
+    // 1st page won't trigger page_created event
+    await this.update('page_created', pages[0])
+    if (!links || !links.length) return
+    await pages[0].goto(links[0])
+    // Can't create new page in incognito mode due to puppeteer bug/limitation?
+    if (!this.isIncognitoMode) {
+      links.shift()
+      if (!links.length) return
+      this.launchPages(links)
+    }
+  }
+
+  private async launchPages(links: string[]) {
     if (links && links.length) {
       const p: Promise<unknown>[] = []
       links.forEach(async (e: string) => {
@@ -274,7 +290,6 @@ export default class PptBrowser extends Browser {
   private async pageCreated(page: puppeteer.Page) {
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
-    // console.debug('pageCreated: ${pageURL} - ${brand}')
     this.bypassCSP(brand, page)
 
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
@@ -306,11 +321,11 @@ export default class PptBrowser extends Browser {
     })
 
     // @ts-ignore
-    if (!page._pageBindings.has('pageSelected'))
+    if (!page._pageBindings?.has('pageSelected'))
       page.exposeFunction('pageSelected', () => this.update('page_selected:button', page))
 
     // @ts-ignore
-    if (!page._pageBindings.has('playbackChanged'))
+    if (!page._pageBindings?.has('playbackChanged'))
       page.exposeFunction('playbackChanged', (state: string) => this.update(`playback_changed:${state}`, page))
 
   }
