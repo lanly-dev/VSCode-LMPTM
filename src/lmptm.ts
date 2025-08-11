@@ -1,7 +1,6 @@
 import * as path from 'path'
 import * as vscode from 'vscode'
 import type { Browser as PuppeteerBrowser } from 'puppeteer-core'
-import type { Browser as PlaywrightBrowser } from 'playwright-core'
 
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
@@ -49,11 +48,14 @@ export default class Lmptm {
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     const playwright = await import('playwright-core')
     // persistent context doesn't honor --disable-web-security?
-    const args = ['--window-size=500,500']
+    // playwright doesn't honor --window-size
+    const args = ['--window-size=500,500', '--disable-blink-features=AutomationControlled']
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
+    if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+
     if (!cPath) {
-      vscode.window.showInformationMessage('No browser path specified for Playwright.')
+      vscode.window.showInformationMessage('No Chromium or Chrome browser found. 🤔')
       return
     }
 
@@ -103,7 +105,7 @@ export default class Lmptm {
 
   private static async launchPuppeteer(buttons: Buttons) {
     const puppeteer = await import('puppeteer-core')
-    const args = ['--window-size=500,500']
+    const args = ['--disable-blink-features=AutomationControlled']
     const iArgs = ['--disable-extensions'] // enable extension
 
     if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
@@ -124,8 +126,8 @@ export default class Lmptm {
     }
 
     const incognitoMode = vscode.workspace.getConfiguration().get('lmptm.incognitoMode') as boolean
+    // Edge doesn't work with incognito mode
     if (incognitoMode) args.push('--incognito')
-    // args.push('--disable-blink-features=AutomationControlled', '--disable-web-security')
     Lmptm.launched = true
     puppeteer.launch({
       args,

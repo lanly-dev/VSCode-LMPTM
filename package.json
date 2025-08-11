@@ -93,6 +93,15 @@
             "default": null,
             "description": "Specify custom browser executable file path."
           },
+            "lmptm.framework": {
+            "type": "string",
+            "enum": [
+              "puppeteer",
+              "playwright"
+            ],
+            "default": "puppeteer",
+            "description": "Select the browser automation framework to use"
+          },
           "lmptm.incognitoMode": {
             "type": "boolean",
             "default": true,
@@ -116,15 +125,6 @@
           "lmptm.userDataDirectory": {
             "type": "string",
             "markdownDescription": "Specify [--user-data-dir](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md), this will be ignored if '**User Data**' setting is unchecked."
-          },
-          "lmptm.framework": {
-            "type": "string",
-            "enum": [
-              "puppeteer",
-              "playwright"
-            ],
-            "default": "puppeteer",
-            "description": "Select the browser automation framework to use"
           }
         }
       }
