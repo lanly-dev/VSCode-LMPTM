@@ -10,11 +10,39 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - https://www.conventionalcommits.org
 
 ### TODO
-- Playwright vs Puppeteer option
+- Add firefox support
+- Add media player webview, associated with media playback
 - Proxy feature?
-- Seek backward/forward setting option
+- Publish to Open VSX Registry
 - Shelljs vs Execa
 - Support for other sites
+
+## [3.1.0] - August 2025
+- Big update – Playwright is now supported!
+- Turned off the webdriver flag, so logging into YouTube and Gmail should work
+- Lots of small fixes: Spotify play status, infinite loop from CSP bypass, and some UI bugs and typos .etc
+- Updated puppeteer-core to the latest version (incognito mode was no longer work)
+- Treeview items now have colors
+
+### Issues/limitations
+- This version only dev/tested Windows 11
+- Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and it doesn’t work with Edge
+- Playwright with *User Data Directory* (aka *persistent context*) also only launch with 1 tab; need manually to add new tab, but the new tabs may or may not register correctly (event doesn't fire mostly, bug?), and noted that the initial tab won't work correctly - no pick button. You either launch a new page from the initial page's link or duplicate it to see the pick button show up
+- SoundCloud no longer lets users listen without logging in; Puppeteer has trouble with this due to COR error, but and disable web security doesn't help since it removed origin from requests - SoundCould doesn't like that, but you can switch to Playwright to log in (you would stay logged in by using user profile)
+
+### Notes
+- The TODO - Seek backward/forward setting option <-- totally forgot what this one is about
+- Persistent Context in Playwright: when you launch without a user profile/*User Data Directory*
+Incognito mode is for Puppeteer only; it can only create one tab programmatically. Coincidentally, Playwright's persistent context also restricts to one tab only
+- It seems like Playwright refers to launching the browser without *User Data Directory* as Incognito/InPrivate mode, which kind of makes sense except it doesn't have the dark theme associated with it
+- Puppeteer follows the same direction for incognito mode, although it still has the --incognito flag, which actually enables the dark theme for incognito mode. However, you can't create new tabs within the same window programmatically
+- Stopped looking into playwright/ppt-extra modules since those are all inactive
+
+### Links
+- https://github.com/puppeteer/puppeteer/issues/12005
+- https://peter.sh/experiments/chromium-command-line-switches
+- https://playwright.dev/docs/puppeteer#cheat-sheet
+
 
 ## [3.0.0] - November 2024
 - Fix the [bug](https://github.com/lanly-dev/VSCode-LMPTM/blob/4018c50331d881bb7ec7f1e22e60967042b7ad07/src/browser.ts#L423) for CSP

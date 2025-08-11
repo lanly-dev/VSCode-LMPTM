@@ -49,7 +49,6 @@ export default class Lmptm {
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     const playwright = await import('playwright-core')
     // persistent context doesn't honor --disable-web-security?
-    // playwright doesn't honor --window-size
     const args = ['--window-size=500,500', '--disable-blink-features=AutomationControlled']
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
@@ -87,7 +86,8 @@ export default class Lmptm {
         isPersistent = true
       } else {
         theB = await playwright.chromium.launch(opts)
-        contextPW = await theB.newContext()
+        // viewport: null to disable Playwright's default viewport override
+        contextPW = await theB.newContext({ viewport: null })
       }
       Lmptm.activeBrowser = new PwrBrowser(theB!, buttons, contextPW, isPersistent)
       this.launchSuccess(buttons)
@@ -99,7 +99,7 @@ export default class Lmptm {
 
   private static async launchPuppeteer(buttons: Buttons) {
     const puppeteer = await import('puppeteer-core')
-    const args = ['--disable-blink-features=AutomationControlled']
+    const args = ['--window-size=500,500', '--disable-blink-features=AutomationControlled']
     const iArgs = ['--disable-extensions'] // enable extension
 
     if (vscode.workspace.getConfiguration().get('lmptm.userData')) {
