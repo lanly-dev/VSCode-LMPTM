@@ -35,7 +35,7 @@ if (document.readyState === 'loading') {
 }
 
 // Duplicate tabs solution
-// TODO: need note
+// Make the selected tab stayed selected, if duplicated --> load > unload then it won't be selected
 let clear = false
 let loadCount = sessionStorage.getItem(`load`)
 loadCount === null ? (loadCount = 0) : loadCount++

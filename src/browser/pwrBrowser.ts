@@ -221,10 +221,11 @@ export default class PwrBrowser extends Browser {
 
   // Maybe separate one for page and one for pageId
   private async update(event: string, page: playwright.Page | null, pageId?: string) {
-    console.debug('$$$$$$$$$', event, page, pageId)
-    console.debug(this.context.pages())
-    console.debug(this.context.backgroundPages())
-    console.debug(this.currentBrowser.contexts())
+    // Was trying to make sense of persistent context
+    // console.debug('$$$$$$$$$', event, page, pageId)
+    // console.debug(this.context.pages())
+    // console.debug(this.context.backgroundPages())
+    // console.debug(this.currentBrowser.contexts())
     if (!page && !pageId) return
 
     let eventTail
@@ -276,9 +277,7 @@ export default class PwrBrowser extends Browser {
       if (e.pwrPage !== page) return
       arr.splice(i, 1)
     })
-    console.log(this.currentBrowser.isConnected())
-    console.log(this.currentBrowser.contexts().length)
-    console.log(this.context.pages().length)
+
     // If no pages left, close the browser - playwright doesn't close the browser when user manually closes all tabs
     if (this.context.pages().length === 0) {
       this.buttons.setStatusButtonText('Closing $(Chrome)')
@@ -294,7 +293,7 @@ export default class PwrBrowser extends Browser {
   }
 
   private async pageCreated(page: playwright.Page) {
-    console.log('PAGE CREATED')
+    // console.log('PAGE CREATED')
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
 
