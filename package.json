@@ -13,7 +13,11 @@
     "ui"
   ],
   "categories": [
-    "Other"
+    "Other",
+    "Music",
+    "Browser",
+    "Productivity",
+    "Utilities"
   ],
   "keywords": [
     "Browser",
@@ -93,7 +97,7 @@
             "default": null,
             "description": "Specify custom browser executable file path."
           },
-            "lmptm.framework": {
+          "lmptm.framework": {
             "type": "string",
             "enum": [
               "puppeteer",

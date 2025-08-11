@@ -1,4 +1,4 @@
-# LetMePlayTheMusic [🔗](https://marketplace.visualstudio.com/items?itemName=lanly-dev.letmeplaythemusic)
+# LetMePlayTheMusic
 
 Are you tired or annoyed from switching windows in order to pause or skip a song?\
 Doesn't want to or lazy to install the extra official players to the system?\
@@ -22,17 +22,19 @@ Supports SoundCloud, Spotify, YouTube, and YouTube Music
 - [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) is disabled for Spotify, Youtube, and Youtube Music
 
 ## Extension Settings
-* `lmptm.browserPath`: Specify custom browser executable file path.
-* `lmptm.incognitoMode`: Specify whether to launch the browser in incognito/private mode.
-* `lmptm.startPages`: Starting tabs.
-* `lmptm.userData`: Specify if the extension could store the browser's user data; if enabled, a user-data directory setting is required.
-* `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md). This setting will be ignored if **User Data** setting is unchecked.
-
-## Known Issues
-- Does not work with Opera browser
-- Won't be able to log into YouTube and SoundCloud(email method)
+* `lmptm.browserPath`: Specify custom browser executable file path
+* `lmptm.framework`: Pick either Puppeteer vs Playwright
+* `lmptm.incognitoMode`: Specify whether to launch the browser in incognito/private mode - for Puppeteer only
+* `lmptm.startPages`: Starting tabs
+* `lmptm.userData`: Specify if the extension could store the browser's user data; if enabled, a user-data directory setting is required
+* `lmptm.userDataDirectory`: Specify [user data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md). This setting will be ignored if **User Data** setting is unchecked
 
 ## Release Notes
+
+### 3.1.0
+- Add Playwright
+- Improve treeview with color
+- Bugfixes
 
 ### 3.0.0
 - Fix CSP, apply only for Youtube/YTmusic and Spotify

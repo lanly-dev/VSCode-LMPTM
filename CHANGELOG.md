@@ -10,7 +10,8 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - https://www.conventionalcommits.org
 
 ### TODO
-- Add firefox support
+- Add Crawlee and [Hero](https://github.com/ulixee/hero)
+- Add Firefox support
 - Add media player webview, associated with media playback
 - Proxy feature?
 - Publish to Open VSX Registry
@@ -18,7 +19,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Support for other sites
 
 ## [3.1.0] - August 2025
-- Big update – Playwright is now supported!
+- **Playwright is now supported!**
 - Turned off the webdriver flag, so logging into YouTube and Gmail should work
 - Lots of small fixes: Spotify play status, infinite loop from CSP bypass, and some UI bugs and typos .etc
 - Updated puppeteer-core to the latest version (incognito mode was no longer work)
@@ -26,7 +27,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 
 ### Issues/limitations
 - This version only dev/tested Windows 11
-- Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and it doesn’t work with Edge
+- Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and it doesn't work with Edge
 - Playwright with *User Data Directory* (aka *persistent context*) also only launch with 1 tab; need manually to add new tab, but the new tabs may or may not register correctly (event doesn't fire mostly, bug?), and noted that the initial tab won't work correctly - no pick button. You either launch a new page from the initial page's link or duplicate it to see the pick button show up
 - SoundCloud no longer lets users listen without logging in; Puppeteer has trouble with this due to COR error, but and disable web security doesn't help since it removed origin from requests - SoundCould doesn't like that, but you can switch to Playwright to log in (you would stay logged in by using user profile)
 
@@ -53,7 +54,7 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 - Optimize SVGs again using [svgo](https://svgo.dev)
 - Refer image from documentation to GitHub link to reduce extension size
 - Remove setting for Brave browser
-- Update logo<br>
+- **Update logo**<br>
   <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/main/media/vscodeignore/lmptm.png?raw=true' width='50' title='lmptm'/>
   <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/main/media/lmptm2.png?raw=true' width='55' title='lmptm2'/>
 
