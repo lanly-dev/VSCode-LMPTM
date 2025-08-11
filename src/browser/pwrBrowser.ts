@@ -15,6 +15,7 @@ export default class PwrBrowser extends Browser {
   private selectedMusicBrand: string | undefined
   private selectedPage: playwright.Page | undefined
   private playbackChanging: Promise<void> | undefined
+  private isPersistent: boolean
 
   constructor(browser: playwright.Browser, buttons: Buttons, context: playwright.BrowserContext, isPersistent: boolean) {
     super()
@@ -22,7 +23,10 @@ export default class PwrBrowser extends Browser {
     this.currentBrowser = browser
     this.pagesStatus = []
     this.context = context
+    this.isPersistent = isPersistent
     this.context.on('page', (page: playwright.Page) => this.update('page_created', page))
+    // For persistent context - no reliable
+    this.context.on('backgroundpage', (page: playwright.Page) => this.update('page_created', page))
     this.context.addInitScript({ path: Lmptm.jsPath })
     this.context.exposeFunction('pageSelected', (pageId: string) => this.update('page_selected:button', null, pageId))
     this.context.exposeFunction('playbackChanged', (pageId: string, state: string) => this.update(`playback_changed:${state}`, null, pageId))
@@ -35,7 +39,7 @@ export default class PwrBrowser extends Browser {
       vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
       Lmptm.launched = false
     })
-    this.launchPages(isPersistent)
+    this.setupInitPages()
   }
 
   async playPause() {
@@ -149,18 +153,27 @@ export default class PwrBrowser extends Browser {
 
   // ↓↓↓↓ Private methods ↓↓↓↓
 
-  private async launchPages(isPersistent: boolean) {
+  private async setupInitPages() {
     const links: string[] | undefined = vscode.workspace.getConfiguration().get('lmptm.startPages')
     if (!links || !links.length) return
-    if (isPersistent) {
-      const pages = this.context.pages()
-      pages[0].goto(links[0])
-    } else {
-      for (const e of links) {
-        const pg = await this.context.newPage()
-        await pg.goto(e)
-      }
+    const pages = await this.context.pages()
+    if (this.isPersistent) {
+      // 1st page won't trigger page_created event
+      await this.update('page_created', pages[0])
+      await pages[0].goto(links[0])
+      TreeviewProvider.refresh()
+      return
     }
+    this.launchPages(links)
+  }
+
+  private async launchPages(links: string[]) {
+    const p = []
+    for (const e of links) {
+      const pg = await this.context.newPage()
+      p.push(pg.goto(e))
+    }
+    await Promise.all(p)
     TreeviewProvider.refresh()
   }
 
@@ -209,6 +222,9 @@ export default class PwrBrowser extends Browser {
   // Maybe separate one for page and one for pageId
   private async update(event: string, page: playwright.Page | null, pageId?: string) {
     console.debug('$$$$$$$$$', event, page, pageId)
+    console.debug(this.context.pages())
+    console.debug(this.context.backgroundPages())
+    console.debug(this.currentBrowser.contexts())
     if (!page && !pageId) return
 
     let eventTail

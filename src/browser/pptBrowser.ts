@@ -162,18 +162,18 @@ export default class PptBrowser extends Browser {
       links.shift()
       if (!links.length) return
       this.launchPages(links)
+      return
     }
+    TreeviewProvider.refresh()
   }
 
   private async launchPages(links: string[]) {
     if (links && links.length) {
-      const p: Promise<unknown>[] = []
       links.forEach(async (e: string) => {
         const pg = await this.currentBrowser.newPage()
         await pg.setDefaultNavigationTimeout(0)
         await pg.goto(e)
       })
-      await Promise.all(p) // need to wait?
     }
     TreeviewProvider.refresh()
   }
