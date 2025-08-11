@@ -4,6 +4,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "playwright": "^1.54.2",
     "puppeteer": "^24.12.1"
   }
 }
