@@ -48,7 +48,8 @@ export default class Lmptm {
   private static async launchPlaywright(buttons: Buttons) {
     // Dynamically import playwright-core to avoid requiring it for Puppeteer users
     const playwright = await import('playwright-core')
-    const args = ['--window-size=500,500', '--disable-web-security']
+    // persistent context doesn't honor --disable-web-security?
+    const args = ['--window-size=500,500']
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
     if (!cPath) {

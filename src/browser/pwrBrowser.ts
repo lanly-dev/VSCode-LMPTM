@@ -297,7 +297,6 @@ export default class PwrBrowser extends Browser {
     console.log('PAGE CREATED')
     const pageURL = page.url()
     const brand = pageURL === 'about:blank' ? 'other' : this.musicBrandCheck(pageURL)
-    // await this.bypassCSP(brand, page)
 
     let title = pageURL === 'about:blank' ? pageURL : await page.title()
     if (title === '') title = 'New Tab'
@@ -314,8 +313,10 @@ export default class PwrBrowser extends Browser {
         (window as any).__LMPTM_PAGE_ID = id;
         (window as any).__LMPTM_FRAMEWORK = 'playwright'
       }, generatedId)
-      await page.mainFrame().addStyleTag({ path: Lmptm.cssPath })
-      await page.mainFrame().addScriptTag({ path: Lmptm.jsPath })
+
+      await page.addInitScript({ path: Lmptm.jsPath })
+      await page.addStyleTag({ path: Lmptm.cssPath })
+      await page.addScriptTag({ path: Lmptm.jsPath })
     })
 
     page.on('framenavigated', async () => this.update('page_changed', page))
