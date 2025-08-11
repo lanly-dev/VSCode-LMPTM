@@ -6,6 +6,7 @@ import Buttons from './buttons'
 import TreeviewProvider from './treeview'
 import WhichChrome from './whichChrome'
 import PptBrowser from './browser/pptBrowser'
+import PwrBrowser from './browser/pwrBrowser'
 import Browser from './browser/browser'
 
 export default class Lmptm {
@@ -88,18 +89,11 @@ export default class Lmptm {
         theB = await playwright.chromium.launch(opts)
         contextPW = await theB.newContext()
       }
-      Lmptm.launched = true
-      buttons.setStatusButtonText('Running $(browser)')
-      const PwrBrowser = (await import('./browser/pwrBrowser')).default
       Lmptm.activeBrowser = new PwrBrowser(theB!, buttons, contextPW, isPersistent)
-      vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
-      TreeviewProvider.refresh()
+      this.launchSuccess(buttons)
       // Lmptm.activeBrowser.closeBrowser()
     } catch (error: any) {
-      vscode.window.showErrorMessage(error.message)
-      vscode.window.showInformationMessage('Playwright browser launch failed. 😲')
-      vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
-      Lmptm.launched = false
+      this.launchFailed(error)
     }
   }
 
@@ -128,7 +122,6 @@ export default class Lmptm {
     const incognitoMode = vscode.workspace.getConfiguration().get('lmptm.incognitoMode') as boolean
     // Edge doesn't work with incognito mode
     if (incognitoMode) args.push('--incognito')
-    Lmptm.launched = true
     puppeteer.launch({
       args,
       defaultViewport: null,
@@ -136,15 +129,22 @@ export default class Lmptm {
       headless: false,
       ignoreDefaultArgs: iArgs
     }).then(async (theB: PuppeteerBrowser) => {
-      buttons.setStatusButtonText('Running $(browser)')
       Lmptm.activeBrowser = new PptBrowser(theB, buttons, incognitoMode)
-      vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
-      TreeviewProvider.refresh()
-    }, (error: { message: string }) => {
-      vscode.window.showErrorMessage(error.message)
-      vscode.window.showInformationMessage('Browser launch failed. 😲')
-      vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
-      Lmptm.launched = false
-    })
+      this.launchSuccess(buttons)
+    }, this.launchFailed)
+  }
+
+  private static launchSuccess(buttons: Buttons) {
+    Lmptm.launched = true
+    buttons.setStatusButtonText('Running $(browser)')
+    vscode.commands.executeCommand('setContext', 'lmptm.launched', true)
+    TreeviewProvider.refresh()
+  }
+
+  private static launchFailed(error: any) {
+    vscode.window.showErrorMessage(error.message)
+    vscode.window.showInformationMessage('Browser launch failed. 😲')
+    vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
+    Lmptm.launched = false
   }
 }
