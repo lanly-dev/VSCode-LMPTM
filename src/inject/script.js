@@ -11,8 +11,7 @@ const playButtonAttrs = {
   },
   spotify: {
     css: `button[data-testid="control-button-playpause"]`,
-    cssTitle: `div[data-testid="now-playing-widget"]`,
-    play: `M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z`
+    cssTitle: `div[data-testid="now-playing-widget"]`
   },
   youtube: { css: `.ytp-play-button` },
   ytmusic: { css: `#play-pause-button` }
@@ -165,8 +164,9 @@ function getPlaybackState(brand) {
   // spotify doesn't update the mediaSession.playbackState
   if (brand === `spotify`) {
     const { css, play } = playButtonAttrs.spotify
-    const d = document.querySelector(`${css} svg path:last-child`).getAttribute(`d`)
-    const state = d === play ? `paused` : `playing`
+    const btnElm = document.querySelector(css)
+    const s = btnElm.getAttribute('aria-label')
+    const state = s === 'Play' ? `paused` : `playing`
     return state
   } else {
     const state = navigator.mediaSession.playbackState
