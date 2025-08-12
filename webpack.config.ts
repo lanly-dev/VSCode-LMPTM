@@ -21,7 +21,7 @@ export default {
     vscode: `commonjs vscode`, // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: `commonjs bufferutil`, // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
     'utf-8-validate': `commonjs utf-8-validate`,
-    electron: `commonjs electron` // cause by Playwright
+    'playwright-core': `commonjs playwright-core`
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
@@ -44,7 +44,8 @@ export default {
     new CopyPlugin({
       patterns: [
         { from: `src/inject/script.js`, to: `inject` },
-        { from: `src/inject/style.css`, to: `inject` }
+        { from: `src/inject/style.css`, to: `inject` },
+        { from: 'node_modules/playwright-core', to: 'node_modules/playwright-core' }
       ]
     })
   ],

@@ -77,7 +77,8 @@ export default class Lmptm {
     let contextPW
     let theB
     let isPersistent = false
-
+    console.log(playwright)
+    console.log(playwright.chromium)
     try {
       if (uddir) {
         // Launch persistent context with user data directory, can't make multiple tabs
@@ -142,7 +143,7 @@ export default class Lmptm {
   }
 
   private static launchFailed(error: any) {
-    vscode.window.showErrorMessage(error.message)
+    vscode.window.showErrorMessage(error?.message)
     vscode.window.showInformationMessage('Browser launch failed. 😲')
     vscode.commands.executeCommand('setContext', 'lmptm.launched', false)
     Lmptm.launched = false
