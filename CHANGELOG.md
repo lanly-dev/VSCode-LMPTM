@@ -10,7 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - https://www.conventionalcommits.org
 
 ### TODO
-- Add Crawlee and [Hero](https://github.com/ulixee/hero)
+- Add Crawlee and [Hero](https://github.com/ulixee/hero) frameworks
 - Add Firefox support
 - Add media player webview, associated with media playback
 - Proxy feature?
@@ -25,15 +25,15 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Updated puppeteer-core to the latest version (incognito mode was no longer work)
 - Treeview items now have colors
 - webpack 5.101.0 compiled with 2 warnings in 12366 ms
-- 19 files, 1.4 MB, 1.102.0
+- 19 files, 1.41 MB, 1.103.0
   ```
   letmeplaythemusic-3.1.0.vsix
   ├─ [Content_Types].xml
   ├─ extension.vsixmanifest
   └─ extension/
     ├─ LICENSE.md [1.06 KB]
-    ├─ changelog.md [9.14 KB]
-    ├─ package.json [5.49 KB]
+    ├─ changelog.md [10.12 KB]
+    ├─ package.json [5.57 KB]
     ├─ package.nls.json [0.33 KB]
     ├─ package.nls.zh-cn.json [0.33 KB]
     ├─ package.nls.zh-tw.json [0.33 KB]
@@ -51,12 +51,13 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
     └─ media/
         ├─ icon.svg [0.91 KB]
         └─ lmptm2.png [37.15 KB]
+  The file extension/dist/extension.js is large (4.74 MB)
   ```
 
 ### Issues/limitations
-- This version only dev/tested Windows 11
-- Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and it doesn't work with Edge
-- Playwright with *User Data Directory* (aka *persistent context*) also only launch with 1 tab; need manually to add new tab, but the new tabs may or may not register correctly (event doesn't fire mostly, bug?), and noted that the initial tab won't work correctly - no pick button. You either launch a new page from the initial page's link or duplicate it to see the pick button show up
+- This version <ins>only dev/tested Windows 11</ins>
+- Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and <ins>it doesn't work with Edge</ins>
+- Playwright with *User Data Directory* (aka *persistent context*) also only launch with 1 tab; need manually to add new tab, but the new tabs may or may not register correctly (event doesn't fire mostly, bug?), and noted that the <ins>initial tab won't work correctly - no pick button</ins>. You either launch a new page from the initial page's link or duplicate it to see the pick button show up
 - SoundCloud no longer lets users listen without logging in; Puppeteer has trouble with this due to COR error, but and disable web security doesn't help since it removed origin from requests - SoundCould doesn't like that, but you can switch to Playwright to log in (you would stay logged in by using user profile)
 
 ### Notes
@@ -64,7 +65,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Persistent Context in Playwright: when you launch without a user profile/*User Data Directory*
 Incognito mode is for Puppeteer only; it can only create one tab programmatically. Coincidentally, Playwright's persistent context also restricts to one tab only
 - It seems like Playwright refers to launching the browser without *User Data Directory* as Incognito/InPrivate mode, which kind of makes sense except it doesn't have the dark theme associated with it
-- Puppeteer follows the same direction for incognito mode, although it still has the --incognito flag, which actually enables the dark theme for incognito mode. However, you can't create new tabs within the same window programmatically
+- Puppeteer follows the same direction for incognito mode, although it still has the `--incognito` flag, which actually enables the dark theme for incognito mode. However, you can't create new tabs within the same window programmatically
 - Stopped looking into playwright/ppt-extra modules since those are all inactive
 
 ### Links
@@ -103,7 +104,7 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 ### Notes
 - Chrome team added the [Trusted Types to YouTube](https://developer.chrome.com/blog/trusted-types-on-youtube) - thanks [Matthew](https://github.com/mattzgg) for the info
 - There is probably a proper way to comply with the new security requirement but yeah, one shortcut is just to bypass it by disabling the [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
-- It seems like the webpack (in old project/machine) that used to publish this extension doesn't combine files, another package stats:
+- It seems like the webpack in old project/machine that used to publish this extension is no longer combining files, another package stats from the new machine:
   - webpack 5.94.0 compiled successfully in 3000 ms
   - 15 files, 1.4MB, 1.93.0
 

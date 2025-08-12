@@ -21,6 +21,7 @@
     "testid",
     "treeview",
     "uddir",
+    "vsixmanifest",
     "ytmusic"
   ],
   "cSpell.ignorePaths": [
