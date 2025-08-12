@@ -7,7 +7,7 @@
   "author": "lanly",
   "publisher": "lanly-dev",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.102.0"
   },
   "extensionKind": [
     "ui"
@@ -175,12 +175,13 @@
     "@types/puppeteer-core": "^7.0.4",
     "@types/shelljs": "^0.8.17",
     "@types/vscode": "^1.102.0",
-    "@typescript-eslint/eslint-plugin": "^8.39.0",
-    "@typescript-eslint/parser": "^8.39.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
     "@vscode/vsce": "^3.6.0",
     "copy-webpack-plugin": "^13.0.0",
     "css-minimizer-webpack-plugin": "^7.0.2",
     "eslint": "^9.33.0",
+    "ignore-loader": "^0.1.2",
     "shelljs": "^0.10.0",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
@@ -191,7 +192,7 @@
   "dependencies": {
     "karma-chrome-launcher": "^3.2.0",
     "playwright-core": "^1.54.2",
-    "puppeteer-core": "^24.16.0"
+    "puppeteer-core": "^24.16.1"
   },
   "repository": {
     "type": "git",

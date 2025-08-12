@@ -20,11 +20,12 @@ export default {
   externals: {
     vscode: `commonjs vscode`, // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: `commonjs bufferutil`, // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
-    'utf-8-validate': `commonjs utf-8-validate`
+    'utf-8-validate': `commonjs utf-8-validate`,
+    electron: `commonjs electron` // cause by Playwright
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: [`.ts`, `.js`, `css`]
+    extensions: [`.ts`, `.js`, `.css`]
   },
   module: {
     rules: [
@@ -32,6 +33,10 @@ export default {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [{ loader: `ts-loader` }]
+      },
+      { // from Playwright
+        test: /\.(svg|png|html|ttf|css)$/i,
+        use: 'ignore-loader'
       }
     ]
   },

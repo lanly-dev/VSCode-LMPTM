@@ -24,6 +24,34 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Lots of small fixes: Spotify play status, infinite loop from CSP bypass, and some UI bugs and typos .etc
 - Updated puppeteer-core to the latest version (incognito mode was no longer work)
 - Treeview items now have colors
+- webpack 5.101.0 compiled with 2 warnings in 12366 ms
+- 19 files, 1.4 MB, 1.102.0
+  ```
+  letmeplaythemusic-3.1.0.vsix
+  ├─ [Content_Types].xml
+  ├─ extension.vsixmanifest
+  └─ extension/
+    ├─ LICENSE.md [1.06 KB]
+    ├─ changelog.md [9.14 KB]
+    ├─ package.json [5.49 KB]
+    ├─ package.nls.json [0.33 KB]
+    ├─ package.nls.zh-cn.json [0.33 KB]
+    ├─ package.nls.zh-tw.json [0.33 KB]
+    ├─ readme.md [3.31 KB]
+    ├─ dist/
+    │  ├─ 1.extension.js [27.89 KB]
+    │  ├─ 2.extension.js [42.8 KB]
+    │  ├─ 3.extension.js [61.52 KB]
+    │  ├─ 4.extension.js [25.7 KB]
+    │  ├─ 5.extension.js [0.28 KB]
+    │  ├─ extension.js [4.74 MB]
+    │  └─ inject/
+    │     ├─ script.js [4.48 KB]
+    │     └─ style.css [4.61 KB]
+    └─ media/
+        ├─ icon.svg [0.91 KB]
+        └─ lmptm2.png [37.15 KB]
+  ```
 
 ### Issues/limitations
 - This version only dev/tested Windows 11
@@ -57,6 +85,8 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 - **Update logo**<br>
   <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/main/media/vscodeignore/lmptm.png?raw=true' width='50' title='lmptm'/>
   <img src='https://github.com/lanly-dev/VSCode-LMPTM/blob/main/media/lmptm2.png?raw=true' width='55' title='lmptm2'/>
+- webpack 5.96.1 compiled successfully in 17898 ms
+- 14 files, 243.83 KB, 1.95.0
 
 ### Notes
 - I18n isn't necessary
@@ -64,8 +94,6 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 - ~~esbuild appears to be faster; however, after using webpack, it gave out errors every time the project was updated, and it was time-consuming to correct them --> this project doesn't use a bundler anymore~~ Have to bundle dependencies and esbuild doesn't support it --> back to webpack since *node_modules* is huge
 - The logo has been changed for consistency with its menu vector
 - Not sure if the Brave setting is still relevant
-- webpack 5.96.1 compiled successfully in 17898 ms
-- 14 files, 243.83 KB, 1.95.0
 
 ## [2.2.0] - September 2024
 - Youtube CSP bypass [#15](https://github.com/lanly-dev/VSCode-LMPTM/issues/15)
@@ -106,8 +134,7 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 - Webpack 5.65.0 compiled successfully in 9980 ms
 - 15 files, 1.39MB, 1.63.0
 
-### Note
-
+### Notes
 - This release mostly has a more significant impact on the dev side rather than a product update.
 - One funny thing is that the picture in README.md accounts for a large part of this extension's size.
 
