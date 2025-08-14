@@ -1,7 +1,5 @@
 # Change Log
-
-All notable changes to the "LetMePlayTheMusic" extension will be documented in this file.
-
+All notable changes to the "LetMePlayTheMusic" extension will be documented in this file.\
 Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how to structure this file.
 
 ### References
@@ -24,41 +22,42 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Lots of small fixes: Spotify play status, infinite loop from CSP bypass, and some UI bugs and typos .etc
 - Updated puppeteer-core to the latest version (incognito mode was no longer work)
 - Treeview items now have colors
-- webpack 5.101.0 compiled with 2 warnings in 12366 ms
-- 19 files, 1.41 MB, 1.103.0
+- webpack 5.101.0 compiled with 2 warnings in 10275 ms
+- 352 files, 2.34 MB, 1.103.0
   ```
   letmeplaythemusic-3.1.0.vsix
   ├─ [Content_Types].xml
   ├─ extension.vsixmanifest
   └─ extension/
     ├─ LICENSE.md [1.06 KB]
-    ├─ changelog.md [10.12 KB]
-    ├─ package.json [5.57 KB]
+    ├─ changelog.md [10.41 KB]
+    ├─ package.json [5.56 KB]
     ├─ package.nls.json [0.33 KB]
     ├─ package.nls.zh-cn.json [0.33 KB]
     ├─ package.nls.zh-tw.json [0.33 KB]
     ├─ readme.md [3.31 KB]
     ├─ dist/
-    │  ├─ 1.extension.js [27.89 KB]
+    │  ├─ 1.extension.js [27.9 KB]
     │  ├─ 2.extension.js [42.8 KB]
     │  ├─ 3.extension.js [61.52 KB]
-    │  ├─ 4.extension.js [25.7 KB]
+    │  ├─ 4.extension.js [25.71 KB]
     │  ├─ 5.extension.js [0.28 KB]
-    │  ├─ extension.js [4.74 MB]
-    │  └─ inject/
-    │     ├─ script.js [4.48 KB]
-    │     └─ style.css [4.61 KB]
+    │  ├─ extension.js [2.05 MB]
+    │  ├─ inject/
+    │  │  ├─ script.js [4.48 KB]
+    │  │  └─ style.css [4.61 KB]
+    │  └─ node_modules/
+    │     └─ playwright-core/ (333 files) [5.25 MB]
     └─ media/
         ├─ icon.svg [0.91 KB]
         └─ lmptm2.png [37.15 KB]
-  The file extension/dist/extension.js is large (4.74 MB)
   ```
 
 ### Issues/limitations
-- This version <ins>only dev/tested Windows 11</ins>
 - Puppeteer's incognito mode starts with just one tab; you have to add more tabs manually, and <ins>it doesn't work with Edge</ins>
 - Playwright with *User Data Directory* (aka *persistent context*) also only launch with 1 tab; need manually to add new tab, but the new tabs may or may not register correctly (event doesn't fire mostly, bug?), and noted that the <ins>initial tab won't work correctly - no pick button</ins>. You either launch a new page from the initial page's link or duplicate it to see the pick button show up
 - SoundCloud no longer lets users listen without logging in; Puppeteer has trouble with this due to COR error, but and disable web security doesn't help since it removed origin from requests - SoundCould doesn't like that, but you can switch to Playwright to log in (you would stay logged in by using user profile)
+- Ubuntu's Chromium at `/snap/bin/chromium` doesn't work - not sure why
 
 ### Notes
 - The TODO - Seek backward/forward setting option <-- totally forgot what this one is about
@@ -67,6 +66,7 @@ Incognito mode is for Puppeteer only; it can only create one tab programmaticall
 - It seems like Playwright refers to launching the browser without *User Data Directory* as Incognito/InPrivate mode, which kind of makes sense except it doesn't have the dark theme associated with it
 - Puppeteer follows the same direction for incognito mode, although it still has the `--incognito` flag, which actually enables the dark theme for incognito mode. However, you can't create new tabs within the same window programmatically
 - Stopped looking into playwright/ppt-extra modules since those are all inactive
+- Discovered that playwright-core cannot be bundled with webpack during publishing 😵, unlike puppeteer-core. As a result, the entire module must be copied, which increases the file count from 19 to 352 and the package size from 1.41MB to 2.34MB
 
 ### Links
 - https://github.com/puppeteer/puppeteer/issues/12005

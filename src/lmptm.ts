@@ -77,8 +77,7 @@ export default class Lmptm {
     let contextPW
     let theB
     let isPersistent = false
-    console.log(playwright)
-    console.log(playwright.chromium)
+
     try {
       if (uddir) {
         // Launch persistent context with user data directory, can't make multiple tabs

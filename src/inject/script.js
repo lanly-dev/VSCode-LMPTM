@@ -176,6 +176,7 @@ function getPlaybackState(brand) {
 }
 
 function verifyPage() {
+  // If brand is present === already selected
   const brand = sessionStorage.getItem(`lmptm`)
   const href = window.location.href
   if (!brand) return
