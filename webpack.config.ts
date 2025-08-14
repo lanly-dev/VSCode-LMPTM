@@ -21,7 +21,7 @@ export default {
     vscode: `commonjs vscode`, // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     bufferutil: `commonjs bufferutil`, // https://github.com/websockets/ws/issues/1220#issuecomment-433066790
     'utf-8-validate': `commonjs utf-8-validate`,
-    'playwright-core': `commonjs playwright-core`
+    'playwright-core': `commonjs playwright-core` // playwright-core can't be webpacked
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader

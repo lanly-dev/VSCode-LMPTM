@@ -4,7 +4,7 @@ import type { Browser as PuppeteerBrowser } from 'puppeteer-core'
 
 import Buttons from './buttons'
 import TreeviewProvider from './treeview'
-import WhichChrome from './whichChrome'
+import FindChrome from './findChrome'
 import PptBrowser from './browser/pptBrowser'
 import PwrBrowser from './browser/pwrBrowser'
 import Browser from './browser/browser'
@@ -52,7 +52,7 @@ export default class Lmptm {
     const args = ['--window-size=500,500', '--disable-blink-features=AutomationControlled']
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
-    if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+    if (!cPath) cPath = FindChrome.getPaths()
 
     if (!cPath) {
       vscode.window.showInformationMessage('No Chromium or Chrome browser found. 🤔')
@@ -113,7 +113,7 @@ export default class Lmptm {
     }
 
     let cPath = vscode.workspace.getConfiguration().get('lmptm.browserPath')
-    if (!cPath) cPath = WhichChrome.getPaths().Chrome || WhichChrome.getPaths().Chromium
+    if (!cPath) cPath = FindChrome.getPaths()
 
     if (!cPath) {
       vscode.window.showInformationMessage('No Chromium or Chrome browser found. 🤔')
