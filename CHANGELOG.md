@@ -22,7 +22,7 @@ Check [Keep a Changelog](http://keepachangelog.com) for recommendations on how t
 - Lots of small fixes: Spotify play status, infinite loop from CSP bypass, and some UI bugs and typos .etc
 - Updated puppeteer-core to the latest version (incognito mode was no longer work)
 - Treeview items now have colors
-- webpack 5.101.0 compiled with 2 warnings in 10275 ms
+- webpack 5.101.0 compiled successfully in 9866 ms
 - 352 files, 2.34 MB, 1.103.0
   ```
   letmeplaythemusic-3.1.0.vsix
